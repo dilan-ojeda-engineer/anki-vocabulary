@@ -1,0 +1,47 @@
+# Dependencies and build output
+node_modules/
+dist/
+out/
+release/
+coverage/
+*.tsbuildinfo
+
+# Credentials and local environment
+.env
+.env.*
+!.env.example
+!.env.*.example
+credentials*.json
+secrets/
+*.pem
+*.key
+
+# Personal application data, databases, and backups
+app-data/
+userdata/
+backups/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+
+# Downloaded voices and generated artifacts
+voices/
+models/
+generated/
+audio-cache/
+exports/
+*.onnx
+*.onnx.json
+*.mp3
+*.wav
+*.apkg
+*.colpkg
+
+# Logs and local OS files
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini
