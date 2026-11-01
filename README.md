@@ -2,10 +2,11 @@
 
 A planned Windows app that turns vocabulary and contextual sentences into reviewed Anki cards with audio.
 
-**Status:** Initial documentation, version 0.7, October 11, 2026. Application code has not been implemented. The project name is a working name.
+**Status:** AV-002 desktop foundation in progress, November 1, 2026. The Electron/React skeleton is implemented; vocabulary generation, speech, and Anki delivery remain unimplemented. The project name is a working name. Document version 0.7 is separate from application version `0.1.0-dev.0`.
 
 ## Start here
 
+- [Windows development setup, checks, and AV-002 evidence](docs/DEVELOPMENT.md)
 - [Project brief, requirements, architecture, and delivery plan](docs/PROJECT.md)
 - [Card specification and your original prompt](docs/CARD_SPEC.md)
 - [How AI generation works, TypeScript boundaries, and future custom profiles](docs/AI_GENERATION.md)
@@ -45,7 +46,7 @@ The core application will use **TypeScript, React, and Electron**. React builds 
 | Local audio | External Piper engine, invoked from TypeScript; current setup requires Python and a voice model |
 | Anki delivery | TypeScript AnkiConnect adapter for deck listing/direct delivery; ankipack with sql.js for package export, subject to compatibility tests |
 | Credential protection | Electron safeStorage using Windows-provided encryption |
-| Development quality | pnpm, ESLint, Prettier, Vitest, React Testing Library, Playwright |
+| Development quality | npm, ESLint, Prettier, Vitest, React Testing Library, Playwright |
 | Windows packaging | electron-builder |
 
 See the [architecture and stack rationale](docs/PROJECT.md#4-architecture-and-internal-interfaces) for boundaries, tradeoffs, and release checks. The application stack is a recommendation aligned with your TypeScript/JavaScript preference; packages and exact compatible versions will be validated and locked during the prototype.

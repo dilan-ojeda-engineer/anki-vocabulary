@@ -5,6 +5,9 @@ out/
 release/
 coverage/
 *.tsbuildinfo
+.tools/
+test-results/
+playwright-report/
 
 # Credentials and local environment
 .env

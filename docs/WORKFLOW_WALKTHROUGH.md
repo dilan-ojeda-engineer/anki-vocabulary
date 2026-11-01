@@ -185,7 +185,7 @@ The vocabulary app has finished this batch. It retains your approved note and ge
 | Tool | When we use it | Concrete value for this project |
 |---|---|---|
 | TypeScript compiler | Development and build checks | Catch incompatible fields/statuses before running the app; emits JavaScript |
-| pnpm and lockfile | Installing dependencies and running scripts | Reproduce the same compatible package versions |
+| npm and package-lock.json | Installing dependencies and running scripts | Reproduce the same compatible package versions |
 | Vite/electron-vite | Development and build | Refresh the interface during development and compile the separate Electron entry points |
 | ESLint | Code review and automated checks | Detect risky or inconsistent coding patterns |
 | Prettier | Source formatting | Keep code consistent and changes easy to review |

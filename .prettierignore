@@ -1,0 +1,14 @@
+node_modules/
+out/
+dist/
+release/
+.tools/
+package-lock.json
+.agents/skills/requesting-code-review/
+test-results/
+playwright-report/
+# Preserve the archived teaching prompt and existing planning artifacts.
+docs/
+AGENTS.md
+CONTRIBUTING.md
+README.md

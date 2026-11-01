@@ -3,7 +3,7 @@
 **Project:** Anki Vocabulary Studio (working name)  
 **Version:** 0.7  
 **Date:** October 11, 2026  
-**Status:** Initial draft for review; no application implementation yet.
+**Status:** Design draft for review. AV-002 desktop scaffolding is in progress; see [development setup and actual evidence](DEVELOPMENT.md). Feature integrations and release compatibility remain unverified.
 
 ## 1. Purpose and success criteria
 
@@ -121,7 +121,7 @@ All custom application code can be TypeScript, with `.tsx` for React and CSS for
 | Credential encryption | Electron safeStorage | Encrypt locally stored provider keys using OS cryptography; on Windows this uses DPAPI |
 | Tests | Vitest, React Testing Library, and Playwright | Test pipeline behavior, review interactions, and desktop workflow smoke scenarios |
 | Code quality | ESLint, Prettier, and TypeScript checks | Detect common mistakes and maintain consistent source code |
-| Dependencies | pnpm and its lockfile | Reproduce builds with explicit compatible dependencies |
+| Dependencies | npm and package-lock.json | Reproduce builds with explicit compatible dependencies |
 | Windows distribution | electron-builder | Produce the packaged desktop app and, after pilot validation, an installer |
 | Version control | Git; GitHub Actions if the repository is hosted on GitHub | Track changes and automate type, lint, test, and build checks |
 
@@ -247,9 +247,9 @@ Each human owner explicitly assigns a task ID/scope to their coding assistant. [
 | 4. Reliability | Resume, delivery reconciliation, deduplication, cache, backup/restore, diagnostics | Partial send, restart, repeated send/export, and update scenarios pass; credentials absent from artifacts |
 | 5. Pilot release | Windows setup/launcher, usage guide, version and known limitations | Clean Windows installation tested; second group member completes the workflow; mobile audio confirmed on the group's actual apps |
 
-Do not provide time estimates until the five-item proof of concept measures setup effort, text quality, voice quality, and generation latency. During development use pnpm scripts; for the pilot, package a Windows desktop build through electron-builder and document Piper setup. Validate bundled native/WASM assets on a clean computer. A full installer with bundled Piper runtime can follow once provider and model distribution requirements are understood.
+Do not provide time estimates until the five-item proof of concept measures setup effort, text quality, voice quality, and generation latency. During development use npm scripts; for the pilot, package a Windows desktop build through electron-builder and document Piper setup. Validate bundled native/WASM assets on a clean computer. A full installer with bundled Piper runtime can follow once provider and model distribution requirements are understood.
 
-Planned development commands are `pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:e2e`, `pnpm build`, and `pnpm package:win`. They will be added during scaffolding and do not exist yet. Default checks use fake providers; real-provider smoke checks are explicit and consume the user's available allowance. Keep a Windows CI lane if GitHub Actions is adopted. Playwright's Electron support is experimental, so retain manual packaged-app verification as a release check.
+Planned development commands are `npm run dev`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:e2e`, `npm run build`, and `npm run package:win`. The AV-002 scaffold supplies these commands except `npm run package:win`, which remains deferred; see [actual setup and evidence](DEVELOPMENT.md). Default checks use fake providers; real-provider smoke checks are explicit and consume the user's available allowance. Keep a Windows CI lane if GitHub Actions is adopted. Playwright's Electron support is experimental, so retain manual packaged-app verification as a release check.
 
 ### Required test scenarios
 

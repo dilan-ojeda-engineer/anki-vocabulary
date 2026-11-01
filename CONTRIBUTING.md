@@ -1,6 +1,6 @@
 # Contributing as a three-person team
 
-**Status:** Working agreement proposed October 11, 2026. Local Git is initialized on `main`. Application scaffolding, remote hosting, and CI are not yet configured. Git conventions below were recorded November 1, 2026; automated enforcement is pending.
+**Status:** Working agreement proposed October 11, 2026. Local Git and the AV-002 application scaffold are established. Git conventions were recorded November 1, 2026. Local check scripts and a Windows workflow are prepared; remote hosting, remote CI execution, and branch protection remain unconfigured. See [development setup and evidence](docs/DEVELOPMENT.md).
 
 Read [PROJECT.md](docs/PROJECT.md), [the delivery playbook](docs/DELIVERY_PLAYBOOK.md), and [the initial backlog](docs/BACKLOG.md). The playbook defines roles, Ready/Done, WIP limits, and release responsibilities. The confirmed team is Dilan, Bulma, and Trunks, all full-stack developers; the backlog proposes named owners/reviewers whose allocation is to be confirmed against availability.
 
@@ -88,7 +88,7 @@ Keep each PR focused on one reviewable outcome. Open a draft early for shared in
 
 ## Development and checks
 
-During AV-002, pin compatible tooling, commit the lockfile, and provide onboarding commands. The planned commands are `pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:e2e`, `pnpm build`, and `pnpm package:win`; they do not exist yet.
+AV-002 pins compatible tooling and supplies the lockfile and [Windows onboarding commands](docs/DEVELOPMENT.md). Available scripts are `npm run dev`, `npm start`, `npm run typecheck`, `npm run lint`, `npm run format`, `npm run format:check`, `npm test`, `npm run test:e2e`, `npm run build`, and `npm run check`. `npm run package:win` remains deferred to the packaging tasks. Use the recorded evidence to distinguish available commands from verified outcomes.
 
 Ordinary tests use fake providers without network keys. Run real generation checks explicitly within the owner's available allowance. Test data/revision/retry rules meaningfully; do not add tests that only repeat implementation details or arbitrary coverage targets. Doc changes need content/link verification rather than code tests.
 
@@ -101,6 +101,8 @@ Give the assistant the issue ID, accepted scope, relevant specifications, and ac
 Use [AGENTS.md](AGENTS.md) for shared project instructions and [AI_TASK_WORKFLOW.md](docs/AI_TASK_WORKFLOW.md) for implementation, review, and resume prompts. Start the assistant in your project checkout and verify its loaded context. A task is selected by the human's explicit assignment, not by an open editor tab or an owner column alone.
 
 Coding assistants do not count as the independent human reviewer. Claims of passing checks must include actual results; mark untested behavior clearly. Coordinate shared-file/interface changes through the issue and team, just as for manually written code.
+
+For AI-assisted task reviews, use the project-local [requesting-code-review skill](.agents/skills/requesting-code-review/SKILL.md) and its companion reviewer template. The [source record](.agents/skills/requesting-code-review/SOURCE.md) identifies the pinned upstream revision and license. Supply the assigned task's acceptance criteria, relevant architecture rules, and exact Git range; explicitly include any uncommitted changes intended for review. On Windows, use PowerShell equivalents of the upstream Bash examples. Review findings do not authorize commits, merges, publication, or board acceptance; the project and user's instructions still apply.
 
 ## Merging, releasing, and support
 

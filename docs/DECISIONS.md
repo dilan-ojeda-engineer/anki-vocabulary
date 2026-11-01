@@ -23,6 +23,10 @@ Record meaningful product/architecture choices with their status, reason, altern
 | DEC-014 | Separate raw AI quality, structural validity, manual corrections, and final card approval | Recorded evaluation approach; reference expectations need human review | Makes linguistic problems visible rather than hiding them behind schema validity or hand-edited cards | AI_EVALUATION.md supplies 13 learning cases and seven pipeline fixtures; AV-005 executes and records evidence |
 | DEC-015 | Explicit task-ID assignment to coding assistants, shared AGENTS.md guidance, and reusable handoff prompts | Documentation established; real session loading and team execution unverified | Keeps separate sessions aligned with scoped work and shared evidence; no automatic backlog dispatcher | AGENTS.md and AI_TASK_WORKFLOW.md exist; each developer verifies loaded context and chooses a Ready task |
 
+## Package manager — November 1, 2026
+
+DEC-016: Use npm and `package-lock.json` for AV-002 and subsequent development. Accepted through the user's explicit instruction to switch from pnpm. npm is bundled with the selected Node.js runtime and avoids a separate package-manager installation. This supersedes the original pnpm tooling recommendation; it does not change the application architecture. Pin npm in `package.json`, use `npm ci` for onboarding/CI, and run the same foundation checks after migration. The earlier pnpm runs remain historical evidence in [DEVELOPMENT.md](DEVELOPMENT.md); npm validation is recorded separately there. No automated release publication is enabled.
+
 ## Prototype configuration and unresolved choices
 
 [PROTOTYPE_PLAN.md](PROTOTYPE_PLAN.md#proposed-experiment-configuration) records the proposed first-run settings, with [open items and proposed owners](PROTOTYPE_PLAN.md#open-items-and-ownership). [AI_EVALUATION.md](AI_EVALUATION.md) records fixed input and expected behavior without claiming human-reviewed ground truth.
