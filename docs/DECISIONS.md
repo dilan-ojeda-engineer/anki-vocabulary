@@ -29,6 +29,12 @@ DEC-016: Use npm and `package-lock.json` for AV-002 and subsequent development. 
 
 ## Prototype configuration and unresolved choices
 
+### DEC-017 — AnkiConnect protocol for the feasibility adapter
+
+On November 1, 2026, AV-004 selected JSON-RPC API v1 for its new TypeScript probe after inspecting official upstream source `c577b44aaadbd72dbc22c823f874a126213fe5c5` and querying the actual isolated runtime. The current upstream recommends v1 for new clients; explicit collection-session guards and operation handles support the required recovery checks. Legacy API 6 remains an untested alternative. This is an experiment decision, not a promise to support all add-on versions or a completed production delivery adapter.
+
+The tested Anki runtime was 26.09.3; the add-on's documented minimum is 26.08. The captured runtime contract matched reference `c577b44`, while a later on-disk source audit matched `760ff48`; those are recorded separately rather than claiming a permanent source pin. String IDs are converted to AV-003 numeric IDs only when safe. Persistent collection identity is not inferred from a profile name: current pairing is session-bound and blocks after session changes. [ANKI_FEASIBILITY.md](ANKI_FEASIBILITY.md) records the real results, simulated failures, source provisioning, and follow-ups. AV-015/AV-021 must revisit persistent re-pairing, concurrency, independent edits, and cross-mode compatibility before production use.
+
 [PROTOTYPE_PLAN.md](PROTOTYPE_PLAN.md#proposed-experiment-configuration) records the proposed first-run settings, with [open items and proposed owners](PROTOTYPE_PLAN.md#open-items-and-ownership). [AI_EVALUATION.md](AI_EVALUATION.md) records fixed input and expected behavior without claiming human-reviewed ground truth.
 
 The user's instruction to proceed authorized this readiness-document pass. It does not establish human role appointments, account access, a confirmed production provider, a selected voice, or passing compatibility tests. Keep pending statuses until the relevant choice/evidence is actually recorded; independent fixture/skeleton work can proceed without every later release decision being settled.

@@ -3,7 +3,7 @@
 **Project:** Anki Vocabulary Studio (working name)  
 **Version:** 0.7  
 **Date:** October 11, 2026  
-**Status:** Design draft for review. AV-002 desktop scaffolding is in progress; see [development setup and actual evidence](DEVELOPMENT.md). Feature integrations and release compatibility remain unverified.
+**Status:** Design draft for review. AV-002 scaffolding and AV-003 contracts are merged; see [development evidence](DEVELOPMENT.md) and [shared contracts](SHARED_CONTRACTS.md). AV-004 has [recorded Anki feasibility evidence](ANKI_FEASIBILITY.md); production integrations and release compatibility remain unverified.
 
 ## 1. Purpose and success criteria
 

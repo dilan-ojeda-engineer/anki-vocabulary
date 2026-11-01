@@ -1,6 +1,6 @@
 # AV-003 shared contracts and fixtures
 
-Status: implementation prepared for review; owner acceptance and independent human review remain pending. AV-003 was explicitly assigned November 1, 2026, following the owner's approval of AV-002 and its local squash merge into `main` as `c1ed60e`. AV-002's recorded audit, team-onboarding, and remote-enforcement follow-ups remain open; its approval does not turn those into completed checks.
+Status: owner-authorized for commit and merge on November 1, 2026. AV-003 was committed as `841dc18` and squash-merged into local `main` as `851a2be`; the completed task branch was removed after tree verification. Independent human peer review/board acceptance were not claimed by that operation. AV-002's recorded audit, team-onboarding, and remote-enforcement follow-ups remain open; approval does not turn those into completed checks.
 
 ## Consumer entry points
 
@@ -69,4 +69,4 @@ Observed locally on November 1, 2026 with Node.js 26.13.0 and npm 11.20.0:
 - The installed requesting-code-review skill dispatched a separate read-only reviewer for the full uncommitted AV-003 implementation against `c1ed60e`. No actionable Critical, Important, or Minor findings were confirmed. The reviewer did not rerun checks; the execution results above are separate evidence.
 - Relative documentation file links and diff whitespace passed. The archived prompt, package manifest, lockfile, preload bridge, and desktop implementation were unchanged. No dependencies were installed or provider calls made for AV-003.
 
-All AV-003 fixtures and tests are offline; they do not validate real providers, Anki compatibility, audio quality, or database recovery. Consumers can use these shapes now, while human review and integration evidence remain separate acceptance work. No AV-003 commit, merge, publication, human assignment acceptance, or remote-board update is implied by this review-ready result.
+All AV-003 fixtures and tests are offline; they do not validate real providers, Anki compatibility, audio quality, or database recovery. Consumers can use these shapes now, while human review and integration evidence remain separate acceptance work. The initial review-ready result did not authorize a commit or merge; the owner subsequently authorized the local operations recorded above. No publication, proposed human assignment acceptance, or remote-board update occurred.

@@ -2,11 +2,11 @@
 
 **Version:** 0.2  
 **Date:** October 11, 2026  
-**Status:** Proposed assignments and ordering. The owner approved AV-002 for proceeding and authorized its local merge on November 1, 2026; [documented follow-ups](DEVELOPMENT.md) remain. AV-003 shared contracts and fixtures are prepared for human review; see [scope and evidence](SHARED_CONTRACTS.md). Other implementation remains unstarted. No remote board status or proposed human assignment acceptance is implied.
+**Status:** Proposed assignments and ordering. The owner authorized AV-002, AV-003, and AV-004 merges into local `main`; [foundation follow-ups](DEVELOPMENT.md) and [contract evidence](SHARED_CONTRACTS.md) remain recorded. AV-004 Anki feasibility has [real and simulated evidence](ANKI_FEASIBILITY.md); independent human peer review and board acceptance remain separate. Other implementation remains unstarted. No remote board status or proposed human assignment acceptance is implied.
 
 Use this as the baseline for a shared issue board. Dilan, Bulma, and Trunks are confirmed full-stack developers. Owners/reviewers below are proposed initial assignments; confirm them against availability at kickoff. See [DELIVERY_PLAYBOOK.md](DELIVERY_PLAYBOOK.md). Rows are not remote issues or assignments sent to people.
 
-The readiness pass is documented in [PROTOTYPE_PLAN.md](PROTOTYPE_PLAN.md): proposed configuration, open decisions, and AP-01–AP-13 acceptance scenarios. [AI_EVALUATION.md](AI_EVALUATION.md) fixes the five prototype inputs and defines additional learning/response cases. Planning artifacts exist; no corresponding executable check or human review is complete.
+The readiness pass is documented in [PROTOTYPE_PLAN.md](PROTOTYPE_PLAN.md): proposed configuration, open decisions, and AP-01–AP-13 acceptance scenarios. [AI_EVALUATION.md](AI_EVALUATION.md) fixes the five prototype inputs and defines additional learning/response cases. The integrated five-item demo and linguistic review remain pending; task-specific execution evidence is linked above.
 
 Priority `P0` means establish this prerequisite or resolve a critical risk early; `P1` means required for the desktop release; `P2` means future work. It does not mean every P0 item can start simultaneously. `Ready` requires the working-agreement criteria; items below start in Backlog until refined and prerequisites checked.
 

@@ -34,6 +34,8 @@ The end-to-end tests launch windows and need an interactive Windows desktop. The
 
 `npm run package:win` is not implemented in AV-002. Native SQLite/WASM/export packaging belongs to AV-008, and release packaging to AV-023. Dependencies for those integrations are deliberately deferred.
 
+AV-004 adds `npm run experiment:anki` for a read-only AnkiConnect capability/deck probe. Explicit disposable-profile execution, actual integration evidence, and limitations are documented in [ANKI_FEASIBILITY.md](ANKI_FEASIBILITY.md). This experiment is separate from ordinary offline checks and does not add provider or Anki requirements to the desktop skeleton.
+
 ## Process boundaries
 
 - `src/renderer`: React and CSS; accesses only the typed `window.desktop` API.

@@ -1,0 +1,101 @@
+{
+  "task": "AV-004",
+  "date": "2026-11-01",
+  "status": "prepared-for-review",
+  "runId": "4e77c223-bcad-4288-abe6-2548fdb39567",
+  "environment": {
+    "apiMajor": 1,
+    "node": "26.13.0",
+    "ankiVersion": "26.09.3",
+    "npm": "11.20.0",
+    "profile": "User 1",
+    "endpoint": "http://127.0.0.1:18765/api/v1",
+    "isolatedBase": ".tools/anki-av004",
+    "ankiConnectProvisionedReference": "c577b44aaadbd72dbc22c823f874a126213fe5c5",
+    "runtimeContractSha256": "5638cd7d844a17e7709d43d9954d2a39799dd5613ea41ccecbd6807ef7eb7546",
+    "runtimeContractMatchesProvisionedReference": true,
+    "onDiskSourceRevisionAfterStartup": "760ff48d8bbcfbc956f57c40475a8ab960c36a9c",
+    "onDiskSourceFilesVerifiedAfterNewlineNormalization": 11,
+    "installedPackageMod": 1792032779
+  },
+  "sourceNoteId": "av004-4e77c223-bcad-4288-abe6-2548fdb39567",
+  "noteId": "1793530174392",
+  "cardId": "1793530174392",
+  "destination": {
+    "mode": "direct",
+    "collectionPairId": "4e77c223-bcad-4288-abe6-2548fdb39567",
+    "deckId": 1793530170212,
+    "deckName": "AV004::4e77c223"
+  },
+  "noteType": {
+    "id": "1793530170622",
+    "name": "AV004_4e77c223bcad4288abe62548fdb39567"
+  },
+  "audio": {
+    "filename": "av004-4e77c223-bcad-4288-abe6-2548fdb39567.wav",
+    "sha256": "0ceb888f2b2d894d1e88b898fb70e4c04abcfbd0ae4e7b01d720878f4cbeb1f6",
+    "readbackVerified": true,
+    "playbackRequestChanged": true,
+    "audibleConfirmation": "confirmed-by-user-in-anki-preview",
+    "kind": "diagnostic-tone-not-speech",
+    "confirmationAt": "2026-11-01T10:59:41.429919Z"
+  },
+  "receiptLoss": {
+    "injectedAfterExternalCreation": true,
+    "persistedIntentReloaded": true,
+    "reconciledDisposition": "reconciled-before-resume",
+    "resumedAfterNavigationSchemaFailure": true
+  },
+  "repeatDisposition": "unchanged",
+  "updateDisposition": "updated",
+  "notesCreateRequests": 1,
+  "notesUpdateRequests": 1,
+  "matchingNotesAfter": 1,
+  "schedulingBefore": {
+    "type": "learning",
+    "queue": "learning",
+    "due": {
+      "kind": "timestamp",
+      "at": "2026-11-01T11:04:19Z"
+    },
+    "intervalDays": 0,
+    "learningIntervalSeconds": 600,
+    "remainingSteps": 1,
+    "repetitions": 1,
+    "lapses": 0,
+    "sm2EasePermille": 0,
+    "fsrsMemory": null,
+    "desiredRetention": null
+  },
+  "schedulingAfter": {
+    "type": "learning",
+    "queue": "learning",
+    "due": {
+      "kind": "timestamp",
+      "at": "2026-11-01T11:04:19Z"
+    },
+    "intervalDays": 0,
+    "learningIntervalSeconds": 600,
+    "remainingSteps": 1,
+    "repetitions": 1,
+    "lapses": 0,
+    "sm2EasePermille": 0,
+    "fsrsMemory": null,
+    "desiredRetention": null
+  },
+  "schedulingUnchanged": true,
+  "realStaleSessionGuard": {
+    "operation": "read-only decks.list",
+    "code": 1005,
+    "type": "staleSession"
+  },
+  "evidenceBoundaries": [
+    "Live note/media/review/update through AnkiConnect; no direct collection DB writes",
+    "Local receipt loss deliberately injected after successful external create",
+    "Resume reused existing source identity after navigation acknowledgment schema correction",
+    "Audible tone confirmed by user in Anki Preview; not a speech quality test",
+    "Other negative cases use fake transport",
+    "Persistent re-pairing after Anki restart and cross-mode delivery are not implemented",
+    "Captured runtime contract matched the provisioned reference, but later on-disk source matched an older upstream revision; a restart requires renewed verification"
+  ]
+}
