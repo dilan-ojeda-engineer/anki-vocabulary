@@ -2,7 +2,7 @@
 
 **Version:** 0.2  
 **Date:** October 11, 2026  
-**Status:** Proposed assignments and ordering. AV-002 local foundation work was explicitly authorized November 1, 2026; see [implementation evidence and acceptance gaps](DEVELOPMENT.md). Other implementation remains unstarted; human review and board acceptance are not implied.
+**Status:** Proposed assignments and ordering. The owner approved AV-002 for proceeding and authorized its local merge on November 1, 2026; [documented follow-ups](DEVELOPMENT.md) remain. AV-003 shared contracts and fixtures are prepared for human review; see [scope and evidence](SHARED_CONTRACTS.md). Other implementation remains unstarted. No remote board status or proposed human assignment acceptance is implied.
 
 Use this as the baseline for a shared issue board. Dilan, Bulma, and Trunks are confirmed full-stack developers. Owners/reviewers below are proposed initial assignments; confirm them against availability at kickoff. See [DELIVERY_PLAYBOOK.md](DELIVERY_PLAYBOOK.md). Rows are not remote issues or assignments sent to people.
 

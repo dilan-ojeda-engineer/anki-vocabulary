@@ -2,11 +2,12 @@
 
 A planned Windows app that turns vocabulary and contextual sentences into reviewed Anki cards with audio.
 
-**Status:** AV-002 desktop foundation in progress, November 1, 2026. The Electron/React skeleton is implemented; vocabulary generation, speech, and Anki delivery remain unimplemented. The project name is a working name. Document version 0.7 is separate from application version `0.1.0-dev.0`.
+**Status:** AV-002 foundation merged; AV-003 shared contracts prepared for human review, November 1, 2026. The Electron/React skeleton is implemented; vocabulary generation, speech, and Anki delivery remain unimplemented. The project name is a working name. Document version 0.7 is separate from application version `0.1.0-dev.0`.
 
 ## Start here
 
 - [Windows development setup, checks, and AV-002 evidence](docs/DEVELOPMENT.md)
+- [Shared contracts, synthetic fixtures, and AV-003 scope](docs/SHARED_CONTRACTS.md)
 - [Project brief, requirements, architecture, and delivery plan](docs/PROJECT.md)
 - [Card specification and your original prompt](docs/CARD_SPEC.md)
 - [How AI generation works, TypeScript boundaries, and future custom profiles](docs/AI_GENERATION.md)
