@@ -2,7 +2,7 @@
 
 A planned local web tool for reviewing English Coach cards, generating target/example audio, and safely creating or updating notes in Anki.
 
-**Status:** The owner accepted a local web direction and initial Anki Card and Audio Workspace requirements on November 2, 2026. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no production audio provider or written-card provider is adopted. The local web implementation has not started. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
+**Status:** The owner accepted a local web direction and initial Anki Card and Audio Workspace requirements on November 2, 2026. A read-only foundation now runs on loopback, reports Anki availability, and lists decks when the required AnkiConnect capabilities are available. Card import, audio, approval, and Anki writes are not implemented. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no production audio provider or written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
 
 ## Start here
 
@@ -15,7 +15,7 @@ A planned local web tool for reviewing English Coach cards, generating target/ex
 - [Card specification and your original prompt](docs/CARD_SPEC.md)
 - [How AI generation works, TypeScript boundaries, and future custom profiles](docs/AI_GENERATION.md)
 - [Three-developer team organization and delivery process](docs/DELIVERY_PLAYBOOK.md)
-- [Initial task backlog, proposed owners, and acceptance criteria](docs/BACKLOG.md)
+- [Current local-web task backlog and historical Electron records](docs/BACKLOG.md)
 - [Five-word prototype configuration, readiness, and acceptance scenarios](docs/PROTOTYPE_PLAN.md)
 - [English Coach evaluation inputs, expectations, and review rubric](docs/AI_EVALUATION.md)
 - [Product and architecture decision register](docs/DECISIONS.md)
@@ -55,6 +55,23 @@ The application remains in this repository and uses **strict TypeScript, React, 
 
 See the [local web plan](docs/LOCAL_WEB_PLAN.md) for current boundaries and acceptance scenarios. [PROJECT.md](docs/PROJECT.md) retains the earlier Electron proposal as historical design context until its reusable requirements are migrated.
 
+## Run the local web foundation
+
+Prerequisites are Node.js 26.13.x, npm 11.20.0, and—when testing the live connection—a running Anki Desktop installation with the supported AnkiConnect API. Install dependencies and start the loopback server:
+
+```powershell
+npm install
+npm run dev:web
+```
+
+Open `http://127.0.0.1:43110` in a browser. The current interface is read-only: refreshing connection status and choosing a displayed deck do not change Anki. Stop the server with `Ctrl+C`.
+
+Run the complete local validation with:
+
+```powershell
+npm run check
+```
+
 ## Decks and supported note types
 
 Any existing Anki deck can be selected as the destination. New notes initially use the app-owned English Coach note type, and existing supported English Coach notes can be loaded and updated. A deck can contain several unrelated note types, so arbitrary field editing requires a later explicit mapping workflow.
@@ -67,20 +84,14 @@ This is a local browser interface backed by a loopback Node service, not a publi
 
 ## How we will build this together
 
-**Dilan, Bulma, and Trunks**, all full-stack developers, will build the project together. Use a shared Kanban backlog with weekly planning/demos, one owner and a peer reviewer per task, small pull requests, and automated checks. Named task assignments are proposed in the backlog; confirm availability and coordinating roles at kickoff. Codex supports their work rather than replacing team accountability.
+**Dilan, Bulma, and Trunks**, all full-stack developers, will build the project together. Use a shared Kanban backlog with weekly planning/demos, one owner and a peer reviewer per task, small pull requests, and automated checks. Current local-web owners/reviewers are unassigned; confirm them and the coordinating roles before treating a task as Ready. Codex supports their work rather than replacing team accountability.
 
-Start with team kickoff, repository/tooling setup, shared contracts, and focused integration experiments. The [delivery playbook](docs/DELIVERY_PLAYBOOK.md) covers the process from discovery through release/support; [BACKLOG.md](docs/BACKLOG.md) assigns proposed tasks and dependencies. Remote repository, board, and CI configuration remain unstarted.
+The [delivery playbook](docs/DELIVERY_PLAYBOOK.md) covers the process from discovery through release/support. [BACKLOG.md](docs/BACKLOG.md) defines AV-028 through AV-036 as the current local-web sequence and preserves AV-001 through AV-027 as historical Electron-first records. Human owners and reviewers remain unassigned; remote repository, board, and CI configuration remain unstarted.
 
 You can request changes in plain English; keep accepted scope and decisions in the project documents and, once adopted, track live tasks on the shared issue board.
 
-Next, replace the historical desktop backlog with small local web tasks, then build the accepted five-card vertical slice in a disposable Anki profile. Audio provider/voice selection remains a separate prerequisite for real voice evidence.
+Next, finish AV-028 by committing the reviewed foundation and recording a real connected-Anki deck check. AV-029 is the following card-import slice, but it must not start until explicitly assigned. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
 
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
 
-A useful next implementation request is:
-
-> I am Dilan. Work on AV-002 from docs/BACKLOG.md in my project checkout. Read AGENTS.md, check its prerequisites, and explain the intended changes before editing. Implement the agreed foundation scope, run relevant checks, and prepare the result for Trunks's review. Keep unresolved remote hosting as a documented gap and do not begin provider integrations.
-
-This is an example assignment, not an instruction to start AV-002 now. Use the [reusable task prompt](docs/AI_TASK_WORKFLOW.md#reusable-implementation-assignment) for any selected task. The team should agree readiness and ownership before implementation.
-
-No installation or launch commands are provided yet because the app does not exist. Provider keys should be entered through the eventual app settings, never pasted into this chat or committed to source control.
+Use the [reusable task prompt](docs/AI_TASK_WORKFLOW.md#reusable-implementation-assignment) for a selected task. The team should agree readiness and ownership before implementation. Provider keys currently belong only in the documented local environment configuration; never paste them into chat or commit them to source control.

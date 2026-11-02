@@ -1,16 +1,117 @@
-# Initial development backlog
+# Development backlog
 
-**Version:** 0.2  
-**Date:** October 11, 2026  
-**Status:** Historical Electron-first backlog. AV-002 through AV-005 results remain preserved, but unstarted desktop tasks must not be started automatically. The owner accepted the [local web direction and initial requirements](LOCAL_WEB_PLAN.md) on November 2, 2026. A replacement implementation backlog will be derived from that plan before new coding begins; no new task IDs or human assignments are implied yet.
+**Version:** 0.3
 
-Use this as the baseline for a shared issue board. Dilan, Bulma, and Trunks are confirmed full-stack developers. Owners/reviewers below are proposed initial assignments; confirm them against availability at kickoff. See [DELIVERY_PLAYBOOK.md](DELIVERY_PLAYBOOK.md). Rows are not remote issues or assignments sent to people.
+**Date:** November 2, 2026
+
+**Status:** AV-028 through AV-036 are the current local-web implementation sequence. AV-001 through AV-027 remain historical Electron-first records and must not be started automatically. Listing a task does not assign it or authorize work; the user selects each task explicitly.
+
+The owner accepted the [local web direction and initial requirements](LOCAL_WEB_PLAN.md) on November 2, 2026. The current backlog divides that workflow into small reviewable outcomes. It preserves the old IDs instead of reusing AV-006 through AV-027, so commits and evidence remain unambiguous.
+
+## Current local-web task inventory
+
+| ID | Outcome | Priority / phase | State | Owner / reviewer | Dependencies |
+|---|---|---|---|---|---|
+| AV-028 | Read-only loopback web foundation with Anki status and deck discovery | P0 / foundation | In review; automated and live connected-Anki checks recorded, human acceptance pending | Unassigned / Unassigned | Reuses AV-002 tooling and AV-004 Anki contracts |
+| AV-029 | Paste/import English Coach cards with boundary detection, validation, and source preservation | P0 / import | Backlog | Unassigned / Unassigned | AV-028; accepted import fixtures |
+| AV-030 | Review, edit, include/exclude, copy, and preview cards one by one | P0 / review | Backlog | Unassigned / Unassigned | AV-029; English Coach profile/template |
+| AV-031 | Enforce exact-revision content approval outside React and invalidate it on edits | P0 / safety | Backlog | Unassigned / Unassigned | AV-030; relevant AV-003 contracts |
+| AV-032 | Extract and select target/front/additional-example audio items | P0 / audio preparation | Backlog | Unassigned / Unassigned | AV-031; English Coach audio-field rules |
+| AV-033 | Generate, cache, play, compare, and retry audio individually or in batches | P0 / audio | Backlog | Unassigned / Unassigned | AV-032; selected TTS provider/voice and confirmed allowance |
+| AV-034 | Create approved English Coach notes with audio in an explicitly selected Anki deck | P0 / delivery | Backlog | Unassigned / Unassigned | AV-028, AV-031, AV-033; disposable Anki profile |
+| AV-035 | Load supported notes and safely update fields or replace one audio placement in place | P0 / update | Backlog | Unassigned / Unassigned | AV-034; stable identity and reconciliation evidence from AV-004 |
+| AV-036 | Demonstrate and accept the complete five-card local workflow | P0 / acceptance gate | Backlog | Unassigned / Unassigned | AV-029 through AV-035 |
+
+Only one of these tasks should be treated as the active implementation task unless the team explicitly coordinates parallel work. A task becomes Done only after its acceptance evidence is reviewed and accepted; a passing implementation review alone is not product acceptance.
+
+## Current local-web acceptance criteria
+
+### AV-028 — Read-only local web foundation
+
+- `npm run dev:web` starts a browser application and server bound only to loopback; every HTTP/WebSocket listener opened by the command is verified as loopback-only.
+- The browser shows sanitized server/Anki status and refreshes it without receiving the Anki collection session or credentials.
+- With a disposable Anki profile, list and sort existing normal, filtered, and nested decks when the required AnkiConnect capabilities are available.
+- Reject unexpected request hosts/origins and all mutation methods; this task exposes no card, media, or Anki write command.
+- Runtime schemas reject invalid provider/Anki and browser/server boundary data. Automated checks and both historical Electron and local-web builds remain green.
+- Record unavailable-Anki and connected-Anki results separately. AV-028 remains open until a human owner accepts it.
+
+**AV-028 evidence (November 2, 2026):** Commit `609f642` passed `npm run check` (69 tests, typecheck, lint, formatting, Electron and web builds). With Anki unavailable, `GET /api/status` returned HTTP 200 with an `unavailable` state. A Chrome browser smoke test rendered the foundation screen. An exact process-scoped listener check found only `127.0.0.1:43110` and `127.0.0.1:24678`; a foreign HTTP Host returned 403. Code review found and then verified the fix for Vite's WebSocket loopback binding.
+
+**Live connected check (November 2, 2026):** Started Anki 26.09.3 from the isolated `.tools/anki-av004` base and opened the disposable `User 1` profile. The installed add-on listened on `127.0.0.1:8765`, matching the web server default. The local API returned `connected`, the expected disposable profile, three sorted normal decks including one nested deck, and no collection session in its JSON. Chrome rendered the connected state and all three deck options. This was read-only; no note or media operation was invoked. The profile had no filtered deck, so filtered-deck discovery was not observed live. Human acceptance remains pending.
+
+### AV-029 — Card paste/import
+
+- Paste one or more cards in the official English Coach text structure and preview detected card boundaries before adding them to the queue.
+- Import documented UTF-8 TSV, CSV, and structured JSON fixtures; show row/card errors without discarding other valid entries.
+- Preserve the exact original source text for comparison. Import performs no model, audio, media, clipboard, or Anki write operation.
+- Validate the profile structure at runtime, including required headings, conditional sections, and the agreed four-to-five additional examples.
+- Freeze representative valid, invalid, multiline, quoted, and non-ASCII fixtures in the task evidence before declaring the formats supported.
+
+### AV-030 — Card review and preview
+
+- Navigate imported cards individually; edit fields, include/exclude an item, discard unsaved edits, and retain the rest of the queue.
+- Show clear `Ready`, `Needs attention`, and `Edited` states and prevent structurally invalid cards from advancing.
+- Render accurate English Coach front/back previews with the official heading order and no unintended Spanish content outside the prompt-defined pronunciation tip/translation fields.
+- Copy the reviewed official card text without changing application or Anki state.
+- Provide keyboard-accessible controls and a usable narrow-screen layout. Verify behavior with fixtures rather than a live text provider.
+
+### AV-031 — Exact-revision approval
+
+- Create a deterministic revision identity from all deliverable card content and record explicit approval on the local server, not solely in browser state.
+- Reject audio or delivery commands for invalid, excluded, unapproved, or stale revisions.
+- Editing any card field creates a new revision and clears content approval; reverting content does not silently manufacture approval.
+- Return a clear conflict that lets the browser refresh when its displayed revision is stale.
+- Cover approval, invalidation, replay, and tampered-command cases with controlled tests.
+
+### AV-032 — Audio extraction and selection
+
+- For an approved English Coach revision, extract only `target`, `frontExample`, and every `examples` item as distinct placements.
+- Do not select meanings, headings, category, irregular forms, IPA, pronunciation guidance, chunks, usage notes, alternatives, or Spanish translation by default.
+- Show source placement, exact text, include control, character count, and current/stale/missing status before generation.
+- Support selecting one, several, or all missing placements without rewriting or correcting their text.
+- Reject extraction/generation preparation when approval refers to a different revision.
+
+### AV-033 — Audio generation and review
+
+- Generate one item, selected items, or all missing items through a server-side TypeScript adapter; provider keys never reach React, logs, cards, exports, or Git.
+- Before a batch, show the selected provider, voice, format, clip count, characters, and only allowance information the provider actually reports.
+- Cache only exact text/provider/model/voice/settings/format matches. Preserve successes during partial failure and retry only missing or explicitly selected failures.
+- Play every proposed clip before delivery and allow comparison where a replacement is proposed. Changed source text makes the old association stale.
+- Use fake providers for ordinary tests and separately record real listening evidence, actual model/voice/format, allowance authorization, and human voice-quality decision.
+
+### AV-034 — Create notes in Anki
+
+- Require an explicit existing destination deck and revalidate the active collection/session, deck, approval, and audio readiness immediately before writing.
+- Show per-item create/omit intent, note type, destination, validation, and audio readiness before confirmation.
+- Create the app-owned versioned English Coach note type/notes, upload uniquely named media, and use dedicated audio fields without changing source sentence fields.
+- Persist stable source identity and per-item receipts; repeat delivery does not duplicate notes or request unnecessary audio.
+- Reconcile ambiguous creation by source identity before retrying and report partial success accurately. Verify in a disposable Anki profile.
+
+### AV-035 — Load and safely update notes/audio
+
+- Load only supported English Coach notes from the chosen deck and show field-level before/after differences.
+- Update an existing note in place without deleting/recreating it; retain note/card identity and studied scheduling evidence.
+- For one audio placement, play the current and proposed clips, require confirmation, upload a uniquely named replacement, and change only that reference.
+- Do not automatically overwrite or delete the old media file. Block unresolved collection or cross-mode identity reuse.
+- Re-read the note and relevant identity/scheduling data after the update and record real disposable-profile evidence.
+
+### AV-036 — Five-card acceptance workflow
+
+- Import at least five English Coach cards, expose invalid input, and review/edit every valid card with accurate previews.
+- Approve exact revisions, demonstrate that an edit clears approval, and extract the target/front/additional-example audio placements only.
+- Generate and listen to one clip and all missing clips, including a controlled partial failure and resume.
+- Create selected notes in an existing nested deck, repeat delivery without duplicates, then load one note and replace one clip without changing identity or scheduling.
+- Record automated, fake-provider, real-provider, real-Anki, linguistic, and voice-review evidence separately. Product-owner acceptance is required to close the gate.
+
+## Historical Electron-first backlog
+
+This section is retained as design and feasibility history, not as the current issue-board baseline. Dilan, Bulma, and Trunks are confirmed full-stack developers. The owners/reviewers below were proposed initial assignments and were not confirmed merely by appearing here. See [DELIVERY_PLAYBOOK.md](DELIVERY_PLAYBOOK.md). Rows are not remote issues or assignments sent to people.
 
 The readiness pass is documented in [PROTOTYPE_PLAN.md](PROTOTYPE_PLAN.md): proposed configuration, open decisions, and AP-01–AP-13 acceptance scenarios. [AI_EVALUATION.md](AI_EVALUATION.md) fixes the five prototype inputs and defines additional learning/response cases. The integrated five-item demo and linguistic review remain pending; task-specific execution evidence is linked above.
 
 Priority `P0` means establish this prerequisite or resolve a critical risk early; `P1` means required for the desktop release; `P2` means future work. It does not mean every P0 item can start simultaneously. `Ready` requires the working-agreement criteria; items below start in Backlog until refined and prerequisites checked.
 
-## Task inventory
+### Historical task inventory
 
 | ID | Outcome | Priority / phase | Proposed owner | Reviewer | Dependencies |
 |---|---|---|---|---|---|
@@ -44,7 +145,7 @@ Priority `P0` means establish this prerequisite or resolve a critical risk early
 
 AV-026/027 are roadmap epics, not Ready implementation tickets. Split them into small issues when those phases are planned. Redistribute owners as capacity and skills become known; do not use this table as a workload estimate.
 
-## Initial parallel work
+### Historical initial parallel-work proposal
 
 After kickoff, Dilan establishes the development skeleton while Bulma refines shared contracts and evaluation fixtures. Trunks prepares the Anki test environment and experiment plan. Merge the minimum shared contracts before consumers depend on them.
 
@@ -52,7 +153,7 @@ After foundation, Trunks runs AV-004, Bulma runs AV-005, and Dilan runs AV-007. 
 
 During the first workflow, Dilan builds the preview against fixtures, Bulma implements saved drafts and approval, and Trunks integrates speech and Anki against the agreed commands. AV-016 is a shared demonstration, with Dilan responsible for assembling the acceptance evidence. Tests and reviews remain part of each feature ticket, not deferred entirely to AV-021.
 
-## Acceptance criteria for the first work
+### Historical acceptance criteria
 
 ### AV-001 — Kickoff
 
@@ -171,7 +272,7 @@ During the first workflow, Dilan builds the preview against fixtures, Bulma impl
 - Use the fixed P01–P05 inputs and the [prototype acceptance checklist](PROTOTYPE_PLAN.md#prototype-acceptance-scenarios). Report all AP-01–AP-13 results, distinguishing real integrations from controlled fault tests; unresolved blockers keep the gate open.
 - This first integrated hosted/direct path does not close the remaining Piper/export/packaging/reliability release work.
 
-## Release criteria and issue format
+### Historical release criteria and issue format
 
 AV-017 through AV-025 are required before desktop release; refine their criteria using the [project test scenarios](PROJECT.md#required-test-scenarios) and [release checklist](DELIVERY_PLAYBOOK.md#9-quality-and-release-responsibility). A passing five-word prototype does not complete the release milestone.
 

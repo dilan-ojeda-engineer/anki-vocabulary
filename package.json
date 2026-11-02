@@ -2,7 +2,7 @@
   "name": "anki-vocabulary-studio",
   "version": "0.1.0-dev.0",
   "private": true,
-  "description": "A desktop workspace for reviewed vocabulary cards",
+  "description": "A local web workspace for reviewed Anki cards and audio",
   "type": "module",
   "main": "./out/main/index.js",
   "packageManager": "npm@11.20.0",
@@ -12,6 +12,7 @@
   },
   "scripts": {
     "dev": "electron-vite dev",
+    "dev:web": "tsx src/server/dev.ts",
     "start": "electron-vite preview",
     "postinstall": "install-electron",
     "typecheck": "tsc -p tsconfig.node.json && tsc -p tsconfig.web.json && tsc -p tsconfig.test.json",
@@ -23,7 +24,8 @@
     "experiment:text": "vite build --config vite.text-experiment.config.ts && node out/text-experiment/text-feasibility.mjs",
     "test:e2e": "npm run build && playwright test",
     "build": "electron-vite build",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build"
+    "build:web": "vite build --config vite.local-web.config.ts",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build && npm run build:web"
   },
   "dependencies": {
     "react": "19.3.1",
@@ -43,6 +45,7 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.7",
     "prettier": "3.9.10",
+    "tsx": "4.23.15",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.1",
     "vite": "8.3.5",

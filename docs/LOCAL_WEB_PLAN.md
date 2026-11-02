@@ -1,7 +1,9 @@
 # Local web plan: Anki Card and Audio Workspace
 
 **Date:** November 2, 2026
-**Status:** Product direction and initial requirements accepted; implementation has not started.
+**Status:** Product direction and initial requirements accepted; read-only loopback/Anki-status/deck-list foundation implemented for review. Card import, audio, approval, and Anki writes have not started.
+
+Implementation is tracked as AV-028 through AV-036 in the [current backlog](BACKLOG.md#current-local-web-task-inventory). The IDs continue after the historical Electron backlog to avoid reusing earlier task references. Listing the sequence does not authorize starting the next task automatically.
 
 ## Purpose
 
@@ -152,6 +154,8 @@ src/
 - Anki remains the system of record for delivered notes, scheduling, decks, and synced media.
 - Initial local configuration may use process/user environment variables. A later settings design must keep secrets outside browser storage, logs, cards, exports, and Git.
 - Persistence beyond Anki should be added only for demonstrated needs such as resumable imports, pending audio, and delivery reconciliation. SQLite is not assumed for the first vertical slice.
+
+The current read-only foundation exposes only `GET /api/status`. It validates the request host and browser origin and returns a sanitized Anki status/deck view; the Anki session remains server-side. Session-token and command-body enforcement becomes mandatory when the first mutation endpoint is introduced.
 
 ## Reuse from completed work
 

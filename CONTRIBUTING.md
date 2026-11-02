@@ -2,7 +2,7 @@
 
 **Status:** Working agreement proposed October 11, 2026. Local Git and the AV-002 application scaffold are established. Git conventions were recorded November 1, 2026. Local check scripts and a Windows workflow are prepared; remote hosting, remote CI execution, and branch protection remain unconfigured. See [development setup and evidence](docs/DEVELOPMENT.md).
 
-Read [PROJECT.md](docs/PROJECT.md), [the delivery playbook](docs/DELIVERY_PLAYBOOK.md), and [the initial backlog](docs/BACKLOG.md). The playbook defines roles, Ready/Done, WIP limits, and release responsibilities. The confirmed team is Dilan, Bulma, and Trunks, all full-stack developers; the backlog proposes named owners/reviewers whose allocation is to be confirmed against availability.
+Read [PROJECT.md](docs/PROJECT.md), [the delivery playbook](docs/DELIVERY_PLAYBOOK.md), and [the current backlog](docs/BACKLOG.md). The playbook defines roles, Ready/Done, WIP limits, and release responsibilities. The confirmed team is Dilan, Bulma, and Trunks, all full-stack developers; current local-web owners/reviewers remain unassigned until confirmed against availability.
 
 ## Before beginning a task
 
@@ -88,7 +88,7 @@ Keep each PR focused on one reviewable outcome. Open a draft early for shared in
 
 ## Development and checks
 
-AV-002 pins compatible tooling and supplies the lockfile and [Windows onboarding commands](docs/DEVELOPMENT.md). Available scripts are `npm run dev`, `npm start`, `npm run typecheck`, `npm run lint`, `npm run format`, `npm run format:check`, `npm test`, `npm run test:e2e`, `npm run build`, and `npm run check`. `npm run package:win` remains deferred to the packaging tasks. Use the recorded evidence to distinguish available commands from verified outcomes.
+AV-002 pins compatible tooling and supplies the lockfile and [Windows onboarding commands](docs/DEVELOPMENT.md). The current local-web commands are `npm run dev:web` and `npm run build:web`; the historical Electron commands remain `npm run dev`, `npm start`, and `npm run build`. Shared checks include `npm run typecheck`, `npm run lint`, `npm run format`, `npm run format:check`, `npm test`, `npm run test:e2e`, and `npm run check`. Windows packaging remains deferred. Use the recorded evidence to distinguish available commands from verified outcomes.
 
 Ordinary tests use fake providers without network keys. Run real generation checks explicitly within the owner's available allowance. Test data/revision/retry rules meaningfully; do not add tests that only repeat implementation details or arbitrary coverage targets. Doc changes need content/link verification rather than code tests.
 
