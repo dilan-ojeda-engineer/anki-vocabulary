@@ -1,0 +1,798 @@
+[
+  {
+    "caseId": "P01",
+    "sourceRunId": "13e1cf08-3eb2-4014-bff5-77a5193491fd",
+    "sourceProfileVersion": "av005-2",
+    "sourcePromptHash": "102b2bcaa2ac6e655075b32df18ae96d94cf511e1b37088f5a3682f1ce9d17e1",
+    "origin": "AI-proposed-editorial-corrections",
+    "humanReview": "pending",
+    "approved": false,
+    "fields": {
+      "target": "awkward",
+      "frontExample": "I felt awkward asking for help.",
+      "meaning": "Feeling uncomfortable or self-conscious in a social situation, especially when you are unsure what to say or do.",
+      "category": "Adjective",
+      "irregularForms": null,
+      "nativePronunciation": "/ˈɑːkwɚd/ or /ˈɔːkwɚd/. Stress the first syllable. Keep the second syllable weak, with an American r-colored vowel.",
+      "spanishPronunciation": "La segunda sílaba es débil y la r no se vibra como una r española. No añadas una vocal después de la d final. Usa el IPA como referencia; una aproximación escrita no reproduce todos los sonidos.",
+      "examples": [
+        "I always feel awkward when I don’t know anyone at a party.",
+        "The conversation got awkward when they started arguing.",
+        "That was an awkward moment, but everyone eventually laughed about it.",
+        "She’s gotten less awkward in meetings as she’s become more confident."
+      ],
+      "chunks": [
+        "feel awkward",
+        "an awkward silence",
+        "an awkward moment",
+        "socially awkward",
+        "get awkward",
+        "kind of awkward"
+      ],
+      "usageNote": "Use feel awkward for social discomfort: I felt awkward asking for help. Embarrassed is more specific: you feel self-conscious about something, often something you did. Awkward can also describe something difficult to use or handle; it is not limited to social situations.",
+      "alternatives": [
+        "uncomfortable",
+        "uneasy",
+        "self-conscious"
+      ],
+      "spanishTranslation": "incómodo / sentirse incómodo; en este contexto: Me sentí incómodo al pedir ayuda."
+    },
+    "corrections": [
+      {
+        "original": "akward",
+        "proposed": "awkward",
+        "reason": "Spelling correction"
+      }
+    ],
+    "edits": [
+      {
+        "field": "meaning",
+        "before": "feeling uneasy or embarrassed in a situation",
+        "after": "Feeling uncomfortable or self-conscious in a social situation, especially when you are unsure what to say or do."
+      },
+      {
+        "field": "nativePronunciation",
+        "before": "/ˈɑːkwɚd/; /ˈɔːkwɚd/ is also used by American speakers. Stress the first syllable. The second syllable has an American r-colored vowel; do not use the vowel in cat.",
+        "after": "/ˈɑːkwɚd/ or /ˈɔːkwɚd/. Stress the first syllable. Keep the second syllable weak, with an American r-colored vowel."
+      },
+      {
+        "field": "spanishPronunciation",
+        "before": "La primera vocal no es /æ/ como en cat. En la segunda sílaba, mantén la r americana sin vibrarla como una r española. La aproximación escrita no sustituye al IPA ni al audio.",
+        "after": "La segunda sílaba es débil y la r no se vibra como una r española. No añadas una vocal después de la d final. Usa el IPA como referencia; una aproximación escrita no reproduce todos los sonidos."
+      },
+      {
+        "field": "examples",
+        "before": [
+          "She felt awkward staying silent during the meeting.",
+          "It was an awkward moment when the power went out.",
+          "He gave an awkward laugh after the joke fell flat.",
+          "They had an awkward conversation about money."
+        ],
+        "after": [
+          "I always feel awkward when I don’t know anyone at a party.",
+          "The conversation got awkward when they started arguing.",
+          "That was an awkward moment, but everyone eventually laughed about it.",
+          "She’s gotten less awkward in meetings as she’s become more confident."
+        ]
+      },
+      {
+        "field": "chunks",
+        "before": [
+          "feel awkward",
+          "an awkward silence",
+          "an awkward moment",
+          "an awkward conversation"
+        ],
+        "after": [
+          "feel awkward",
+          "an awkward silence",
+          "an awkward moment",
+          "socially awkward",
+          "get awkward",
+          "kind of awkward"
+        ]
+      },
+      {
+        "field": "usageNote",
+        "before": "Use feel awkward to describe feeling uncomfortable in a situation. Awkward can also describe something difficult to use or handle; it is not limited to people or social situations.",
+        "after": "Use feel awkward for social discomfort: I felt awkward asking for help. Embarrassed is more specific: you feel self-conscious about something, often something you did. Awkward can also describe something difficult to use or handle; it is not limited to social situations."
+      },
+      {
+        "field": "alternatives",
+        "before": [
+          "uneasy",
+          "uncomfortable",
+          "embarrassed"
+        ],
+        "after": [
+          "uncomfortable",
+          "uneasy",
+          "self-conscious"
+        ]
+      },
+      {
+        "field": "spanishTranslation",
+        "before": "incómodo / sentirse incómodo",
+        "after": "incómodo / sentirse incómodo; en este contexto: Me sentí incómodo al pedir ayuda."
+      }
+    ],
+    "editorialRevision": 2,
+    "previousRevision": "AV-005-edited-candidates-revision-1.json",
+    "referenceAttachment": "AV-005-user-comparison-source.txt",
+    "previousEdits": [
+      {
+        "field": "nativePronunciation",
+        "before": "/ˈækwərd/ – stress on the first syllable, the “aw” sounds like the short a in “cat”",
+        "after": "/ˈɑːkwɚd/; /ˈɔːkwɚd/ is also used by American speakers. Stress the first syllable. The second syllable has an American r-colored vowel; do not use the vowel in cat."
+      },
+      {
+        "field": "spanishPronunciation",
+        "before": "Pronunciar /ˈækwərd/ como “á-kwérd”; la vocal /æ/ no existe en español, se acerca a una “a” corta pero más abierta",
+        "after": "La primera vocal no es /æ/ como en cat. En la segunda sílaba, mantén la r americana sin vibrarla como una r española. La aproximación escrita no sustituye al IPA ni al audio."
+      },
+      {
+        "field": "chunks",
+        "before": [
+          "feel awkward",
+          "awkward silence",
+          "awkward situation",
+          "awkwardly"
+        ],
+        "after": [
+          "feel awkward",
+          "an awkward silence",
+          "an awkward moment",
+          "an awkward conversation"
+        ]
+      },
+      {
+        "field": "usageNote",
+        "before": "Avoid using “awkwardly” when you need the adjective; “awkwardly” is the adverb form (e.g., “He walked awkwardly”).",
+        "after": "Use feel awkward to describe feeling uncomfortable in a situation. Awkward can also describe something difficult to use or handle; it is not limited to people or social situations."
+      }
+    ]
+  },
+  {
+    "caseId": "P02",
+    "sourceRunId": "13e1cf08-3eb2-4014-bff5-77a5193491fd",
+    "sourceProfileVersion": "av005-2",
+    "sourcePromptHash": "102b2bcaa2ac6e655075b32df18ae96d94cf511e1b37088f5a3682f1ce9d17e1",
+    "origin": "AI-proposed-editorial-corrections",
+    "humanReview": "pending",
+    "approved": false,
+    "fields": {
+      "target": "draining",
+      "frontExample": "Back-to-back meetings can be draining.",
+      "meaning": "Making you feel very tired or low on energy, especially mentally or emotionally.",
+      "category": "Adjective — the -ing form of the regular verb drain used as an adjective",
+      "irregularForms": null,
+      "nativePronunciation": "/ˈdreɪnɪŋ/. Stress the first syllable. In careful pronunciation, -ing ends in /ɪŋ/: keep the nasal /ŋ/ without adding a separate g sound.",
+      "spanishPronunciation": "Empieza con /dr/ y el diptongo /eɪ/. En -ing, /ɪ/ no es la i española: cambia la posición de la lengua, no solo la duración. Termina con /ŋ/, sin añadir una g separada.",
+      "examples": [
+        "Dealing with constant complaints is emotionally draining.",
+        "Yesterday’s meeting was really draining.",
+        "This project has been draining lately, but we’re almost finished.",
+        "Working long hours without breaks can be physically and mentally draining."
+      ],
+      "chunks": [
+        "emotionally draining",
+        "mentally draining",
+        "physically draining",
+        "really draining",
+        "find something draining",
+        "a draining day"
+      ],
+      "usageNote": "Draining describes what causes the tiredness: The meeting was draining. Drained describes the person’s feeling: I felt drained after the meeting. Say I feel drained, not I feel draining, when you mean that you are exhausted.",
+      "alternatives": [
+        "exhausting",
+        "tiring",
+        "wearing me out",
+        "taking a lot out of me"
+      ],
+      "spanishTranslation": "agotador / desgastante / que te deja sin energía (describe las reuniones que causan el cansancio)."
+    },
+    "corrections": [],
+    "edits": [
+      {
+        "field": "meaning",
+        "before": "causing you to feel very tired or mentally exhausted",
+        "after": "Making you feel very tired or low on energy, especially mentally or emotionally."
+      },
+      {
+        "field": "category",
+        "before": "Adjective, from the regular verb drain",
+        "after": "Adjective — the -ing form of the regular verb drain used as an adjective"
+      },
+      {
+        "field": "nativePronunciation",
+        "before": "/ˈdreɪ.nɪŋ/ – stress on the first syllable; the “a” sounds like the “a” in “day”, and the final “‑ing” is pronounced with a short /ɪŋ/.",
+        "after": "/ˈdreɪnɪŋ/. Stress the first syllable. In careful pronunciation, -ing ends in /ɪŋ/: keep the nasal /ŋ/ without adding a separate g sound."
+      },
+      {
+        "field": "examples",
+        "before": [
+          "The long commute was really draining after work.",
+          "Studying for finals can be draining if you don’t take breaks.",
+          "She found the constant noise in the office draining.",
+          "Running a marathon without proper training is draining."
+        ],
+        "after": [
+          "Dealing with constant complaints is emotionally draining.",
+          "Yesterday’s meeting was really draining.",
+          "This project has been draining lately, but we’re almost finished.",
+          "Working long hours without breaks can be physically and mentally draining."
+        ]
+      },
+      {
+        "field": "chunks",
+        "before": [
+          "emotionally draining",
+          "draining experience",
+          "draining job",
+          "draining schedule",
+          "draining workload"
+        ],
+        "after": [
+          "emotionally draining",
+          "mentally draining",
+          "physically draining",
+          "really draining",
+          "find something draining",
+          "a draining day"
+        ]
+      },
+      {
+        "field": "usageNote",
+        "before": "Learners often mix up “draining” (describing the thing that causes fatigue) with “drained” (describing how a person feels). Use “draining” for the source of exhaustion.",
+        "after": "Draining describes what causes the tiredness: The meeting was draining. Drained describes the person’s feeling: I felt drained after the meeting. Say I feel drained, not I feel draining, when you mean that you are exhausted."
+      },
+      {
+        "field": "spanishTranslation",
+        "before": "agotador",
+        "after": "agotador / desgastante / que te deja sin energía (describe las reuniones que causan el cansancio)."
+      }
+    ],
+    "editorialRevision": 2,
+    "previousRevision": "AV-005-edited-candidates-revision-1.json",
+    "referenceAttachment": "AV-005-user-comparison-source.txt",
+    "previousEdits": [
+      {
+        "field": "category",
+        "before": "Adjective",
+        "after": "Adjective, from the regular verb drain"
+      },
+      {
+        "field": "spanishPronunciation",
+        "before": "Se pronuncia “dréining”; la /eɪ/ suena como la “ei” en “reina”, y la “‑ing” se mantiene como en inglés.",
+        "after": "Empieza con /dr/ y el diptongo /eɪ/. En -ing, /ɪ/ no es la i española: cambia la posición de la lengua, no solo la duración. Termina con /ŋ/, sin añadir una g separada."
+      },
+      {
+        "field": "alternatives",
+        "before": [
+          "exhausting",
+          "tiring",
+          "wearing out",
+          "sapping"
+        ],
+        "after": [
+          "exhausting",
+          "tiring",
+          "wearing me out",
+          "taking a lot out of me"
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "P03",
+    "sourceRunId": "13e1cf08-3eb2-4014-bff5-77a5193491fd",
+    "sourceProfileVersion": "av005-2",
+    "sourcePromptHash": "102b2bcaa2ac6e655075b32df18ae96d94cf511e1b37088f5a3682f1ce9d17e1",
+    "origin": "AI-proposed-editorial-corrections",
+    "humanReview": "pending",
+    "approved": false,
+    "fields": {
+      "target": "went",
+      "frontExample": "I went to the office yesterday.",
+      "meaning": "Went is the past simple of go. Here, it means that I traveled to the office yesterday.",
+      "category": "Verb — past simple of go",
+      "irregularForms": "go → went → gone",
+      "nativePronunciation": "/wɛnt/, one syllable; /ɛ/ is the vowel in bed. The forms sound different: go /ɡoʊ/, went /wɛnt/, gone /ɡɔn/ or /ɡɑːn/. Keep the final /nt/ together without adding a vowel; the t may be unreleased.",
+      "spanishPronunciation": "Empieza con /w/, sin añadir una g. La vocal /ɛ/ es más abierta que la e española. Conserva /nt/ al final y no añadas una e después de la t.",
+      "examples": [
+        "I usually go to the gym after work.",
+        "We went out for dinner last night.",
+        "She’s already gone home.",
+        "He goes to the office early on Mondays."
+      ],
+      "chunks": [
+        "went to work",
+        "went to the office",
+        "went home",
+        "went straight home",
+        "went back",
+        "went out for dinner"
+      ],
+      "usageNote": "In this example, went describes a completed trip: I went to the office yesterday. After have, has, or had, use gone, not went: She has gone home. After did or didn’t, use go: Did you go to the office?",
+      "alternatives": [
+        "headed to",
+        "traveled to",
+        "made my way to"
+      ],
+      "spanishTranslation": "fui a la oficina (un viaje o desplazamiento ya terminado)."
+    },
+    "corrections": [],
+    "edits": [
+      {
+        "field": "meaning",
+        "before": "past tense of go; traveled or moved to a place",
+        "after": "Went is the past simple of go. Here, it means that I traveled to the office yesterday."
+      },
+      {
+        "field": "nativePronunciation",
+        "before": "/wɛnt/. The vowel is like the one in bet. Keep the final /nt/ together without adding a vowel; the final t may be unreleased in natural speech.",
+        "after": "/wɛnt/, one syllable; /ɛ/ is the vowel in bed. The forms sound different: go /ɡoʊ/, went /wɛnt/, gone /ɡɔn/ or /ɡɑːn/. Keep the final /nt/ together without adding a vowel; the t may be unreleased."
+      },
+      {
+        "field": "examples",
+        "before": [
+          "She went to the gym after work.",
+          "We went out for dinner last Friday.",
+          "They went to the office early to finish the paperwork.",
+          "He went back home to get his laptop."
+        ],
+        "after": [
+          "I usually go to the gym after work.",
+          "We went out for dinner last night.",
+          "She’s already gone home.",
+          "He goes to the office early on Mondays."
+        ]
+      },
+      {
+        "field": "chunks",
+        "before": [
+          "went to work",
+          "went to the office",
+          "went home",
+          "went back",
+          "went out for dinner"
+        ],
+        "after": [
+          "went to work",
+          "went to the office",
+          "went home",
+          "went straight home",
+          "went back",
+          "went out for dinner"
+        ]
+      },
+      {
+        "field": "usageNote",
+        "before": "Common mistake: using “go” instead of the past form “went” when talking about a completed action. Remember “went” is only for past events.",
+        "after": "In this example, went describes a completed trip: I went to the office yesterday. After have, has, or had, use gone, not went: She has gone home. After did or didn’t, use go: Did you go to the office?"
+      },
+      {
+        "field": "alternatives",
+        "before": [
+          "traveled to",
+          "headed to",
+          "went over to"
+        ],
+        "after": [
+          "headed to",
+          "traveled to",
+          "made my way to"
+        ]
+      },
+      {
+        "field": "spanishTranslation",
+        "before": "fui",
+        "after": "fui a la oficina (un viaje o desplazamiento ya terminado)."
+      }
+    ],
+    "editorialRevision": 2,
+    "previousRevision": "AV-005-edited-candidates-revision-1.json",
+    "referenceAttachment": "AV-005-user-comparison-source.txt",
+    "previousEdits": [
+      {
+        "field": "category",
+        "before": "Verb",
+        "after": "Verb — past simple of go"
+      },
+      {
+        "field": "nativePronunciation",
+        "before": "/wɛnt/ – the vowel is like the short “e” in “bet”; final “t” is a crisp, unaspirated sound",
+        "after": "/wɛnt/. The vowel is like the one in bet. Keep the final /nt/ together without adding a vowel; the final t may be unreleased in natural speech."
+      },
+      {
+        "field": "spanishPronunciation",
+        "before": "Suena como “uént”, con la “w” inicial similar a la “u” inglesa y la “e” corta como en “peso”",
+        "after": "Empieza con /w/, sin añadir una g. La vocal /ɛ/ es más abierta que la e española. Conserva /nt/ al final y no añadas una e después de la t."
+      },
+      {
+        "field": "examples",
+        "before": [
+          "She went to the gym after work.",
+          "We went out for dinner last Friday.",
+          "They went through a lot of paperwork before the deadline.",
+          "He went over the report with the team this morning."
+        ],
+        "after": [
+          "She went to the gym after work.",
+          "We went out for dinner last Friday.",
+          "They went to the office early to finish the paperwork.",
+          "He went back home to get his laptop."
+        ]
+      },
+      {
+        "field": "chunks",
+        "before": [
+          "went over",
+          "went through",
+          "went out",
+          "went off",
+          "went back"
+        ],
+        "after": [
+          "went to work",
+          "went to the office",
+          "went home",
+          "went back",
+          "went out for dinner"
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "P04",
+    "sourceRunId": "13e1cf08-3eb2-4014-bff5-77a5193491fd",
+    "sourceProfileVersion": "av005-2",
+    "sourcePromptHash": "102b2bcaa2ac6e655075b32df18ae96d94cf511e1b37088f5a3682f1ce9d17e1",
+    "origin": "AI-proposed-editorial-corrections",
+    "humanReview": "pending",
+    "approved": false,
+    "fields": {
+      "target": "put off",
+      "frontExample": "Let's not put off this conversation.",
+      "meaning": "To delay an activity or conversation until a later time, sometimes because you do not want to deal with it yet.",
+      "category": "Phrasal verb",
+      "irregularForms": "put → put → put",
+      "nativePronunciation": "/pʊt ˈɔf/ or /pʊt ˈɑf/. The base, past, and participle put sound the same. Link the final t into the vowel of off; phrase stress can vary with emphasis.",
+      "spanishPronunciation": "La vocal /ʊ/ de put es más relajada y diferente de la u española; no es solo una diferencia de duración. Une las palabras sin añadir una vocal entre ellas y conserva la f final de off.",
+      "examples": [
+        "I usually put off difficult tasks until the last minute.",
+        "I put off calling him yesterday because I didn’t know what to say.",
+        "We’ve put off the meeting until next week.",
+        "Don’t keep putting it off—you’ll have to do it eventually."
+      ],
+      "chunks": [
+        "put something off",
+        "put it off",
+        "put off doing something",
+        "keep putting something off",
+        "put off a meeting",
+        "put off until later"
+      ],
+      "usageNote": "For another action, use -ing: put off calling him, not put off to call him. With a pronoun, say put it off, not put off it. With a noun, both put off the meeting and put the meeting off are natural.",
+      "alternatives": [
+        "postpone",
+        "delay",
+        "push back",
+        "leave it until later"
+      ],
+      "spanishTranslation": "posponer / aplazar / dejar para después; en este contexto: posponer esta conversación."
+    },
+    "corrections": [],
+    "edits": [
+      {
+        "field": "meaning",
+        "before": "to postpone or delay something",
+        "after": "To delay an activity or conversation until a later time, sometimes because you do not want to deal with it yet."
+      },
+      {
+        "field": "nativePronunciation",
+        "before": "/pʊt ˈɔf/; off also has /ɑf/ in American speech. Link the final t into the next vowel. Phrase stress can change with emphasis; do not assume put is always stressed.",
+        "after": "/pʊt ˈɔf/ or /pʊt ˈɑf/. The base, past, and participle put sound the same. Link the final t into the vowel of off; phrase stress can vary with emphasis."
+      },
+      {
+        "field": "spanishPronunciation",
+        "before": "Empieza put con /p/, no con /s/. La vocal /ʊ/ no es exactamente la u española. En off, mantén /f/ al final sin añadir una vocal.",
+        "after": "La vocal /ʊ/ de put es más relajada y diferente de la u española; no es solo una diferencia de duración. Une las palabras sin añadir una vocal entre ellas y conserva la f final de off."
+      },
+      {
+        "field": "examples",
+        "before": [
+          "We put off the meeting until next week.",
+          "She keeps putting off her dentist appointment.",
+          "I’ve put it off long enough.",
+          "Don’t put off talking to your manager."
+        ],
+        "after": [
+          "I usually put off difficult tasks until the last minute.",
+          "I put off calling him yesterday because I didn’t know what to say.",
+          "We’ve put off the meeting until next week.",
+          "Don’t keep putting it off—you’ll have to do it eventually."
+        ]
+      },
+      {
+        "field": "chunks",
+        "before": [
+          "put off the deadline",
+          "put it off",
+          "put off until later",
+          "put off the decision"
+        ],
+        "after": [
+          "put something off",
+          "put it off",
+          "put off doing something",
+          "keep putting something off",
+          "put off a meeting",
+          "put off until later"
+        ]
+      },
+      {
+        "field": "usageNote",
+        "before": "With a pronoun, put it between the two parts: put it off, not put off it. A noun can follow off or go between the parts: put off the meeting / put the meeting off.",
+        "after": "For another action, use -ing: put off calling him, not put off to call him. With a pronoun, say put it off, not put off it. With a noun, both put off the meeting and put the meeting off are natural."
+      },
+      {
+        "field": "alternatives",
+        "before": [
+          "postpone",
+          "delay",
+          "leave it until later"
+        ],
+        "after": [
+          "postpone",
+          "delay",
+          "push back",
+          "leave it until later"
+        ]
+      },
+      {
+        "field": "spanishTranslation",
+        "before": "posponer",
+        "after": "posponer / aplazar / dejar para después; en este contexto: posponer esta conversación."
+      }
+    ],
+    "editorialRevision": 2,
+    "previousRevision": "AV-005-edited-candidates-revision-1.json",
+    "referenceAttachment": "AV-005-user-comparison-source.txt",
+    "previousEdits": [
+      {
+        "field": "irregularForms",
+        "before": null,
+        "after": "put → put → put"
+      },
+      {
+        "field": "nativePronunciation",
+        "before": "/pʊt ɔf/ – stress on the first word; the /t/ is often linked to the following vowel in fast speech (\"put‑off\").",
+        "after": "/pʊt ˈɔf/; off also has /ɑf/ in American speech. Link the final t into the next vowel. Phrase stress can change with emphasis; do not assume put is always stressed."
+      },
+      {
+        "field": "spanishPronunciation",
+        "before": "pʊt → sút (como en \"sút\"), ɔf → óf (como en \"óf\"). Presta atención a la /t/ que suena más suave que la /t/ española.",
+        "after": "Empieza put con /p/, no con /s/. La vocal /ʊ/ no es exactamente la u española. En off, mantén /f/ al final sin añadir una vocal."
+      },
+      {
+        "field": "usageNote",
+        "before": "Common mistake: using \"put off\" when you mean \"put on\" (as in clothing). \"Put off\" is informal but widely accepted in both casual and workplace settings.",
+        "after": "With a pronoun, put it between the two parts: put it off, not put off it. A noun can follow off or go between the parts: put off the meeting / put the meeting off."
+      },
+      {
+        "field": "examples",
+        "before": [
+          "Let's not put off this conversation.",
+          "We should put off the meeting until next week.",
+          "He kept putting off his dentist appointment.",
+          "She decided to put off buying a new car.",
+          "They put off the product launch because of technical bugs."
+        ],
+        "after": [
+          "We put off the meeting until next week.",
+          "She keeps putting off her dentist appointment.",
+          "I’ve put it off long enough.",
+          "Don’t put off talking to your manager."
+        ]
+      },
+      {
+        "field": "alternatives",
+        "before": [
+          "postpone",
+          "delay",
+          "defer"
+        ],
+        "after": [
+          "postpone",
+          "delay",
+          "leave it until later"
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "P05",
+    "sourceRunId": "13e1cf08-3eb2-4014-bff5-77a5193491fd",
+    "sourceProfileVersion": "av005-2",
+    "sourcePromptHash": "102b2bcaa2ac6e655075b32df18ae96d94cf511e1b37088f5a3682f1ce9d17e1",
+    "origin": "AI-proposed-editorial-corrections",
+    "humanReview": "pending",
+    "approved": false,
+    "fields": {
+      "target": "fuel",
+      "frontExample": "These rumors fuel the argument.",
+      "meaning": "To make something stronger or keep it going. Here, the rumors make the argument stronger or harder to stop.",
+      "category": "Verb",
+      "irregularForms": null,
+      "nativePronunciation": "/ˈfjuːəl/. The first part sounds like few; move toward the weak vowel /ə/ before the final l. Some American speakers compress the syllables.",
+      "spanishPronunciation": "Empieza con /f/ seguida de /j/, como la y inglesa en yes, y luego /uː/. La segunda vocal /ə/ es débil: no la conviertas en una a española fuerte.",
+      "examples": [
+        "The new evidence fueled the debate at work.",
+        "His angry comments only fueled the argument.",
+        "Social media posts can fuel rumors and unnecessary conflict.",
+        "The team’s recent success has fueled hopes for a championship."
+      ],
+      "chunks": [
+        "fuel an argument",
+        "fuel a debate",
+        "fuel speculation",
+        "fuel conflict",
+        "fuel someone’s anger",
+        "fuel hopes"
+      ],
+      "usageNote": "Here, fuel is a verb: rumors fuel an argument by making it stronger. It is regular; the American past spelling is fueled, with one l: The announcement fueled speculation. As a noun, fuel means a substance used for energy: We need more fuel for the car.",
+      "alternatives": [
+        "feed",
+        "intensify",
+        "add to",
+        "make stronger"
+      ],
+      "spanishTranslation": "alimentar / avivar; en este contexto: Estos rumores alimentan la discusión."
+    },
+    "corrections": [],
+    "edits": [
+      {
+        "field": "meaning",
+        "before": "to make something stronger or more intense, especially a disagreement or debate",
+        "after": "To make something stronger or keep it going. Here, the rumors make the argument stronger or harder to stop."
+      },
+      {
+        "field": "nativePronunciation",
+        "before": "/ˈfjuːəl/. Start with /fj/ and move from /uː/ toward the weak vowel /ə/ before l. Some speakers compress the syllables; do not describe the stressed vowel as /ʊ/ in book.",
+        "after": "/ˈfjuːəl/. The first part sounds like few; move toward the weak vowel /ə/ before the final l. Some American speakers compress the syllables."
+      },
+      {
+        "field": "spanishPronunciation",
+        "before": "Empieza con /f/ seguida de un deslizamiento /j/, como la y inicial inglesa de yes. Pasa de /uː/ hacia una vocal débil antes de la l; una aproximación española no reproduce todos los sonidos.",
+        "after": "Empieza con /f/ seguida de /j/, como la y inglesa en yes, y luego /uː/. La segunda vocal /ə/ es débil: no la conviertas en una a española fuerte."
+      },
+      {
+        "field": "examples",
+        "before": [
+          "The new evidence fueled the debate.",
+          "His angry speech fueled the crowd’s frustration.",
+          "Social media can fuel rumors.",
+          "The team’s recent win has fueled hopes for a championship."
+        ],
+        "after": [
+          "The new evidence fueled the debate at work.",
+          "His angry comments only fueled the argument.",
+          "Social media posts can fuel rumors and unnecessary conflict.",
+          "The team’s recent success has fueled hopes for a championship."
+        ]
+      },
+      {
+        "field": "chunks",
+        "before": [
+          "fuel the argument",
+          "fuel the debate",
+          "fuel speculation",
+          "fuel someone’s anger"
+        ],
+        "after": [
+          "fuel an argument",
+          "fuel a debate",
+          "fuel speculation",
+          "fuel conflict",
+          "fuel someone’s anger",
+          "fuel hopes"
+        ]
+      },
+      {
+        "field": "usageNote",
+        "before": "In this context, fuel is a verb: something fuels an argument, fear, or speculation by making it stronger. The regular American past spelling is fueled. The noun fuel also means a substance used for energy.",
+        "after": "Here, fuel is a verb: rumors fuel an argument by making it stronger. It is regular; the American past spelling is fueled, with one l: The announcement fueled speculation. As a noun, fuel means a substance used for energy: We need more fuel for the car."
+      },
+      {
+        "field": "alternatives",
+        "before": [
+          "make it stronger",
+          "feed",
+          "add to"
+        ],
+        "after": [
+          "feed",
+          "intensify",
+          "add to",
+          "make stronger"
+        ]
+      },
+      {
+        "field": "spanishTranslation",
+        "before": "alimentar / avivar (una discusión o un sentimiento)",
+        "after": "alimentar / avivar; en este contexto: Estos rumores alimentan la discusión."
+      }
+    ],
+    "editorialRevision": 2,
+    "previousRevision": "AV-005-edited-candidates-revision-1.json",
+    "referenceAttachment": "AV-005-user-comparison-source.txt",
+    "previousEdits": [
+      {
+        "field": "nativePronunciation",
+        "before": "/fjuːl/ – one syllable, the /j/ sound is like the ‘y’ in “yes”; in fast speech the final /l/ may be a light, almost vocalic sound.",
+        "after": "/ˈfjuːəl/. Start with /fj/ and move from /uː/ toward the weak vowel /ə/ before l. Some speakers compress the syllables; do not describe the stressed vowel as /ʊ/ in book."
+      },
+      {
+        "field": "spanishPronunciation",
+        "before": "Pronunciar como “fyúl”; la /j/ suena como la ‘y’ inglesa, no como la ‘y’ española.",
+        "after": "Empieza con /f/ seguida de un deslizamiento /j/, como la y inicial inglesa de yes. Pasa de /uː/ hacia una vocal débil antes de la l; una aproximación española no reproduce todos los sonidos."
+      },
+      {
+        "field": "examples",
+        "before": [
+          "The new evidence really fuel(ed) the controversy at the meeting.",
+          "His passionate speech fuel(ed) the crowd’s enthusiasm.",
+          "Social media posts can quickly fuel (or fuelled) panic during a crisis.",
+          "The manager’s comments only fuel(ed) the team's frustration."
+        ],
+        "after": [
+          "The new evidence fueled the debate.",
+          "His angry speech fueled the crowd’s frustration.",
+          "Social media can fuel rumors.",
+          "The team’s recent win has fueled hopes for a championship."
+        ]
+      },
+      {
+        "field": "usageNote",
+        "before": "‘Fuel’ can be both a noun (e.g., gasoline) and a verb. When used as a verb, it usually means to intensify or sustain something, not to literally provide energy.",
+        "after": "In this context, fuel is a verb: something fuels an argument, fear, or speculation by making it stronger. The regular American past spelling is fueled. The noun fuel also means a substance used for energy."
+      },
+      {
+        "field": "alternatives",
+        "before": [
+          "ignite",
+          "stoke",
+          "drive",
+          "propel"
+        ],
+        "after": [
+          "make it stronger",
+          "feed",
+          "add to"
+        ]
+      },
+      {
+        "field": "chunks",
+        "before": [
+          "fuel the fire",
+          "fuel the debate",
+          "fuel growth",
+          "fuel the engine",
+          "fuel up"
+        ],
+        "after": [
+          "fuel the argument",
+          "fuel the debate",
+          "fuel speculation",
+          "fuel someone’s anger"
+        ]
+      },
+      {
+        "field": "spanishTranslation",
+        "before": "alimentan",
+        "after": "alimentar / avivar (una discusión o un sentimiento)"
+      }
+    ]
+  }
+]

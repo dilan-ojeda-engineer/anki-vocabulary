@@ -2,11 +2,13 @@
 
 **Version:** 0.1  
 **Date:** October 11, 2026  
-**Status:** Draft reference expectations; no model run or human linguistic sign-off yet.  
+**Status:** Draft reference expectations; real AV-005 model runs and preliminary AI findings are recorded in [TEXT_FEASIBILITY.md](TEXT_FEASIBILITY.md). Human linguistic sign-off remains pending.
 **Proposed owner:** Bulma  
 **Proposed learning reviewer:** Dilan; obtain additional linguistic review for uncertain judgments.
 
 This set tests the built-in English Coach profile in [CARD_SPEC.md](CARD_SPEC.md). It supplies input and expected behavior, not complete generated cards or approved ground truth. All input sentences below are synthetic examples created for the project. Expected wording may vary; a model must preserve the intended sense and learning requirements.
+
+Language-policy clarification, November 2, 2026: current profile `av005-5` preserves the entire official structure, including Spanish Translation. Explanations, correction reasons, examples, and both pronunciation subsections must be in English; only the translation field uses contextual Spanish. The case inputs/IDs and meaning/form expectations are unchanged. Earlier v3/v4 section removals are historical deviations, not the current content requirement.
 
 ## Five-item prototype batch
 
@@ -65,11 +67,11 @@ Define the actual fixture field keys and schema during AV-003. This document des
 
 For every generated card, check:
 
-- **Structure:** exact profile headings/order; every required field; 3–4 additional examples, 3–6 chunks, 2–4 alternatives; irregular forms present only when applicable.
+- **Structure:** exact profile headings/order; every required field; 4–5 additional examples (owner decision November 1, 2026), 3–6 chunks, 2–4 alternatives; irregular forms present only when applicable. Case inputs remain dataset version 0.1; the AV-005 operational profile records this revised count separately.
 - **Meaning and grammar:** target/context preserved, correction explained, useful category/base-form guidance, accurate sense and forms.
 - **Speaking usefulness:** natural American English examples, useful common chunks, varied but realistic constructions, B1–B2 explanations.
-- **Pronunciation:** suitable General American IPA and both required pronunciation subsections; accurate Spanish-speaker guidance. Review pronunciation with a reliable pronunciation reference or qualified reviewer where uncertain; no exact IPA answer key is asserted here.
-- **Translation and alternatives:** contextual Spanish and alternatives that fit the supplied meaning; no requirement that every synonym be interchangeable in every sentence.
+- **Pronunciation:** suitable General American IPA and practical English-language guidance in both Native English and For Spanish speakers subsections. Review pronunciation with a reliable pronunciation reference or qualified reviewer where uncertain; no exact IPA answer key is asserted here. Older runs retain their historical review findings.
+- **Language, translation, and alternatives:** English in explanations, examples, usage notes, corrections, and both pronunciation subsections; contextual Spanish only in Spanish Translation. Alternatives must fit the supplied meaning; no requirement that every synonym be interchangeable in every sentence.
 - **Review usability:** concise entries without omitted content; readable phone layout; no extra quizzes, rankings, or headings introduced by the model.
 
 Classify findings as **blocker**, **needs correction**, or **acceptable variation**. Wrong meaning, false forms, missing required content, or misleading pronunciation block that card's acceptance. Acceptable differences in phrasing or supported American pronunciation variants do not fail a card merely for differing from a single answer string.
@@ -100,4 +102,4 @@ Candidate decision: suitable for next experiment / adjust and rerun / replace / 
 Reviewer, evidence location, and linked issue:
 ```
 
-**Current evidence:** P01–P05, Q01–Q08, and F01–F07 are defined. All execution results and human approvals remain **Not run / Pending**. Do not mark AV-005 complete merely because this document exists.
+**Current evidence:** P01–P05 and Q01–Q08 have real AV-005 execution evidence, with separate prompt versions and raw-versus-edited findings linked in [TEXT_FEASIBILITY.md](TEXT_FEASIBILITY.md). F04/F05/F06 and alternate-profile validation have controlled offline coverage; import/renderer scenarios remain unrun in this experiment. Human expectation review and card approval remain **Pending**. No integrated prototype acceptance is claimed.

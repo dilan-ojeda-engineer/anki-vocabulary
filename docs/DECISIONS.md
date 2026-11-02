@@ -11,7 +11,7 @@ Record meaningful product/architecture choices with their status, reason, altern
 | DEC-002 | Kanban flow with weekly planning/demo, WIP limits, and small PRs | Proposed | Fits uncertain integration work and potentially part-time availability; a formal Scrum cadence can be reconsidered if the team prefers it | Confirm the working agreement at kickoff; review flow after two weeks of development |
 | DEC-003 | GitHub repository/Issues/Projects/Actions | Proposed | Keeps task, review, and build evidence together; another shared Git host/board is acceptable | Choose hosting/visibility, inspect account features/budget, then configure AV-002 |
 | DEC-004 | TypeScript application with React/Electron and modular adapters | Proposed implementation; TypeScript ecosystem is a confirmed preference | Supports desktop/local integrations and reusable core; packaging has native/runtime tradeoffs | AV-002/008 validate repeatable setup and Windows packaging |
-| DEC-005 | Groq with GPT-OSS 120B for the first text-model experiment | Proposed, not selected | Candidate supports structured output and a quota-limited free workflow; alternatives should be evaluated if quality/capacity fails | Record account access and model choice before AV-005; evaluate actual learning output |
+| DEC-005 | Groq with GPT-OSS 120B for the first text-model experiment | Experiment selection completed; no production adoption, superseded for provider selection by DEC-024 | Candidate supports structured output and a quota-limited free workflow; alternatives were evaluated after quality/capacity issues | AV-005 records actual quality, usage, and quota behavior |
 | DEC-006 | ElevenLabs hosted speech plus one local engine | Confirmed requirement; Piper is proposed local engine | Offers hosted voice choice and offline synthesis; Piper adds an external runtime | AV-006/007 evaluate both; clarify no-extra-Python requirement if requested |
 | DEC-007 | Existing Anki deck selection and direct AnkiConnect delivery; retain package export | Confirmed workflow; adapter/library compatibility unverified | Direct selection meets the requested workflow; export supports portability | AV-004/008 test identities, repeated delivery, updates, and media |
 | DEC-008 | Explicit approval of exact revisions before audio/delivery | Confirmed requirement | Human review is needed for AI content; edits invalidate stale approval | AV-013/016 enforce and demonstrate the rule |
@@ -38,6 +38,34 @@ The tested Anki runtime was 26.09.3; the add-on's documented minimum is 26.08. T
 [PROTOTYPE_PLAN.md](PROTOTYPE_PLAN.md#proposed-experiment-configuration) records the proposed first-run settings, with [open items and proposed owners](PROTOTYPE_PLAN.md#open-items-and-ownership). [AI_EVALUATION.md](AI_EVALUATION.md) records fixed input and expected behavior without claiming human-reviewed ground truth.
 
 The user's instruction to proceed authorized this readiness-document pass. It does not establish human role appointments, account access, a confirmed production provider, a selected voice, or passing compatibility tests. Keep pending statuses until the relevant choice/evidence is actually recorded; independent fixture/skeleton work can proceed without every later release decision being settled.
+
+### DEC-018 — English Coach example count and AV-005 prompt
+
+On November 1, 2026, the owner explicitly chose 4–5 additional examples, four by default and a fifth only when useful, after being shown the conflict between the new attachment's main rule and the earlier 3–4 project interpretation. This supersedes that earlier count for AV-005 onward; historical prompt archives and AV-003 fixtures stay unchanged. The versioned `av005-1` profile/adaptation preserves the new attachment's teaching guidance, uses nullable irregular forms in JSON, and leaves display headings to the profile layout. Default sentence audio planning becomes five clips per card, with six when a fifth additional example is present. No audio integration is implemented by this decision. See [TEXT_FEASIBILITY.md](TEXT_FEASIBILITY.md).
+
+### DEC-019 — English-only learning content
+
+On November 2, 2026, the owner explicitly removed Spanish from the cards. Current profile/prompt `av005-3` therefore omits the Spanish pronunciation and translation fields and their layout entries; explanations, correction reasons, examples, and pronunciation guidance are English only, with IPA retained. This supersedes the archived prompt's bilingual requirements for current output. Earlier prompt/profile snapshots and real run evidence stay unchanged. The new layout has its own note-type key/version; this does not migrate existing Anki notes. See [CARD_SPEC.md](CARD_SPEC.md) and [the English-only prompt](prompts/english-coach-av005-3.md).
+
+### DEC-020 — Audience-specific pronunciation guidance remains in English
+
+The owner clarified on November 2, 2026 that the Spanish-speaker pronunciation tips were missing. The English-only instruction concerns the language of the content, not removal of that teaching support. This corrects the overly broad subsection removal recorded in DEC-019. Current profile/prompt av005-4 includes both Native English and For Spanish speakers guidance, entirely in English with IPA, and excludes Spanish translations. Historical v3 and earlier evidence remain unchanged. The new layout uses its own note-type key/version; no existing Anki collection migration or new provider validation is implied.
+
+### DEC-021 — Preserve the complete official card structure
+
+On November 2, 2026, the owner explicitly confirmed that Spanish Translation stays because it is part of the prompt. This resolves the language/structure ambiguity and supersedes the translation removal in DEC-019/DEC-020. Current av005-5 preserves every official heading in order, omitting only Irregular Forms when inapplicable. All explanations and both pronunciation subsections are in English; contextual Spanish appears only in Spanish Translation. A contract test locks the complete heading sequence and required translation field. Earlier versions/evidence remain unchanged; no real av005-5 response or Anki migration is implied.
+
+### DEC-022 — Explicit Qwen comparison without automatic fallback
+
+On November 2, 2026, the owner authorized a comparison of Groq Qwen 3.8 27B against GPT-OSS 120B using the unchanged av005-5 prompt, strict schema, fixed inputs, and request settings. The experiment runner accepts only explicit allowlisted model IDs and records the selected model; its historical default remains GPT-OSS. The [actual comparison](evidence/AV-005-qwen-comparison.md) completed two cases and stopped after a repeated rate-limit rejection on P03. Qwen is not adopted: the comparison is incomplete and available cards still have teaching defects. This does not authorize paid/provider fallback or imply production model selection.
+
+### DEC-023 — Explicit Gemini feasibility comparison
+
+On November 2, 2026, the owner selected Gemini after the incomplete Groq comparison, configured a local key, and reported the associated project's Free tier. This authorizes the explicit native Gemini `gemini-3.8-flash` experiment with the unchanged av005-5 prompt; it does not adopt a production provider or authorize paid fallback. The adapter records native settings/usage and its transport schema separately from canonical local validation. The [experiment report](TEXT_FEASIBILITY.md#gemini-configuration) records access, checks, actual outcomes, and pending learning acceptance. Groq evidence remains preserved.
+
+### DEC-024 — Pause AV-005 without adopting a text provider
+
+On November 2, 2026, the owner paused AV-005 and chose to preserve its code, prompts, raw evidence, and editorial candidates as an inconclusive feasibility record. Groq GPT-OSS produced structurally valid cards with substantive learning defects; the Qwen comparison remained incomplete after rate limits; Gemini generation returned service-unavailable diagnostics and no cards. None is adopted for production, and no generated or manually edited card is automatically approved. This decision closes the current experiment checkpoint without claiming product acceptance. A future project-direction decision may reuse the profile, validation, evaluation cases, provider boundaries, and Anki evidence while selecting a different workflow or provider.
 
 ## Lightweight architecture decision format
 

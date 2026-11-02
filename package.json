@@ -20,6 +20,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "experiment:anki": "vite build --config vite.experiments.config.ts && node out/experiments/anki-feasibility.mjs",
+    "experiment:text": "vite build --config vite.text-experiment.config.ts && node out/text-experiment/text-feasibility.mjs",
     "test:e2e": "npm run build && playwright test",
     "build": "electron-vite build",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build"

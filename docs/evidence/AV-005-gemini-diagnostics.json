@@ -1,0 +1,43 @@
+{
+  "task": "AV-005",
+  "date": "2026-11-02",
+  "purpose": "Isolate the Gemini generation timeout from the card prompt and structured-output schema",
+  "model": "gemini-3.8-flash",
+  "endpoint": "generateContent",
+  "request": {
+    "content": "Reply with exactly OK.",
+    "structuredOutput": false,
+    "systemInstruction": false,
+    "temperature": 0.2,
+    "maxOutputTokens": 128,
+    "candidateCount": 1,
+    "thinkingLevel": "LOW",
+    "includeThoughts": false,
+    "deadlineMs": 30000
+  },
+  "probes": [
+    {
+      "id": "a0e49b6d-e410-4089-ace7-132d1d5ac05a",
+      "connectedMs": 177.6211,
+      "bodySentMs": 181.1733,
+      "responseHeadersMs": 2879.2064,
+      "httpStatus": 503,
+      "elapsedMs": 2884.8472
+    },
+    {
+      "id": "1ec3aba3-72e1-4764-9667-fa6936745c9c",
+      "connectedMs": 1098.2673,
+      "bodySentMs": 1127.9669,
+      "responseHeadersMs": 5824.1059,
+      "httpStatus": 503,
+      "elapsedMs": 5834.1162
+    }
+  ],
+  "retries": 0,
+  "deliberateFollowUpProbes": 1,
+  "fallback": false,
+  "completionReceived": false,
+  "usageAvailable": false,
+  "diagnosis": "Gemini generation service temporarily overloaded or unavailable; not a demonstrated prompt, schema, authentication, model-name, network, or quota failure",
+  "humanReview": "pending"
+}

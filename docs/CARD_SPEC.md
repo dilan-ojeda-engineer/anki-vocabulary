@@ -1,6 +1,6 @@
 # Card content specification
 
-**Version:** 0.2  
+**Version:** 0.6
 **Source:** User-supplied English-coach prompt.  
 **Status:** Content requirements recorded; front/back boundary and audio placement are proposed interpretations for review.
 
@@ -8,7 +8,7 @@
 
 ## Content and rendering contract
 
-Teach one vocabulary target in one primary context per note. Preserve context, American English usage, B1–B2 explanation difficulty, useful B2–C1 nuances, and Spanish-speaker pronunciation guidance.
+Teach one vocabulary target in one primary context per note. Preserve context, American English usage, B1–B2 explanation difficulty, and useful B2–C1 nuances. The owner confirmed on November 2, 2026 that the complete official structure must remain, including Spanish Translation. Meanings, examples, usage notes, corrections, and both pronunciation subsections are written in English; contextual Spanish appears only in Spanish Translation. This supersedes the section removals in av005-3/av005-4; archives and recorded runs remain unchanged.
 
 Proposed front:
 
@@ -32,9 +32,9 @@ Back headings must appear in this exact order:
 10. Natural alternatives:
 11. Spanish Translation:
 
-`Native English:` and `For Spanish speakers:` are subsections of `Pronunciation tip:`. Use the actual user's content requirements rather than generating prose for these numbered entries.
+`Native English:` and `For Spanish speakers:` are subsections of `Pronunciation tip:`. Both are written in English; the second gives practical English sound guidance for that learner audience, not a translation or Spanish spelling approximation. General American IPA remains required. Use the actual user's content requirements rather than generating prose for these numbered entries.
 
-Provide 3–4 additional examples, 3–6 chunks, and 2–4 alternatives. The default is three additional examples; a fourth is allowed when useful. Never omit required content merely to fit a shorter card.
+Provide 4–5 additional examples, 3–6 chunks, and 2–4 alternatives. The default is four additional examples; a fifth is allowed when useful. This owner decision on November 1, 2026 supersedes the earlier 3–4 default for AV-005 onward. Never omit required content merely to fit a shorter card. The original archive below and AV-003 fixtures preserve their historical wording; the newly supplied [prompt archive](prompts/english-coach-user-2026-11-01.txt) is also preserved unchanged, with its conflicts resolved in the [versioned operational adaptation](prompts/english-coach-av005-1.md).
 
 Keep spelling corrections in the app's review area before the card; use the corrected target in the card. Explain an inflected form/base word through the category or existing usage sections. Add a low-priority warning inside the existing usage-note section, without adding a new heading. These placement choices are implementation defaults derived from the user's restrictions on additional sections.
 
@@ -42,7 +42,7 @@ The original prompt contains a teaching specification followed by the final temp
 
 ## Structured content and audio
 
-Store target, front example, contextual meaning, category, optional irregular forms, pronunciation content for both subsections, extra examples, chunks, usage note, alternatives, and Spanish translation as distinct typed fields. Keep corrections, input context, prompt/model metadata, approval state, and media references separately from visible learning content.
+Store target, front example, contextual meaning, category, optional irregular forms, both English-written pronunciation subsections, extra examples, chunks, usage note, alternatives, and contextual Spanish translation as distinct typed fields. Current profile `av005-5` requires `spanishPronunciation` for English-written audience-specific guidance and `spanishTranslation` for the Spanish equivalent. Historical snapshots retain their original fields for reproduction. Keep corrections, input context, prompt/model metadata, approval state, and media references separately from visible learning content.
 
 Use a nullable irregular-forms value in machine output and omit its visible heading when absent. Array length, required text, and rendering order are programmatically checked; pronunciation, naturalness, and semantic accuracy also need human review.
 

@@ -5,11 +5,13 @@
     "src/main/**/*.ts",
     "src/integrations/**/*.ts",
     "src/experiments/**/*.ts",
+    "src/profiles/**/*.ts",
     "src/preload/**/*.ts",
     "src/shared/**/*.ts",
     "electron.vite.config.ts",
     "vite.renderer.config.ts",
     "vite.experiments.config.ts",
+    "vite.text-experiment.config.ts",
     "vitest.config.ts",
     "playwright.config.ts"
   ]

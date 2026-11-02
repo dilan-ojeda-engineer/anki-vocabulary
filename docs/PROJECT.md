@@ -25,16 +25,16 @@ The first release succeeds when a person can enter up to 50 vocabulary items, re
 | Operating system | Windows first | Confirmed |
 | Batch size | Up to 50 vocabulary items | Confirmed |
 | Study devices | Computer and mobile | Confirmed |
-| Learning content | User's prompt; American English and Spanish-speaker guidance | Confirmed |
+| Learning content | User's teaching prompt, with English explanations, General American pronunciation guidance, and Spanish only in the required contextual translation | Owner confirmed the complete official structure November 2, 2026; earlier prompt/profile snapshots remain historical |
 | Review | Display generated cards and require approval before further processing | Confirmed |
 | Provider credentials | Each person uses their own accounts and API keys | Confirmed |
 | Speech integrations | One local engine and one hosted provider initially | Confirmed |
 | Hosted speech | ElevenLabs | Confirmed |
 | Local speech | Piper with a General American voice | Recommended default; voice needs a listening test |
-| Written card generation | Free hosted text API, with Groq as the initial candidate | Provisional; user confirmed automatic generation but not the execution location/provider |
-| Prototype text-model candidate | GPT-OSS 120B through Groq | Recommended experiment; not yet selected or validated |
+| Written card generation | Replaceable text-provider adapter; no production provider adopted | AV-005 evaluated Groq candidates and Gemini, then paused inconclusively |
+| Prototype text-model candidate | Unresolved | [Real evaluation](TEXT_FEASIBILITY.md) found learning defects, rate limits, and service unavailability; preserved candidates are not endorsed |
 | Card layout | Target, example, and question on front; explanations on back | Proposed interpretation of the supplied prompt |
-| Audio coverage | Front example and all 3–4 additional examples | Proposed default |
+| Audio coverage | Front example and all 4–5 additional examples | Owner revised the example count for AV-005 on November 1, 2026; default is four additional examples |
 | Audio playback | Front sentence on front; additional sentences on back, each with a replay control | Proposed default; test Anki autoplay behavior |
 | Anki delivery | AnkiConnect for direct delivery; retain `.apkg` export for manual import | Direct delivery confirmed; package export retained |
 | Destination deck | List existing Anki decks; user selects where new cards belong | Confirmed first-release requirement |
@@ -42,7 +42,7 @@ The first release succeeds when a person can enter up to 50 vocabulary items, re
 | Future delivery | Hosted web app after the desktop release; build reusable boundaries now | Confirmed roadmap item |
 | Future customization | User-defined prompts and card structures through versioned profiles | Confirmed roadmap item; generic engine boundaries apply now |
 
-Automatic written-card generation is required. Manual copying from a chat service is not the planned primary workflow. The provisional text-provider choice must be resolved and recorded before implementing that integration; documentation and export experiments can proceed independently.
+Automatic written-card generation remains a requirement in this version of the project brief. Manual copying from a chat service is not the planned primary workflow. AV-005 ended without adopting a provider: Groq outputs needed substantive learning corrections, its Qwen comparison was rate-limited, and Gemini generation was unavailable during the recorded checks. Revisit the provider/content-validation strategy before implementing production generation.
 
 ## 3. First-release workflow and requirements
 
@@ -113,7 +113,7 @@ All custom application code can be TypeScript, with `.tsx` for React and CSS for
 | Processing runtime | Electron's embedded Node.js; Node.js LTS for development | Run provider requests, local file operations, and background work in TypeScript |
 | Runtime validation | Zod | Validate input, profile-defined AI output, settings, and inter-process messages; derive JSON Schema where supported |
 | Persistent storage | SQLite with better-sqlite3 and Drizzle ORM/Drizzle Kit | Keep a local database, typed queries, and versioned SQL migrations |
-| Text generation | TypeScript adapter using the chosen provider's SDK or HTTPS API | Keep the provider replaceable; free hosted generation with Groq remains the provisional default |
+| Text generation | TypeScript adapter using a selected provider's SDK or HTTPS API | Keep the provider replaceable; AV-005 did not establish a production default |
 | Hosted speech | ElevenLabs JavaScript SDK behind a TTS adapter | Use each person's credentials and save audio locally |
 | Local speech | Piper CLI, invoked by a TypeScript adapter | Generate offline audio; treat the engine, Python runtime, and voice files as external dependencies |
 | Direct Anki integration | TypeScript adapter over AnkiConnect's local HTTP API | List existing decks, upload audio, and insert/update app-owned notes in the chosen destination |

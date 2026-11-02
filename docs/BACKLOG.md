@@ -2,7 +2,7 @@
 
 **Version:** 0.2  
 **Date:** October 11, 2026  
-**Status:** Proposed assignments and ordering. The owner authorized AV-002, AV-003, and AV-004 merges into local `main`; [foundation follow-ups](DEVELOPMENT.md) and [contract evidence](SHARED_CONTRACTS.md) remain recorded. AV-004 Anki feasibility has [real and simulated evidence](ANKI_FEASIBILITY.md); independent human peer review and board acceptance remain separate. Other implementation remains unstarted. No remote board status or proposed human assignment acceptance is implied.
+**Status:** Proposed assignments and ordering. The owner authorized AV-002, AV-003, and AV-004 merges into local `main`; [foundation follow-ups](DEVELOPMENT.md) and [contract evidence](SHARED_CONTRACTS.md) remain recorded. AV-004 Anki feasibility has [real and simulated evidence](ANKI_FEASIBILITY.md). AV-005 is paused as an inconclusive feasibility experiment: its [real text-model results and preliminary learning findings](TEXT_FEASIBILITY.md) are preserved, but no production provider or generated card set was adopted. Independent human review and board acceptance remain separate. Other implementation remains unstarted. No remote board status or proposed human assignment acceptance is implied.
 
 Use this as the baseline for a shared issue board. Dilan, Bulma, and Trunks are confirmed full-stack developers. Owners/reviewers below are proposed initial assignments; confirm them against availability at kickoff. See [DELIVERY_PLAYBOOK.md](DELIVERY_PLAYBOOK.md). Rows are not remote issues or assignments sent to people.
 

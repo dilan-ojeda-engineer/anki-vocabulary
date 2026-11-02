@@ -2,3 +2,5 @@
 *.png binary
 *.jpg binary
 *.ico binary
+docs/prompts/english-coach-user-2026-11-01.txt -text -eol whitespace=-trailing-space
+docs/evidence/AV-005-user-comparison-source.txt -text -eol whitespace=-trailing-space

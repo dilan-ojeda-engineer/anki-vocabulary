@@ -2,13 +2,13 @@
 
 **Version:** 0.1  
 **Date:** October 11, 2026  
-**Status:** Design proposal; provider and Anki integrations are not implemented.
+**Status:** Production workflow design. Separate [Anki feasibility](ANKI_FEASIBILITY.md) and [text-model feasibility](TEXT_FEASIBILITY.md) experiments have evidence; production worker/settings/UI integration remains unimplemented.
 
 ## What the different choices mean
 
 | Choice | What it controls | Example |
 |---|---|---|
-| Text provider and model | Which service generates written content | A suitable model through Groq; provisional |
+| Text provider and model | Which service generates written content | Unresolved after AV-005; adapter remains replaceable |
 | Prompt | Teaching instructions, language, tone, and content | Your B1-to-B2/C1 English-coach instructions |
 | Card structure/template | Fields and how they appear on each side | Target and sentence on front; explanations on back |
 | Audio selection | Which fields are spoken and where clips appear | Front sentence and additional examples |
@@ -21,7 +21,7 @@ A deck groups cards for study. Its name does not define their field layout. A pr
 
 Input: `draining (context: Back-to-back meetings can be draining.)`.
 
-1. **Configure the services once.** Select the written-content provider/model and enter its API key in settings. Configure ElevenLabs separately for speech. Groq is the provisional text-provider candidate; ElevenLabs is the confirmed hosted speech provider. The written-content choice still needs confirmation and a quality/allowance check.
+1. **Configure the services once.** Select the written-content provider/model and enter its API key in settings. Configure ElevenLabs separately for speech. AV-005 evaluated Groq and Gemini without adopting either for production; a later decision must select and validate a provider. ElevenLabs is the confirmed hosted speech provider in this historical desktop design. The settings UI described here remains planned; AV-005 uses local backend environment variables.
 2. **Start a batch.** Choose the English Coach profile and destination deck. The import preview separates the target `draining` from its context. Save this input so a failure will not lose it.
 3. **Build the AI request.** Our TypeScript code combines the selected profile's teaching instructions, the target/context, and an output schema describing the profile's fields. The schema tells the model where to put its meaning, examples, pronunciation guidance, and translations. Adapt transport instructions in a separately versioned operational prompt; keep the original user prompt archived intact.
 4. **Call the model's API.** A TypeScript provider adapter sends that request from the processing worker. We use an existing model; there is no model training, chat-window automation, or autonomous agent required. The provider returns generated data and available usage metadata. Hosted generation sends the submitted target/context to that provider; the deck name and unrelated library content need not be sent.

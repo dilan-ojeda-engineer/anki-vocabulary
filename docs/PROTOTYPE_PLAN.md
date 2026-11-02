@@ -20,10 +20,10 @@ This is an experiment configuration, not confirmation that candidate tools work 
 | Application | Strict TypeScript, React/Electron, one repository | AV-002/008 verify setup and packaging; compatible package versions are not pinned yet |
 | Profile | Built-in `english-coach`, initial immutable profile version | Operational adaptation derives from the archived prompt; AV-003 records exact schema and version/hash |
 | Front/back layout | Target/example/question front; required sections back | Existing proposed interpretation in CARD_SPEC.md; Dilan's visual review pending |
-| Text provider/model | Groq / `openai/gpt-oss-120b` | Provisional experiment candidate, not a confirmed production choice; validate account access and current schema support before AV-005 |
+| Text provider/model | Unresolved after AV-005 | [Actual evidence](TEXT_FEASIBILITY.md) is preserved; Groq candidates were not suitable for adoption and Gemini generation was unavailable during the experiment |
 | Text output mode | Profile-derived JSON Schema when supported | Still perform runtime validation and human review; record actual request settings without claiming schema compliance proves semantic quality |
 | Main-path speech | ElevenLabs | Hosted provider confirmed; actual available General American voice/model and supported file format selected after a listening check |
-| Audio coverage | Front sentence plus three additional examples by default | Existing proposed default: four clips per note, 20 clips for five notes; fourth additional example remains allowed and creates another clip |
+| Audio coverage | Front sentence plus four additional examples by default | Owner revised the count November 1, 2026: five clips per note, 25 clips for five notes; a fifth additional example remains allowed and creates another clip |
 | Local speech experiment | Piper, through external runtime/voice installation | Local integration required; Python runtime proposal and actual voice/setup/license checks pending |
 | Direct Anki connection | Configured loopback endpoint, currently proposed `http://127.0.0.1:8765` | Verify current installed API and capabilities, pairing, and a writable ordinary destination deck in AV-004 |
 | Test destination | User-selected nested deck in a disposable collection | Select the actual deck at experiment setup; do not hard-code a learner's live deck |
@@ -31,7 +31,7 @@ This is an experiment configuration, not confirmation that candidate tools work 
 | Generation budget | Free-tier accounts without paid fallback | Confirm the account owner's allowance/billing state; pause on quota errors rather than buying capacity |
 | Initial processing | One worker, sequential per-item jobs | Persist results/receipts; prevent double-clicks from starting duplicate work |
 
-Four clips per note describes the chosen default, not a changed maximum. A run with four additional examples must report five clips for that note; retry/cache checks use actual expected clips rather than a hard-coded count of 20.
+Five clips per note describes the chosen default, not a changed maximum. A run with five additional examples must report six clips for that note; retry/cache checks use actual expected clips rather than a hard-coded count of 25.
 
 Exact provider settings and versions belong in experiment evidence. Voice IDs, model settings, allowances, and runtime compatibility must not be invented in advance. This document grants no authority to use another developer's account or to publish a release.
 
