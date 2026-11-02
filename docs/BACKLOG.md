@@ -2,7 +2,7 @@
 
 **Version:** 0.2  
 **Date:** October 11, 2026  
-**Status:** Proposed assignments and ordering. The owner authorized AV-002, AV-003, and AV-004 merges into local `main`; [foundation follow-ups](DEVELOPMENT.md) and [contract evidence](SHARED_CONTRACTS.md) remain recorded. AV-004 Anki feasibility has [real and simulated evidence](ANKI_FEASIBILITY.md). AV-005 is paused as an inconclusive feasibility experiment: its [real text-model results and preliminary learning findings](TEXT_FEASIBILITY.md) are preserved, but no production provider or generated card set was adopted. Independent human review and board acceptance remain separate. Other implementation remains unstarted. No remote board status or proposed human assignment acceptance is implied.
+**Status:** Historical Electron-first backlog. AV-002 through AV-005 results remain preserved, but unstarted desktop tasks must not be started automatically. The owner accepted the [local web direction and initial requirements](LOCAL_WEB_PLAN.md) on November 2, 2026. A replacement implementation backlog will be derived from that plan before new coding begins; no new task IDs or human assignments are implied yet.
 
 Use this as the baseline for a shared issue board. Dilan, Bulma, and Trunks are confirmed full-stack developers. Owners/reviewers below are proposed initial assignments; confirm them against availability at kickoff. See [DELIVERY_PLAYBOOK.md](DELIVERY_PLAYBOOK.md). Rows are not remote issues or assignments sent to people.
 

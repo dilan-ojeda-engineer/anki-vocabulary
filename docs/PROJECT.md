@@ -3,7 +3,7 @@
 **Project:** Anki Vocabulary Studio (working name)  
 **Version:** 0.7  
 **Date:** October 11, 2026  
-**Status:** Design draft for review. AV-002 scaffolding and AV-003 contracts are merged; see [development evidence](DEVELOPMENT.md) and [shared contracts](SHARED_CONTRACTS.md). AV-004 has [recorded Anki feasibility evidence](ANKI_FEASIBILITY.md); production integrations and release compatibility remain unverified.
+**Status:** Historical Electron-first design retained for requirements and evidence. The owner accepted the [local web plan](LOCAL_WEB_PLAN.md) on November 2, 2026; it supersedes this document for the application shell and first vertical slice. Reusable learning, approval, identity, Anki, and validation requirements remain candidates for migration rather than automatically accepted unchanged.
 
 ## 1. Purpose and success criteria
 

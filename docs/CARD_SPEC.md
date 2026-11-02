@@ -48,14 +48,16 @@ Use a nullable irregular-forms value in machine output and omit its visible head
 
 Adapt the prompt's output instructions to a structured transport format for automation. Preserve all learning instructions and render the exact front/back format afterward. Keep the archived user prompt intact; any operational prompt adaptation must have its own recorded version.
 
-Proposed audio behavior:
+Accepted audio behavior for the local web direction:
 
-- Create one clip for the front example and one clip for each additional example.
+- Create one clip for the target vocabulary, one for the front example, and one for each additional example. The target may be a word, phrase, expression, or complete target sentence.
 - Place each clip beside its corresponding sentence, without adding new learning headings.
-- Speak the plain English sentence, preserving words and contractions. Remove only display markup and surrounding quotation marks.
+- Speak the exact plain-English target or sentence, preserving words and contractions. Remove only display markup and surrounding quotation marks.
 - Do not speak definitions, IPA, Spanish approximations, or headings by default.
 - Generate only after approval of the exact card revision. Content edits clear approval; regenerate or reuse audio only once the edited revision is approved.
 - Verify replay controls and autoplay in Anki's actual desktop/mobile clients. The back must not accidentally replay the front audio through a repeated front template.
+
+This accepted local web requirement supersedes the earlier front/examples-only selection. The current profile code still needs an implementation change to add `target` to its audio selectors. Four additional examples imply six audio placements per default card; a useful fifth example implies seven. Exact duplicate text/configuration may reuse one artifact while retaining each placement association.
 
 Alternative card types, cloze deletion, extra quizzes, rankings, and summaries are outside this specification unless the user explicitly requests them.
 

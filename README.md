@@ -1,11 +1,12 @@
 # Anki Vocabulary Studio
 
-A planned Windows app that turns vocabulary and contextual sentences into reviewed Anki cards with audio.
+A planned local web tool for reviewing English Coach cards, generating target/example audio, and safely creating or updating notes in Anki.
 
-**Status:** AV-002 foundation, AV-003 contracts, and AV-004 Anki feasibility are merged locally. AV-005 text-model feasibility is paused as inconclusive, with no production text provider adopted; its real results remain available for later review. The Electron/React skeleton and diagnostic experiments are implemented; production vocabulary generation, speech, and delivery UI remain unimplemented. The project name is a working name. Document version 0.7 is separate from application version `0.1.0-dev.0`.
+**Status:** The owner accepted a local web direction and initial Anki Card and Audio Workspace requirements on November 2, 2026. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no production audio provider or written-card provider is adopted. The local web implementation has not started. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
 
 ## Start here
 
+- [Current local web direction and accepted initial requirements](docs/LOCAL_WEB_PLAN.md)
 - [Windows development setup, checks, and AV-002 evidence](docs/DEVELOPMENT.md)
 - [Shared contracts, synthetic fixtures, and AV-003 scope](docs/SHARED_CONTRACTS.md)
 - [AV-004 Anki experiment, actual evidence, and limitations](docs/ANKI_FEASIBILITY.md)
@@ -24,49 +25,45 @@ A planned Windows app that turns vocabulary and contextual sentences into review
 - [A realistic session and the tools behind every step](docs/WORKFLOW_WALKTHROUGH.md)
 - [Interactive workflow simulation](docs/workflow-simulation.html) — open in a browser; uses sample data and makes no provider calls.
 
-The intended workflow is:
+The current first-release workflow is:
 
-1. Enter words, expressions, or sentences containing the vocabulary you want to learn, and select the destination deck.
-2. Generate draft cards using your English-coach prompt.
-3. Review the front and back, edit or regenerate individual drafts, and approve the cards you want.
-4. Generate sentence audio using local Piper or hosted ElevenLabs.
-5. Preview the result and send approved cards and audio to the selected existing Anki deck. Anki desktop must be running with AnkiConnect installed.
-6. Sync Anki to your mobile device and study there. Package export as `.apkg` is also available for manual import.
+1. Connect to Anki Desktop through AnkiConnect and select an existing destination deck.
+2. Paste/import English Coach cards or load supported existing notes.
+3. Review, validate, edit, include/exclude, and preview cards one by one.
+4. Generate and listen to target/front-example/additional-example audio individually or for all missing items.
+5. Create new notes or safely update supported existing notes without resetting scheduling.
+6. Open the result in Anki Preview, then sync and study through Anki.
 
 Each group member runs their own installation, stores their own data, and uses their own provider accounts and API keys.
 
-## Proposed technology stack
+## Current technology direction
 
-The core application will use **TypeScript, React, and Electron**. React builds the visual interface; Electron packages it as a Windows desktop app and provides a Node.js environment for local processing.
+The application remains in this repository and uses **strict TypeScript, React, and a local Node server**. It opens in the user's browser, binds only to loopback, and communicates with the running Anki Desktop application through AnkiConnect. The Electron scaffold remains until reusable code is extracted and the local web vertical slice works.
 
 | Area | Tools |
 |---|---|
-| App development | TypeScript in strict mode, React, Electron, electron-vite |
+| App development | TypeScript in strict mode, React, Vite, local Node server |
 | Styling | CSS Modules and shared design tokens |
-| Local data | SQLite, better-sqlite3, Drizzle ORM and migrations |
-| Validation | Zod for inputs, generated cards, and messages between app processes |
-| Text and hosted audio | Replaceable TypeScript API adapters; ElevenLabs for audio; text provider still provisional |
-| Local audio | External Piper engine, invoked from TypeScript; current setup requires Python and a voice model |
-| Anki delivery | TypeScript AnkiConnect adapter for deck listing/direct delivery; ankipack with sql.js for package export, subject to compatibility tests |
-| Credential protection | Electron safeStorage using Windows-provided encryption |
+| Local data | Anki for delivered notes/media; add app persistence only for demonstrated pending-work needs |
+| Validation | Zod for imports, cards, audio commands, and provider/Anki responses |
+| Audio | Replaceable server-side TypeScript adapter; initial provider/voice pending listening review |
+| Written generation | Deferred provider decision; AV-005 evidence preserved |
+| Anki integration | Existing TypeScript AnkiConnect adapter for decks, notes, media, identity, and safe updates |
+| Credentials | Local server only; never browser storage, cards, logs, exports, or Git |
 | Development quality | npm, ESLint, Prettier, Vitest, React Testing Library, Playwright |
-| Windows packaging | electron-builder |
+| Distribution | Local development/start command first; packaging deferred until the vertical slice is useful |
 
-See the [architecture and stack rationale](docs/PROJECT.md#4-architecture-and-internal-interfaces) for boundaries, tradeoffs, and release checks. The application stack is a recommendation aligned with your TypeScript/JavaScript preference; packages and exact compatible versions will be validated and locked during the prototype.
+See the [local web plan](docs/LOCAL_WEB_PLAN.md) for current boundaries and acceptance scenarios. [PROJECT.md](docs/PROJECT.md) retains the earlier Electron proposal as historical design context until its reusable requirements are migrated.
 
-All application code can be TypeScript, including React's `.tsx` files; CSS handles styling. Piper is an external engine whose currently proposed setup also needs Python. A requirement to avoid that runtime entirely would require a different, validated local speech engine.
+## Decks and supported note types
 
-## Decks and future custom profiles
-
-Deck selection and direct delivery to existing Anki decks are confirmed first-release requirements. Use AnkiConnect to refresh the actual deck list and send approved notes/media. Show the destination before delivery and recover interrupted batches without duplicate insertion. Package export remains a portable alternative; switching delivery modes for the same notes requires verified identity reconciliation.
+Any existing Anki deck can be selected as the destination. New notes initially use the app-owned English Coach note type, and existing supported English Coach notes can be loaded and updated. A deck can contain several unrelated note types, so arbitrary field editing requires a later explicit mapping workflow.
 
 The first release uses your supplied English-coach profile. A confirmed future feature lets users supply their own prompts and card structures. Keep the prompt, field definitions, front/back layout, and audio-field selection in a versioned profile rather than making the coach format a universal requirement. See [the profile design](docs/AI_GENERATION.md#future-custom-prompts-and-card-structures).
 
-## Future web application
+## Local web boundary
 
-A hosted web version is a confirmed future phase after the desktop release. Keep React components, card schemas, approval rules, prompts, and provider/export logic reusable through explicit interfaces. Isolate Electron, local storage, credential encryption, and Piper execution in platform adapters.
-
-The web phase will add browser access, authentication, separate user data, server processing, protected credentials, and hosted media storage. Its deployment, operating budget, and desktop-data migration will be planned separately. See the [future web roadmap](docs/PROJECT.md#future-web-application-confirmed-roadmap-item).
+This is a local browser interface backed by a loopback Node service, not a publicly hosted application. Hosted deployment, accounts, authentication, and multi-user storage remain outside this phase.
 
 ## How we will build this together
 
@@ -76,9 +73,7 @@ Start with team kickoff, repository/tooling setup, shared contracts, and focused
 
 You can request changes in plain English; keep accepted scope and decisions in the project documents and, once adopted, track live tasks on the shared issue board.
 
-Next, build a small example with five vocabulary items. Check the card content, approve it, listen to the audio, select an existing deck in an Anki test profile, and send the cards directly. Also test package import separately. This validates the complete workflow before expanding the interface.
-
-Then implement the local visual app, reliable batch processing, backups, and installation instructions. Each milestone must have a working demonstration and relevant checks before moving on.
+Next, replace the historical desktop backlog with small local web tasks, then build the accepted five-card vertical slice in a disposable Anki profile. Audio provider/voice selection remains a separate prerequisite for real voice evidence.
 
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
 
