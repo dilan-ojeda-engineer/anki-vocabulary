@@ -23,8 +23,40 @@ body {
 }
 
 button,
-select {
+select,
+textarea {
   font: inherit;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #aebdb3;
+  border-radius: 10px;
+  resize: vertical;
+}
+
+textarea::placeholder {
+  color: #65776e;
+  opacity: 1;
+}
+label {
+  margin: 16px 0;
+}
+.import-entry {
+  border-top: 1px solid #d3ddd4;
+  padding: 12px 0;
+}
+.import-entry label {
+  display: flex;
+  align-items: center;
+}
+.issue {
+  color: #7a2f2b;
+}
+pre {
+  overflow: auto;
+  white-space: pre-wrap;
 }
 
 main {

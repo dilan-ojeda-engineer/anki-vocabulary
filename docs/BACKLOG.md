@@ -13,7 +13,7 @@ The owner accepted the [local web direction and initial requirements](LOCAL_WEB_
 | ID | Outcome | Priority / phase | State | Owner / reviewer | Dependencies |
 |---|---|---|---|---|---|
 | AV-028 | Read-only loopback web foundation with Anki status and deck discovery | P0 / foundation | In review; automated and live connected-Anki checks recorded, human acceptance pending | Unassigned / Unassigned | Reuses AV-002 tooling and AV-004 Anki contracts |
-| AV-029 | Paste/import English Coach cards and save the pending queue locally for offline use | P0 / import | Backlog | Unassigned / Unassigned | AV-028; accepted import fixtures and local store requirements |
+| AV-029 | Paste/import English Coach cards and save the pending queue locally for offline use | P0 / import | In review; implementation and local checks recorded, human acceptance pending | Unassigned / Unassigned | AV-028; accepted import fixtures and local store requirements |
 | AV-030 | Review, edit, include/exclude, copy, and preview cards one by one | P0 / review | Backlog | Unassigned / Unassigned | AV-029; English Coach profile/template |
 | AV-031 | Enforce exact-revision content approval outside React and invalidate it on edits | P0 / safety | Backlog | Unassigned / Unassigned | AV-030; relevant AV-003 contracts |
 | AV-032 | Extract and select target/front/additional-example audio items | P0 / audio preparation | Backlog | Unassigned / Unassigned | AV-031; English Coach audio-field rules |
@@ -48,6 +48,8 @@ Only one of these tasks should be treated as the active implementation task unle
 - Freeze representative valid, invalid, multiline, quoted, and non-ASCII fixtures in the task evidence before declaring the formats supported.
 - Save the original source, parsed cards, validation findings, and stable local source IDs in a server-owned, versioned store outside the repository. Choose and document a store with atomic writes and recovery from an interrupted save.
 - Reopen the browser and restart the local server with Anki closed; the same pending queue must return without another import. A malformed or interrupted save must not silently replace good work.
+
+**AV-029 implementation evidence (November 2, 2026):** The import panel accepts pasted official card text or UTF-8 `.txt`, `.json`, `.csv`, and `.tsv` files using [documented formats](IMPORT_FORMATS.md). It reports each card's validation issues, lets the user select valid entries, and stores them in a server-owned version-1 JSON workspace. Each write uses a temporary file and rename; a malformed existing workspace fails closed. `npm run check` passed (75 tests, typecheck, lint, format, Electron and web builds). A local API smoke test previewed one valid and one invalid card, saved only the valid card, then recovered it from the same isolated store after the server restarted; Chrome rendered the recovered pending card. A subsequent isolated run pointed AnkiConnect at an unavailable test port and still loaded the pending card. Tests used fixture content and a disposable local store. The store protects against interrupted process writes; power-loss durability is unverified. No linguistic review or production Anki write is claimed.
 
 ### AV-030 — Card review and preview
 

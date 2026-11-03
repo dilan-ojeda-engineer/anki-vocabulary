@@ -1,8 +1,11 @@
 import { createServer } from 'node:http';
 import { resolve } from 'node:path';
+import { homedir } from 'node:os';
+import { randomUUID } from 'node:crypto';
 import { createServer as createViteServer } from 'vite';
 import { createAnkiReadClient, readAnkiStatus } from './anki-status';
 import { createApiHandler } from './http';
+import { WorkspaceStore } from './workspace';
 
 const host = '127.0.0.1';
 const rawPort = process.env.LOCAL_WEB_PORT ?? '43110';
@@ -14,10 +17,18 @@ const ankiEndpoint =
   process.env.ANKI_CONNECT_URL ?? 'http://127.0.0.1:8765/api/v1';
 const anki = createAnkiReadClient(ankiEndpoint);
 const baseUrl = `http://${host}:${port}`;
+const dataDirectory =
+  process.env.LOCAL_WEB_DATA_DIR ??
+  resolve(
+    process.env.LOCALAPPDATA ?? resolve(homedir(), 'AppData', 'Local'),
+    'AnkiVocabularyStudio',
+  );
 const api = createApiHandler({
   expectedHosts: new Set([`${host}:${port}`, `localhost:${port}`]),
   expectedOrigins: new Set([baseUrl, `http://localhost:${port}`]),
   readStatus: () => readAnkiStatus(anki),
+  workspace: new WorkspaceStore(dataDirectory),
+  sessionToken: randomUUID(),
 });
 const vite = await createViteServer({
   configFile: resolve('vite.local-web.config.ts'),

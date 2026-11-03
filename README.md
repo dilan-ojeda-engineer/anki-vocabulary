@@ -2,11 +2,12 @@
 
 A planned local web tool for reviewing English Coach cards, generating target/example audio, and safely creating or updating notes in Anki.
 
-**Status:** The owner accepted a local web direction and initial Anki Card and Audio Workspace requirements on November 2, 2026. A read-only foundation now runs on loopback, reports Anki availability, and lists decks when the required AnkiConnect capabilities are available. Card import, audio, approval, and Anki writes are not implemented. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no production audio provider or written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
+**Status:** The local web foundation reports Anki availability and lists decks. AV-029 adds card paste/file import, structural preview, and a saved pending queue for review; editing, approval, audio, and Anki writes are not implemented. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no production audio provider or written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
 
 ## Start here
 
 - [Current local web direction and accepted initial requirements](docs/LOCAL_WEB_PLAN.md)
+- [English Coach paste and file import formats](docs/IMPORT_FORMATS.md)
 - [Windows development setup, checks, and AV-002 evidence](docs/DEVELOPMENT.md)
 - [Shared contracts, synthetic fixtures, and AV-003 scope](docs/SHARED_CONTRACTS.md)
 - [AV-004 Anki experiment, actual evidence, and limitations](docs/ANKI_FEASIBILITY.md)
@@ -64,7 +65,7 @@ npm install
 npm run dev:web
 ```
 
-Open `http://127.0.0.1:43110` in a browser. The current interface is read-only: refreshing connection status and choosing a displayed deck do not change Anki. Stop the server with `Ctrl+C`.
+Open `http://127.0.0.1:43110` in a browser. You can preview and save imports locally while Anki is closed. Refreshing connection status and choosing a displayed deck do not change Anki. Stop the server with `Ctrl+C`.
 
 Run the complete local validation with:
 
@@ -90,7 +91,7 @@ The [delivery playbook](docs/DELIVERY_PLAYBOOK.md) covers the process from disco
 
 You can request changes in plain English; keep accepted scope and decisions in the project documents and, once adopted, track live tasks on the shared issue board.
 
-AV-028 is merged with a recorded real connected-Anki deck check. AV-029 is the following card-import and offline-save slice, but it must not start until explicitly assigned. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
+AV-028 is merged with a recorded real connected-Anki deck check. AV-029 is implemented on its task branch and awaits review and acceptance. AV-030 is the planned individual edit/copy/preview slice; it must be explicitly assigned. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
 
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
 
