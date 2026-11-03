@@ -2,11 +2,14 @@ import { localWebStatusSchema } from '../../shared/local-web';
 import type { LocalWebStatus } from '../../shared/local-web';
 import { importPreviewSchema, workspaceSchema } from '../../shared/card-import';
 import type {
+  ApproveCardRequest,
   ImportRequest,
   UpdateCardRequest,
 } from '../../shared/card-import';
 
 let workspaceToken: string | null = null;
+
+export class WorkspaceConflictError extends Error {}
 
 export async function getLocalWebStatus(): Promise<LocalWebStatus> {
   const response = await fetch('/api/status', {
@@ -14,6 +17,7 @@ export async function getLocalWebStatus(): Promise<LocalWebStatus> {
     cache: 'no-store',
   });
   if (!response.ok) throw new Error('Local status request failed.');
+  workspaceToken = response.headers.get('x-workspace-token') ?? workspaceToken;
   return localWebStatusSchema.parse(await response.json());
 }
 
@@ -29,6 +33,10 @@ export async function saveCards(input: ImportRequest, selected: number[]) {
 
 export async function updateCard(id: string, input: UpdateCardRequest) {
   return workspaceSchema.parse(await post(`/api/cards/${id}`, input, 'PATCH'));
+}
+
+export async function approveCard(id: string, input: ApproveCardRequest) {
+  return workspaceSchema.parse(await post(`/api/cards/${id}/approval`, input));
 }
 
 export async function getWorkspace() {
@@ -54,6 +62,8 @@ async function post(
     body: JSON.stringify(body),
     cache: 'no-store',
   });
-  if (!response.ok) throw new Error('Import request failed.');
+  if (response.status === 409)
+    throw new WorkspaceConflictError('The card revision is stale.');
+  if (!response.ok) throw new Error('Workspace request failed.');
   return response.json();
 }

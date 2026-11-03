@@ -73,6 +73,7 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [workspaceError, setWorkspaceError] = useState(false);
   const [format, setFormat] = useState<ImportRequest['format']>('paste');
   const [source, setSource] = useState('');
   const [preview, setPreview] = useState<ImportPreview | null>(null);
@@ -117,15 +118,27 @@ export function App() {
     let cancelled = false;
     void getWorkspace()
       .then((data) => {
-        if (!cancelled) setWorkspace(data);
+        if (!cancelled) {
+          setWorkspace(data);
+          setWorkspaceError(false);
+        }
       })
       .catch(() => {
-        if (!cancelled) setImportError('Saved workspace could not be loaded.');
+        if (!cancelled) setWorkspaceError(true);
       });
     return () => {
       cancelled = true;
     };
   }, []);
+
+  async function retryWorkspace() {
+    setWorkspaceError(false);
+    try {
+      setWorkspace(await getWorkspace());
+    } catch {
+      setWorkspaceError(true);
+    }
+  }
 
   async function inspect() {
     setWorking(true);
@@ -311,7 +324,7 @@ export function App() {
         </label>
         <button
           type="button"
-          disabled={working || !workspace || !source.trim()}
+          disabled={working || !source.trim()}
           onClick={() => void inspect()}
         >
           Preview import
@@ -319,6 +332,14 @@ export function App() {
         {importError ? (
           <p role="alert" className="status error">
             {importError}
+          </p>
+        ) : null}
+        {workspaceError ? (
+          <p role="alert" className="status error">
+            Saved workspace could not be loaded. You can still preview cards.
+            <button type="button" onClick={() => void retryWorkspace()}>
+              Retry loading saved cards
+            </button>
           </p>
         ) : null}
         {visiblePreview ? (
@@ -372,7 +393,9 @@ export function App() {
         <p>
           {workspace
             ? `${workspace.cards.length} card(s) saved locally`
-            : 'Loading workspace…'}
+            : workspaceError
+              ? 'Saved cards are unavailable.'
+              : 'Loading workspace…'}
         </p>
         <ul>
           {workspace?.cards.map((card) => (
@@ -387,10 +410,7 @@ export function App() {
 
       <section className="next" aria-labelledby="next-heading">
         <h2 id="next-heading">Next workspace step</h2>
-        <p>
-          Exact-revision approval, audio generation, and Anki delivery are
-          planned next.
-        </p>
+        <p>Audio selection, generation, and Anki delivery are planned next.</p>
       </section>
     </main>
   );

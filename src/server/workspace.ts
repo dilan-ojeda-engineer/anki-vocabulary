@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { workspaceSchema } from '../shared/card-import';
@@ -6,7 +6,10 @@ import type { ImportPreview, Workspace } from '../shared/card-import';
 import { createEnglishCoachProfile } from '../profiles/english-coach';
 import { createFieldValuesSchema } from '../shared/contracts';
 import { z } from 'zod';
-import type { UpdateCardRequest } from '../shared/card-import';
+import type {
+  UpdateCardRequest,
+  ApproveCardRequest,
+} from '../shared/card-import';
 
 const fieldsSchema = createFieldValuesSchema(
   createEnglishCoachProfile('Workspace validation only'),
@@ -23,10 +26,65 @@ const workspaceV1Schema = z.strictObject({
     }),
   ),
 });
+const workspaceV2Schema = z.strictObject({
+  version: z.literal(2),
+  cards: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      profileVersion: z.literal('av005-5'),
+      originalText: z.string(),
+      originalFields: z.record(z.string(), z.unknown()),
+      fields: z.record(z.string(), z.unknown()),
+      included: z.boolean(),
+      revision: z.number().int().positive(),
+      importedAt: z.iso.datetime(),
+    }),
+  ),
+});
+
+export function contentHash(fields: unknown): string {
+  const validated = fieldsSchema.parse(fields);
+  return createHash('sha256')
+    .update(JSON.stringify({ profileVersion: 'av005-5', fields: validated }))
+    .digest('hex');
+}
+
+export function requireApprovedCard(card: Workspace['cards'][number]): void {
+  if (
+    !card.included ||
+    !card.approval ||
+    card.approval.revision !== card.revision ||
+    card.approval.contentHash !== card.contentHash ||
+    card.contentHash !== contentHash(card.fields)
+  )
+    throw new Error('Card requires approval of its current revision.');
+}
 
 export class WorkspaceStore {
   private pending: Promise<unknown> = Promise.resolve();
   constructor(private readonly directory: string) {}
+
+  async withApprovedCard<T>(
+    id: string,
+    expectedRevision: number,
+    expectedContentHash: string,
+    action: (card: Workspace['cards'][number]) => Promise<T> | T,
+  ): Promise<T> {
+    const operation = this.pending.then(async () => {
+      const workspace = await this.read();
+      const card = workspace.cards.find((item) => item.id === id);
+      if (!card) throw new Error('Card not found.');
+      if (
+        card.revision !== expectedRevision ||
+        card.contentHash !== expectedContentHash
+      )
+        throw new Error('Stale card revision.');
+      requireApprovedCard(card);
+      return action(card);
+    });
+    this.pending = operation.catch(() => undefined);
+    return operation;
+  }
 
   async read(): Promise<Workspace> {
     try {
@@ -34,14 +92,24 @@ export class WorkspaceStore {
         await readFile(join(this.directory, 'workspace.json'), 'utf8'),
       );
       const old = workspaceV1Schema.safeParse(raw);
-      const workspace = old.success
+      const older = workspaceV2Schema.safeParse(raw);
+      const migrated = old.success
+        ? old.data.cards.map((card) => ({
+            ...card,
+            originalFields: card.fields,
+            included: true,
+            revision: 1,
+          }))
+        : older.success
+          ? older.data.cards
+          : null;
+      const workspace = migrated
         ? workspaceSchema.parse({
-            version: 2,
-            cards: old.data.cards.map((card) => ({
+            version: 3,
+            cards: migrated.map((card) => ({
               ...card,
-              originalFields: card.fields,
-              included: true,
-              revision: 1,
+              contentHash: contentHash(card.fields),
+              approval: null,
             })),
           })
         : workspaceSchema.parse(raw);
@@ -49,6 +117,17 @@ export class WorkspaceStore {
       for (const card of workspace.cards) {
         fieldsSchema.parse(card.fields);
         fieldsSchema.parse(card.originalFields);
+        if (card.contentHash !== contentHash(card.fields))
+          throw new Error('Saved card content hash does not match.');
+        if (
+          card.approval &&
+          (card.approval.revision !== card.revision ||
+            card.approval.contentHash !== card.contentHash ||
+            !card.included)
+        )
+          throw new Error(
+            'Saved card approval does not match current revision.',
+          );
         if (ids.has(card.id)) throw new Error('Duplicate saved card identity.');
         ids.add(card.id);
       }
@@ -60,7 +139,7 @@ export class WorkspaceStore {
         'code' in error &&
         error.code === 'ENOENT'
       )
-        return { version: 2, cards: [] };
+        return { version: 3, cards: [] };
       throw error;
     }
   }
@@ -82,7 +161,7 @@ export class WorkspaceStore {
       )
         throw new Error('Only valid preview entries may be saved.');
       const next = workspaceSchema.parse({
-        version: 2,
+        version: 3,
         cards: [
           ...current.cards,
           ...added.map((entry) => ({
@@ -93,6 +172,8 @@ export class WorkspaceStore {
             fields: entry.fields,
             included: true,
             revision: 1,
+            contentHash: contentHash(entry.fields),
+            approval: null,
             importedAt: now,
           })),
         ],
@@ -123,8 +204,40 @@ export class WorkspaceStore {
         fields,
         included: input.included,
         revision: card.revision + 1,
+        contentHash: contentHash(fields),
+        approval: null,
       };
-      const next = workspaceSchema.parse({ version: 2, cards });
+      const next = workspaceSchema.parse({ version: 3, cards });
+      await this.write(next);
+      return next;
+    });
+    this.pending = operation.catch(() => undefined);
+    return operation;
+  }
+
+  async approve(id: string, input: ApproveCardRequest): Promise<Workspace> {
+    const operation = this.pending.then(async () => {
+      const current = await this.read();
+      const index = current.cards.findIndex((card) => card.id === id);
+      if (index < 0) throw new Error('Card not found.');
+      const card = current.cards[index]!;
+      if (
+        card.revision !== input.expectedRevision ||
+        card.contentHash !== input.expectedContentHash
+      )
+        throw new Error('Stale card revision.');
+      if (!card.included) throw new Error('Excluded card cannot be approved.');
+      if (card.approval) return current;
+      const cards = [...current.cards];
+      cards[index] = {
+        ...card,
+        approval: {
+          revision: card.revision,
+          contentHash: card.contentHash,
+          approvedAt: new Date().toISOString(),
+        },
+      };
+      const next = workspaceSchema.parse({ version: 3, cards });
       await this.write(next);
       return next;
     });

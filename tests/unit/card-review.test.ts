@@ -40,7 +40,7 @@ describe('AV-030 saved card review', () => {
     await writeFile(join(directory, 'workspace.json'), JSON.stringify(old));
     const store = new WorkspaceStore(directory);
     const migrated = await store.read();
-    expect(migrated.version).toBe(2);
+    expect(migrated.version).toBe(3);
     expect(migrated.cards[0]).toMatchObject({
       id: old.cards[0]!.id,
       originalFields: fields,

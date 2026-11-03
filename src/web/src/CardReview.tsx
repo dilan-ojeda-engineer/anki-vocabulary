@@ -6,7 +6,12 @@ import {
   coachFieldSchema,
   coachFields,
 } from '../../shared/card-display';
-import { updateCard } from './api';
+import {
+  approveCard,
+  getWorkspace,
+  updateCard,
+  WorkspaceConflictError,
+} from './api';
 
 type Card = Workspace['cards'][number];
 
@@ -66,6 +71,7 @@ function CardEditor({
   );
   const [included, setIncluded] = useState(card.included);
   const [message, setMessage] = useState('');
+  const [conflict, setConflict] = useState(false);
   const [busy, setBusy] = useState(false);
   const validation = coachFieldSchema.safeParse(fields);
   const dirty =
@@ -79,13 +85,18 @@ function CardEditor({
     included !== card.included;
   const edited =
     JSON.stringify(card.fields) !== JSON.stringify(card.originalFields);
+  const approved =
+    card.approval?.revision === card.revision &&
+    card.approval.contentHash === card.contentHash;
   const status = !validation.success
     ? 'Needs attention'
     : !included
       ? 'Excluded'
-      : edited || dirty
-        ? 'Edited'
-        : 'Ready';
+      : approved && !dirty
+        ? 'Approved'
+        : edited || dirty
+          ? 'Edited'
+          : 'Ready';
   const sides = validation.success ? cardSides(validation.data) : null;
 
   function changeField(
@@ -112,6 +123,7 @@ function CardEditor({
     if (!validation.success) return;
     setBusy(true);
     setMessage('');
+    setConflict(false);
     try {
       const next = await updateCard(card.id, {
         expectedRevision: card.revision,
@@ -130,10 +142,15 @@ function CardEditor({
         ),
       );
       setMessage('Saved.');
-    } catch {
-      setMessage(
-        'Could not save. Your edits are still here. Another tab may have changed this card; copy your draft before reloading.',
-      );
+    } catch (error) {
+      if (error instanceof WorkspaceConflictError) {
+        setConflict(true);
+        setMessage(
+          'This card changed in another tab. Your unsaved draft is still here. Copy it before refreshing the saved card.',
+        );
+      } else {
+        setMessage('Could not save. Your unsaved edits are still here.');
+      }
     } finally {
       setBusy(false);
     }
@@ -151,11 +168,70 @@ function CardEditor({
     }
   }
 
+  async function approve() {
+    if (dirty || !validation.success || !included || approved) return;
+    setBusy(true);
+    setMessage('');
+    setConflict(false);
+    try {
+      onChange(
+        await approveCard(card.id, {
+          expectedRevision: card.revision,
+          expectedContentHash: card.contentHash,
+        }),
+      );
+      setMessage('Approved for this exact revision.');
+    } catch (error) {
+      if (error instanceof WorkspaceConflictError) {
+        setConflict(true);
+        setMessage(
+          'This card changed in another tab. Refresh the saved card before approving it.',
+        );
+      } else {
+        setMessage('Approval failed. Check the local server and try again.');
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function refreshConflictedCard() {
+    if (busy) return;
+    setBusy(true);
+    try {
+      onChange(await getWorkspace());
+      setConflict(false);
+      setMessage(
+        'Saved card refreshed. Review the current revision before approving.',
+      );
+    } catch {
+      setMessage('Could not refresh the saved card. Try again.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function copyConflictedDraft() {
+    if (!validation.success || busy) return;
+    try {
+      await navigator.clipboard.writeText(
+        JSON.stringify({ fields: validation.data, included }, null, 2),
+      );
+      setMessage(
+        'Unsaved draft copied as JSON. Refresh when you are ready to discard it here.',
+      );
+    } catch {
+      setMessage(
+        'Clipboard access failed. Your unsaved draft remains visible.',
+      );
+    }
+  }
+
   return (
     <section aria-labelledby="review-heading" className="review-section">
       <div className="section-heading">
         <div>
-          <p className="step">AV-030</p>
+          <p className="step">Card review and approval</p>
           <h2 id="review-heading">Review cards</h2>
         </div>
         <span className="review-status">{status}</span>
@@ -295,8 +371,39 @@ function CardEditor({
         >
           Copy card text
         </button>
+        <button
+          type="button"
+          disabled={
+            dirty || !validation.success || !included || approved || busy
+          }
+          onClick={() => void approve()}
+        >
+          {approved ? 'Approved' : 'Approve this revision'}
+        </button>
       </div>
       {message ? <p role="status">{message}</p> : null}
+      {conflict ? (
+        <div>
+          {dirty ? (
+            <button
+              type="button"
+              disabled={busy || !validation.success}
+              onClick={() => void copyConflictedDraft()}
+            >
+              Copy unsaved draft
+            </button>
+          ) : null}
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void refreshConflictedCard()}
+          >
+            {dirty
+              ? 'Refresh saved card and discard draft'
+              : 'Refresh saved card'}
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }

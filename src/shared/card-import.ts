@@ -26,11 +26,23 @@ export const savedCardSchema = z.strictObject({
   fields: z.record(z.string(), z.unknown()),
   included: z.boolean(),
   revision: z.number().int().positive(),
+  contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+  approval: z
+    .strictObject({
+      revision: z.number().int().positive(),
+      contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+      approvedAt: z.iso.datetime(),
+    })
+    .nullable(),
   importedAt: z.iso.datetime(),
 });
 export const workspaceSchema = z.strictObject({
-  version: z.literal(2),
+  version: z.literal(3),
   cards: z.array(savedCardSchema),
+});
+export const approveCardRequestSchema = z.strictObject({
+  expectedRevision: z.number().int().positive(),
+  expectedContentHash: z.string().regex(/^[a-f0-9]{64}$/),
 });
 export const updateCardRequestSchema = z.strictObject({
   expectedRevision: z.number().int().positive(),
@@ -41,3 +53,4 @@ export type ImportRequest = z.infer<typeof importRequestSchema>;
 export type ImportPreview = z.infer<typeof importPreviewSchema>;
 export type Workspace = z.infer<typeof workspaceSchema>;
 export type UpdateCardRequest = z.infer<typeof updateCardRequestSchema>;
+export type ApproveCardRequest = z.infer<typeof approveCardRequestSchema>;

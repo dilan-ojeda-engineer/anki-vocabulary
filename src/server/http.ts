@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { localWebStatusSchema } from '../shared/local-web';
 import type { LocalWebStatus } from '../shared/local-web';
 import {
+  approveCardRequestSchema,
   importRequestSchema,
   updateCardRequestSchema,
   workspaceSchema,
@@ -53,9 +54,15 @@ export function createApiHandler(options: {
       sendJson(response, 403, { error: 'origin-not-allowed' });
       return true;
     }
-    const cardId = /^\/api\/cards\/([0-9a-f-]{36})$/.exec(url.pathname)?.[1];
+    const cardId = /^\/api\/cards\/([0-9a-f-]{36})(?:\/approval)?$/.exec(
+      url.pathname,
+    )?.[1];
     if (cardId) {
-      if (request.method !== 'PATCH' || !options.workspace) {
+      const isApproval = url.pathname.endsWith('/approval');
+      if (
+        request.method !== (isApproval ? 'POST' : 'PATCH') ||
+        !options.workspace
+      ) {
         sendJson(response, 405, { error: 'method-not-allowed' });
         return true;
       }
@@ -87,7 +94,9 @@ export function createApiHandler(options: {
         sendJson(response, 400, { error: 'invalid-json' });
         return true;
       }
-      const input = updateCardRequestSchema.safeParse(parsed);
+      const input = (
+        isApproval ? approveCardRequestSchema : updateCardRequestSchema
+      ).safeParse(parsed);
       if (!input.success) {
         sendJson(response, 400, { error: 'invalid-request' });
         return true;
@@ -96,7 +105,15 @@ export function createApiHandler(options: {
         sendJson(
           response,
           200,
-          await options.workspace.update(cardId, input.data),
+          isApproval
+            ? await options.workspace.approve(
+                cardId,
+                approveCardRequestSchema.parse(input.data),
+              )
+            : await options.workspace.update(
+                cardId,
+                updateCardRequestSchema.parse(input.data),
+              ),
         );
       } catch (error) {
         const message = error instanceof Error ? error.message : '';
@@ -208,7 +225,12 @@ export function createApiHandler(options: {
       return true;
     }
     const status = localWebStatusSchema.parse(await options.readStatus());
-    sendJson(response, 200, status);
+    sendJson(
+      response,
+      200,
+      status,
+      options.sessionToken ? { 'X-Workspace-Token': options.sessionToken } : {},
+    );
     return true;
   };
 }

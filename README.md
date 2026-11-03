@@ -67,6 +67,8 @@ npm run dev:web
 
 Open `http://127.0.0.1:43110` in a browser. You can preview and save imports locally while Anki is closed. Refreshing connection status and choosing a displayed deck do not change Anki. Stop the server with `Ctrl+C`.
 
+After changing server or shared TypeScript code during development, stop and rerun `npm run dev:web`, then reload the browser page. The browser updates its UI automatically, but this command does not restart the Node server.
+
 Run the complete local validation with:
 
 ```powershell
@@ -91,7 +93,7 @@ The [delivery playbook](docs/DELIVERY_PLAYBOOK.md) covers the process from disco
 
 You can request changes in plain English; keep accepted scope and decisions in the project documents and, once adopted, track live tasks on the shared issue board.
 
-AV-028 and AV-029 are merged. AV-030 is implemented on its task branch and awaits review and acceptance. AV-031 is the next planned exact-revision approval slice; it must be explicitly assigned. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
+AV-028 through AV-031 are merged; human acceptance of AV-031 remains pending. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
 
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
 

@@ -1,9 +1,12 @@
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { previewImport } from '../../src/server/card-import';
 import { WorkspaceStore } from '../../src/server/workspace';
+import { createApiHandler } from '../../src/server/http';
 import { englishCoachFieldsFixture } from '../../src/shared/fixtures/workflow';
 import { cardText } from '../../src/shared/card-display';
 
@@ -14,15 +17,73 @@ const fields = {
   examples: [...englishCoachFieldsFixture.examples, 'The timing felt awkward.'],
 };
 const folders: string[] = [];
+const servers: ReturnType<typeof createServer>[] = [];
 afterEach(async () => {
   await Promise.all(
     folders
       .splice(0)
       .map((folder) => rm(folder, { recursive: true, force: true })),
   );
+  await Promise.all(
+    servers
+      .splice(0)
+      .map(
+        (server) =>
+          new Promise<void>((resolve, reject) =>
+            server.close((error) => (error ? reject(error) : resolve())),
+          ),
+      ),
+  );
 });
 
 describe('AV-029 import and offline workspace', () => {
+  it('allows import preview when saved workspace data cannot load', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'anki-import-'));
+    folders.push(directory);
+    await writeFile(join(directory, 'workspace.json'), '{invalid');
+    const expectedHosts = new Set<string>();
+    const handler = createApiHandler({
+      expectedHosts,
+      expectedOrigins: new Set(['http://allowed.test']),
+      readStatus: async () => ({
+        server: { status: 'ready' },
+        anki: { status: 'unavailable', reason: 'not-running-or-unreachable' },
+      }),
+      workspace: new WorkspaceStore(directory),
+      sessionToken: 'test-token',
+    });
+    const server = createServer((request, response) => {
+      void handler(request, response).catch(() => {
+        response.writeHead(500);
+        response.end();
+      });
+    });
+    servers.push(server);
+    await new Promise<void>((resolve) =>
+      server.listen(0, '127.0.0.1', resolve),
+    );
+    const address = server.address() as AddressInfo;
+    expectedHosts.add(`127.0.0.1:${address.port}`);
+    const base = `http://127.0.0.1:${address.port}`;
+    const status = await fetch(`${base}/api/status`);
+    expect(status.headers.get('x-workspace-token')).toBe('test-token');
+    const preview = await fetch(`${base}/api/import/preview`, {
+      method: 'POST',
+      headers: {
+        origin: 'http://allowed.test',
+        'content-type': 'application/json',
+        'x-workspace-token': 'test-token',
+      },
+      body: JSON.stringify({
+        format: 'json',
+        text: JSON.stringify([fields]),
+      }),
+    });
+    expect(preview.status).toBe(200);
+    expect(
+      ((await preview.json()) as { entries: unknown[] }).entries,
+    ).toHaveLength(1);
+  });
   it('keeps valid JSON cards while reporting invalid cards separately and survives a store restart', async () => {
     const input = {
       format: 'json' as const,
