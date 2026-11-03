@@ -19,9 +19,11 @@ type Card = Workspace['cards'][number];
 export function CardReview({
   workspace,
   onChange,
+  audioRefreshVersion,
 }: {
   workspace: Workspace;
   onChange: (next: Workspace) => void;
+  audioRefreshVersion: number;
 }) {
   const [index, setIndex] = useState(0);
   const card = workspace.cards[Math.min(index, workspace.cards.length - 1)];
@@ -40,6 +42,7 @@ export function CardReview({
       count={workspace.cards.length}
       onNavigate={(next) => setIndex(next)}
       onChange={onChange}
+      audioRefreshVersion={audioRefreshVersion}
     />
   );
 }
@@ -50,12 +53,14 @@ function CardEditor({
   count,
   onNavigate,
   onChange,
+  audioRefreshVersion,
 }: {
   card: Card;
   index: number;
   count: number;
   onNavigate: (index: number) => void;
   onChange: (next: Workspace) => void;
+  audioRefreshVersion: number;
 }) {
   const [fields, setFields] = useState<Record<string, unknown>>(() =>
     structuredClone(card.fields),
@@ -406,7 +411,11 @@ function CardEditor({
         </div>
       ) : null}
       {approved && !dirty ? (
-        <AudioSelection card={card} onChange={onChange} />
+        <AudioSelection
+          card={card}
+          onChange={onChange}
+          refreshVersion={audioRefreshVersion}
+        />
       ) : (
         <p>Save and approve this revision to select audio items.</p>
       )}

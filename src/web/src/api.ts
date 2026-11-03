@@ -8,10 +8,19 @@ import type {
 } from '../../shared/card-import';
 import { audioPlanSchema } from '../../shared/audio-plan';
 import type { AudioSelectionRequest } from '../../shared/audio-plan';
+import {
+  audioReviewSchema,
+  audioPreflightSchema,
+} from '../../shared/audio-generation';
+import type {
+  AudioBatchRequest,
+  AudioGenerateRequest,
+} from '../../shared/audio-generation';
 
 let workspaceToken: string | null = null;
 
 export class WorkspaceConflictError extends Error {}
+export class AudioRequestError extends Error {}
 
 export async function getLocalWebStatus(): Promise<LocalWebStatus> {
   const response = await fetch('/api/status', {
@@ -46,6 +55,21 @@ export async function getAudioPlan(id: string, input: ApproveCardRequest) {
     await post(`/api/cards/${id}/audio-plan`, input),
   );
 }
+export async function getAudioReview(id: string, input: ApproveCardRequest) {
+  return audioReviewSchema.parse(
+    await post(`/api/cards/${id}/audio-review`, input),
+  );
+}
+export async function prepareAudio(id: string, input: AudioBatchRequest) {
+  return audioPreflightSchema.parse(
+    await post(`/api/cards/${id}/audio-prepare`, input),
+  );
+}
+export async function generateAudio(id: string, input: AudioGenerateRequest) {
+  return audioReviewSchema.parse(
+    await post(`/api/cards/${id}/audio-generate`, input),
+  );
+}
 
 export async function selectAudio(id: string, input: AudioSelectionRequest) {
   return workspaceSchema.parse(
@@ -78,6 +102,22 @@ async function post(
   });
   if (response.status === 409)
     throw new WorkspaceConflictError('The card revision is stale.');
-  if (!response.ok) throw new Error('Workspace request failed.');
+  if (!response.ok) {
+    const data: unknown = await response.json().catch(() => null);
+    const code =
+      data && typeof data === 'object' && 'error' in data ? data.error : null;
+    const message =
+      code === 'speech-not-configured'
+        ? 'Start the local server with ELEVENLABS_API_KEY configured.'
+        : code === 'allowance-check-failed'
+          ? 'Could not verify allowance. Check the speech key, account read permissions, and connection.'
+          : code === 'free-allowance-unavailable'
+            ? 'Available free allowance could not cover this request. No paid fallback was used.'
+            : code === 'audio-preview-expired'
+              ? 'Audio preview expired. Prepare this batch again.'
+              : null;
+    if (message) throw new AudioRequestError(message);
+    throw new Error('Workspace request failed.');
+  }
   return response.json();
 }

@@ -2,7 +2,7 @@
 
 A planned local web tool for reviewing English Coach cards, generating target/example audio, and safely creating or updating notes in Anki.
 
-**Status:** The local web app reports Anki availability, lists decks, imports and reviews English Coach cards, approves exact content revisions, and saves audio-item selections. Audio generation, playback, and Anki writes are not implemented. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no production audio provider or written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
+**Status:** The local web app reports Anki availability, lists decks, imports and reviews English Coach cards, approves exact content revisions, and generates and plays cached audio using ElevenLabs/Sarah. Anki writes are not implemented. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
 
 ## Start here
 
@@ -69,6 +69,8 @@ Open `http://127.0.0.1:43110` in a browser. You can preview and save imports loc
 
 After changing server or shared TypeScript code during development, stop and rerun `npm run dev:web`, then reload the browser page. The browser updates its UI automatically, but this command does not restart the Node server.
 
+For speech, set `ELEVENLABS_API_KEY` in the terminal environment before starting the server. The initial voice is Sarah with `eleven_multilingual_v2`, normal speed, and MP3 output. Without a key, saved audio remains available for playback; generation is disabled. Approve a card, choose one item or a batch, review the provider/voice/format/count and reported allowance, then confirm generation. Queue audio can prepare all missing or selected placements across saved approved cards; it shows combined totals and deduplicates matching speech. The server rechecks approval and free allowance, preserves successes on partial failure, and requires an explicit retry for remaining work. Closing the browser may leave the current server request finishing; prepare again to resume missing queue items. Changing content clears approval; after reapproval, old clips appear for comparison and exact cached speech can be reused. Fish Audio and selectable voices/voice groups remain future work.
+
 Run the complete local validation with:
 
 ```powershell
@@ -93,7 +95,7 @@ The [delivery playbook](docs/DELIVERY_PLAYBOOK.md) covers the process from disco
 
 You can request changes in plain English; keep accepted scope and decisions in the project documents and, once adopted, track live tasks on the shared issue board.
 
-AV-028 through AV-032 are merged; human acceptance of AV-031 and AV-032 remains pending. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
+AV-028 through AV-033 are merged. Initial Sarah selection and one-item playback evidence are recorded; complete card-audio listening and human milestone acceptance remain pending. Fish Audio and individual voice/voice-group selection remain future improvements.
 
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
 

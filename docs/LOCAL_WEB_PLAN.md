@@ -1,7 +1,7 @@
 # Local web plan: Anki Card and Audio Workspace
 
 **Date:** November 2, 2026
-**Status:** Product direction and initial requirements accepted; AV-028 through AV-032 are merged, with AV-031 and AV-032 human acceptance pending. Audio generation and Anki writes have not started.
+**Status:** Product direction and initial requirements accepted; AV-028 through AV-033 are merged. Complete card-audio listening and human milestone acceptance remain pending; Anki writes have not started.
 
 Implementation is tracked as AV-028 through AV-036 in the [current backlog](BACKLOG.md#current-local-web-task-inventory). The IDs continue after the historical Electron backlog to avoid reusing earlier task references. Listing the sequence does not authorize starting the next task automatically.
 
@@ -198,6 +198,7 @@ The first vertical slice is acceptable when all of the following are demonstrate
 - Arbitrary Anki note-type editing and automatic field inference
 - `.apkg` package export
 - Multiple production TTS providers
+- Selection of individual account-available voices or reusable voice groups; group assignment and rotation rules require a later design decision
 - Automatic media deletion or collection-wide cleanup
 - Electron packaging and a Windows installer
 - Hosted deployment, accounts, authentication, and multi-user storage

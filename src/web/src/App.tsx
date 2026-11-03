@@ -12,6 +12,7 @@ import {
   saveCards,
 } from './api';
 import { CardReview } from './CardReview';
+import { QueueAudio } from './QueueAudio';
 
 const cardTextPlaceholder = `awkward
 “I felt awkward asking for help.”
@@ -73,6 +74,7 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [audioRefreshVersion, setAudioRefreshVersion] = useState(0);
   const [workspaceError, setWorkspaceError] = useState(false);
   const [format, setFormat] = useState<ImportRequest['format']>('paste');
   const [source, setSource] = useState('');
@@ -405,12 +407,25 @@ export function App() {
       </section>
 
       {workspace ? (
-        <CardReview workspace={workspace} onChange={setWorkspace} />
+        <>
+          <QueueAudio
+            workspace={workspace}
+            onUpdated={() => setAudioRefreshVersion((value) => value + 1)}
+          />
+          <CardReview
+            workspace={workspace}
+            onChange={setWorkspace}
+            audioRefreshVersion={audioRefreshVersion}
+          />
+        </>
       ) : null}
 
       <section className="next" aria-labelledby="next-heading">
         <h2 id="next-heading">Next workspace step</h2>
-        <p>Audio generation, playback, and Anki delivery are planned next.</p>
+        <p>
+          Anki delivery is planned next. Review and listen to your prepared
+          audio first.
+        </p>
       </section>
     </main>
   );

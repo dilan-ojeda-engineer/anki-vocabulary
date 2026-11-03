@@ -11,6 +11,11 @@ import { audioSelectionRequestSchema } from '../shared/audio-plan';
 import { previewImport } from './card-import';
 import type { WorkspaceStore } from './workspace';
 import { z } from 'zod';
+import type { AudioService } from './audio-service';
+import {
+  audioBatchRequestSchema,
+  audioGenerateRequestSchema,
+} from '../shared/audio-generation';
 
 export type StatusReader = () => Promise<LocalWebStatus>;
 
@@ -37,6 +42,7 @@ export function createApiHandler(options: {
   readStatus: StatusReader;
   workspace?: WorkspaceStore;
   sessionToken?: string;
+  audio?: AudioService;
 }) {
   return async (
     request: IncomingMessage,
@@ -55,8 +61,34 @@ export function createApiHandler(options: {
       sendJson(response, 403, { error: 'origin-not-allowed' });
       return true;
     }
+    const mediaKey = /^\/api\/audio\/([a-f0-9]{64})$/.exec(url.pathname)?.[1];
+    if (mediaKey && options.audio) {
+      if (request.method !== 'GET') {
+        sendJson(response, 405, { error: 'method-not-allowed' });
+        return true;
+      }
+      try {
+        const media = await options.audio.media(mediaKey);
+        if (!media) {
+          sendJson(response, 404, { error: 'not-found' });
+          return true;
+        }
+        response.writeHead(200, {
+          'Content-Type':
+            media.record.format === 'mp3' ? 'audio/mpeg' : 'audio/wav',
+          'Content-Length': media.bytes.length,
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+          'Cross-Origin-Resource-Policy': 'same-origin',
+        });
+        response.end(media.bytes);
+      } catch {
+        sendJson(response, 404, { error: 'media-unavailable' });
+      }
+      return true;
+    }
     const cardRoute =
-      /^\/api\/cards\/([0-9a-f-]{36})(?:\/(approval|audio-plan|audio-selection))?$/.exec(
+      /^\/api\/cards\/([0-9a-f-]{36})(?:\/(approval|audio-plan|audio-selection|audio-review|audio-prepare|audio-generate))?$/.exec(
         url.pathname,
       );
     const cardId = cardRoute?.[1];
@@ -98,17 +130,54 @@ export function createApiHandler(options: {
         return true;
       }
       const input = (
-        action === 'audio-selection'
-          ? audioSelectionRequestSchema
-          : action === 'update'
-            ? updateCardRequestSchema
-            : approveCardRequestSchema
+        action === 'audio-generate'
+          ? audioGenerateRequestSchema
+          : action === 'audio-prepare'
+            ? audioBatchRequestSchema
+            : action === 'audio-selection'
+              ? audioSelectionRequestSchema
+              : action === 'update'
+                ? updateCardRequestSchema
+                : approveCardRequestSchema
       ).safeParse(parsed);
       if (!input.success) {
         sendJson(response, 400, { error: 'invalid-request' });
         return true;
       }
       try {
+        if (
+          ['audio-review', 'audio-prepare', 'audio-generate'].includes(action)
+        ) {
+          if (!options.audio) {
+            sendJson(response, 503, { error: 'audio-unavailable' });
+            return true;
+          }
+          const ref = approveCardRequestSchema.parse({
+            expectedRevision: input.data.expectedRevision,
+            expectedContentHash:
+              'expectedContentHash' in input.data
+                ? input.data.expectedContentHash
+                : undefined,
+          });
+          const result =
+            action === 'audio-review'
+              ? await options.audio.review(
+                  cardId,
+                  ref.expectedRevision,
+                  ref.expectedContentHash,
+                )
+              : action === 'audio-prepare'
+                ? await options.audio.prepare(
+                    cardId,
+                    audioBatchRequestSchema.parse(input.data),
+                  )
+                : await options.audio.generate(
+                    cardId,
+                    audioGenerateRequestSchema.parse(input.data),
+                  );
+          sendJson(response, 200, result);
+          return true;
+        }
         sendJson(
           response,
           200,
@@ -136,6 +205,16 @@ export function createApiHandler(options: {
         );
       } catch (error) {
         const message = error instanceof Error ? error.message : '';
+        const audioError =
+          message === 'Speech provider is not configured.'
+            ? 'speech-not-configured'
+            : message === 'Speech allowance could not be verified.'
+              ? 'allowance-check-failed'
+              : message === 'Confirmed free speech allowance is unavailable.'
+                ? 'free-allowance-unavailable'
+                : message === 'Audio preview expired. Prepare the batch again.'
+                  ? 'audio-preview-expired'
+                  : null;
         sendJson(
           response,
           message === 'Stale card revision.'
@@ -147,7 +226,7 @@ export function createApiHandler(options: {
             error:
               message === 'Stale card revision.'
                 ? 'stale-revision'
-                : 'invalid-card-or-storage',
+                : (audioError ?? 'invalid-card-or-storage'),
           },
         );
       }

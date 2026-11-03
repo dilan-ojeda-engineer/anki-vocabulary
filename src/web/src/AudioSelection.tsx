@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
-import type { AudioPlan } from '../../shared/audio-plan';
+import type {
+  AudioReview,
+  AudioPreflight,
+  AudioBatchRequest,
+} from '../../shared/audio-generation';
 import type { Workspace } from '../../shared/card-import';
 import {
-  getAudioPlan,
+  getAudioReview,
+  prepareAudio,
+  generateAudio,
   getWorkspace,
   selectAudio,
   WorkspaceConflictError,
+  AudioRequestError,
 } from './api';
 
 type Card = Workspace['cards'][number];
@@ -13,18 +20,22 @@ type Card = Workspace['cards'][number];
 export function AudioSelection({
   card,
   onChange,
+  refreshVersion,
 }: {
   card: Card;
   onChange: (workspace: Workspace) => void;
+  refreshVersion: number;
 }) {
-  const [plan, setPlan] = useState<AudioPlan | null>(null);
+  const [plan, setPlan] = useState<AudioReview | null>(null);
+  const [preflight, setPreflight] = useState<AudioPreflight | null>(null);
+  const [batch, setBatch] = useState<AudioBatchRequest | null>(null);
   const [message, setMessage] = useState('');
   const [conflict, setConflict] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    void getAudioPlan(card.id, {
+    void getAudioReview(card.id, {
       expectedRevision: card.revision,
       expectedContentHash: card.contentHash,
     })
@@ -41,7 +52,7 @@ export function AudioSelection({
     return () => {
       cancelled = true;
     };
-  }, [card.id, card.revision, card.contentHash]);
+  }, [card.id, card.revision, card.contentHash, refreshVersion]);
 
   const selected = new Set(card.audioSelection?.placementIds ?? []);
   const selectedItems =
@@ -54,6 +65,7 @@ export function AudioSelection({
   async function saveSelection(placementIds: string[]) {
     if (!plan || busy) return;
     setBusy(true);
+    setPreflight(null);
     setMessage('');
     setConflict(false);
     try {
@@ -78,6 +90,57 @@ export function AudioSelection({
     }
   }
 
+  async function prepare(mode: 'explicit' | 'missing', placementIds: string[]) {
+    if (busy || !plan) return;
+    setBusy(true);
+    setMessage('');
+    setPreflight(null);
+    const request = {
+      expectedRevision: card.revision,
+      expectedContentHash: card.contentHash,
+      mode,
+      placementIds,
+    };
+    try {
+      setPreflight(await prepareAudio(card.id, request));
+      setBatch(request);
+    } catch (error) {
+      if (error instanceof WorkspaceConflictError) setConflict(true);
+      setMessage(
+        error instanceof AudioRequestError
+          ? error.message
+          : 'Could not prepare audio. Check the speech key, free allowance, and current card revision.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function generate() {
+    if (busy || !batch || !preflight) return;
+    setBusy(true);
+    setMessage('');
+    try {
+      setPlan(
+        await generateAudio(card.id, { ...batch, preflightId: preflight.id }),
+      );
+      setPreflight(null);
+      setMessage(
+        'Audio batch finished. Review each result and listen before delivery. Failed or paused items can be retried explicitly.',
+      );
+    } catch (error) {
+      if (error instanceof WorkspaceConflictError) setConflict(true);
+      setMessage(
+        error instanceof AudioRequestError
+          ? error.message
+          : 'Audio request failed. Prepare again to recover completed clips and retry remaining work.',
+      );
+      setPreflight(null);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function refreshCard() {
     setBusy(true);
     try {
@@ -97,12 +160,26 @@ export function AudioSelection({
     <div className="audio-selection" aria-labelledby="audio-selection-heading">
       <h3 id="audio-selection-heading">Audio items</h3>
       <p>
-        Choose the target and sentences to prepare for audio. Generation and
-        playback arrive in AV-033.
+        Choose audio items, review the batch details, then generate. Listen to
+        each clip before delivery.
       </p>
       {plan ? (
         <>
           <div className="review-actions">
+            <button
+              type="button"
+              disabled={busy || !plan.configuration || !selected.size}
+              onClick={() => void prepare('explicit', [...selected])}
+            >
+              Generate selected
+            </button>
+            <button
+              type="button"
+              disabled={busy || !plan.configuration}
+              onClick={() => void prepare('missing', [])}
+            >
+              Generate all missing
+            </button>
             <button
               type="button"
               disabled={busy}
@@ -124,6 +201,58 @@ export function AudioSelection({
               Clear selection
             </button>
           </div>
+          {!plan.configuration ? (
+            <p>
+              Speech is not configured. Start the local server with
+              ELEVENLABS_API_KEY in its environment.
+            </p>
+          ) : null}
+          {preflight ? (
+            <div
+              className="card-side"
+              role="region"
+              aria-label="Audio batch preview"
+            >
+              <h4>Audio batch preview</h4>
+              <p>
+                {preflight.configuration.providerId} · {preflight.voiceName} ·{' '}
+                {preflight.configuration.modelId} ·{' '}
+                {preflight.configuration.format}
+              </p>
+              <p>
+                {preflight.clipCount} clips · {preflight.characterCount}{' '}
+                characters
+              </p>
+              <p>
+                {preflight.uncachedCharacters} uncached speech characters; exact
+                cached clips will be reused.
+              </p>
+              <p>
+                Provider report: {preflight.allowance.tier} ·{' '}
+                {preflight.allowance.used} used / {preflight.allowance.limit}{' '}
+                limit. Usage may update after requests.
+              </p>
+              <button
+                type="button"
+                disabled={busy || !preflight.clipCount}
+                onClick={() => void generate()}
+              >
+                Confirm generation
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setPreflight(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          ) : null}
+          {busy ? (
+            <p role="status">
+              Working on audio… Completed clips are saved individually.
+            </p>
+          ) : null}
           <ul className="audio-items">
             {plan.items.map((item) => (
               <li key={item.placementId}>
@@ -131,11 +260,7 @@ export function AudioSelection({
                   <input
                     type="checkbox"
                     checked={selected.has(item.placementId)}
-                    disabled={
-                      busy ||
-                      item.status === 'current' ||
-                      item.status === 'invalid'
-                    }
+                    disabled={busy || item.status === 'invalid'}
                     onChange={(event) =>
                       void saveSelection(
                         event.target.checked
@@ -166,8 +291,49 @@ export function AudioSelection({
                   <p>Edit this card field before selecting it for audio.</p>
                 ) : null}
                 <p>
-                  {item.side} · {item.characterCount} characters · {item.status}
+                  {item.side} · {item.characterCount} characters ·{' '}
+                  {item.audioState}
                 </p>
+                {item.error ? (
+                  <p role="status">Audio issue: {item.error}</p>
+                ) : null}
+                {item.artifactKey ? (
+                  <div>
+                    <p>Current clip</p>
+                    <audio
+                      controls
+                      preload="none"
+                      src={`/api/audio/${item.artifactKey}`}
+                      aria-label={`Current ${item.placementId} audio`}
+                    />
+                  </div>
+                ) : null}
+                {item.previousKey ? (
+                  <div>
+                    <p>Previous clip — compare before replacing</p>
+                    <pre>{item.previousText}</pre>
+                    <audio
+                      controls
+                      preload="none"
+                      src={`/api/audio/${item.previousKey}`}
+                      aria-label={`Previous ${item.placementId} audio`}
+                    />
+                  </div>
+                ) : null}
+                <button
+                  type="button"
+                  disabled={
+                    busy ||
+                    !plan.configuration ||
+                    item.status === 'invalid' ||
+                    item.audioState === 'complete'
+                  }
+                  onClick={() => void prepare('explicit', [item.placementId])}
+                >
+                  {item.audioState === 'failed' || item.audioState === 'paused'
+                    ? 'Retry this item'
+                    : 'Generate this item'}
+                </button>
               </li>
             ))}
           </ul>

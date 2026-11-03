@@ -6,6 +6,11 @@ import { createServer as createViteServer } from 'vite';
 import { createAnkiReadClient, readAnkiStatus } from './anki-status';
 import { createApiHandler } from './http';
 import { WorkspaceStore } from './workspace';
+import { AudioService } from './audio-service';
+import {
+  createInitialSpeechProvider,
+  readElevenLabsAllowance,
+} from './elevenlabs';
 
 const host = '127.0.0.1';
 const rawPort = process.env.LOCAL_WEB_PORT ?? '43110';
@@ -23,11 +28,23 @@ const dataDirectory =
     process.env.LOCALAPPDATA ?? resolve(homedir(), 'AppData', 'Local'),
     'AnkiVocabularyStudio',
   );
+const workspace = new WorkspaceStore(dataDirectory);
+const speechKey = process.env.ELEVENLABS_API_KEY;
+const audio = new AudioService(
+  resolve(dataDirectory, 'audio'),
+  workspace,
+  speechKey ? createInitialSpeechProvider(speechKey) : null,
+  async () => {
+    if (!speechKey) throw new Error('Speech key unavailable.');
+    return readElevenLabsAllowance(speechKey);
+  },
+);
 const api = createApiHandler({
   expectedHosts: new Set([`${host}:${port}`, `localhost:${port}`]),
   expectedOrigins: new Set([baseUrl, `http://localhost:${port}`]),
   readStatus: () => readAnkiStatus(anki),
-  workspace: new WorkspaceStore(dataDirectory),
+  workspace,
+  audio,
   sessionToken: randomUUID(),
 });
 const vite = await createViteServer({
