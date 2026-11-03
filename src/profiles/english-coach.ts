@@ -213,6 +213,10 @@ export function createEnglishCoachProfile(
   if (version === 'av005-5')
     return generationProfileSchema.parse({
       ...historical,
+      audioSelectors: [
+        { fieldKey: 'target', kind: 'text', side: 'front' },
+        ...historical.audioSelectors,
+      ],
       noteType: { key: 'english-coach-english-explanations', layoutVersion: 4 },
     });
   const excluded = new Set(

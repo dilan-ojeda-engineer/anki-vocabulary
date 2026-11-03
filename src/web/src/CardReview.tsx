@@ -12,6 +12,7 @@ import {
   updateCard,
   WorkspaceConflictError,
 } from './api';
+import { AudioSelection } from './AudioSelection';
 
 type Card = Workspace['cards'][number];
 
@@ -404,6 +405,11 @@ function CardEditor({
           </button>
         </div>
       ) : null}
+      {approved && !dirty ? (
+        <AudioSelection card={card} onChange={onChange} />
+      ) : (
+        <p>Save and approve this revision to select audio items.</p>
+      )}
     </section>
   );
 }

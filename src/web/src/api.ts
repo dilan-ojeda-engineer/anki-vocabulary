@@ -6,6 +6,8 @@ import type {
   ImportRequest,
   UpdateCardRequest,
 } from '../../shared/card-import';
+import { audioPlanSchema } from '../../shared/audio-plan';
+import type { AudioSelectionRequest } from '../../shared/audio-plan';
 
 let workspaceToken: string | null = null;
 
@@ -37,6 +39,18 @@ export async function updateCard(id: string, input: UpdateCardRequest) {
 
 export async function approveCard(id: string, input: ApproveCardRequest) {
   return workspaceSchema.parse(await post(`/api/cards/${id}/approval`, input));
+}
+
+export async function getAudioPlan(id: string, input: ApproveCardRequest) {
+  return audioPlanSchema.parse(
+    await post(`/api/cards/${id}/audio-plan`, input),
+  );
+}
+
+export async function selectAudio(id: string, input: AudioSelectionRequest) {
+  return workspaceSchema.parse(
+    await post(`/api/cards/${id}/audio-selection`, input),
+  );
 }
 
 export async function getWorkspace() {

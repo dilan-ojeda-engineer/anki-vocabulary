@@ -1,8 +1,10 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { workspaceSchema } from '../shared/card-import';
+import { savedCardSchema, workspaceSchema } from '../shared/card-import';
 import type { ImportPreview, Workspace } from '../shared/card-import';
+import { audioPlanSchema, extractAudioItems } from '../shared/audio-plan';
+import type { AudioPlan, AudioSelectionRequest } from '../shared/audio-plan';
 import { createEnglishCoachProfile } from '../profiles/english-coach';
 import { createFieldValuesSchema } from '../shared/contracts';
 import { z } from 'zod';
@@ -41,6 +43,10 @@ const workspaceV2Schema = z.strictObject({
     }),
   ),
 });
+const workspaceV3Schema = z.strictObject({
+  version: z.literal(3),
+  cards: z.array(savedCardSchema.omit({ audioSelection: true })),
+});
 
 export function contentHash(fields: unknown): string {
   const validated = fieldsSchema.parse(fields);
@@ -58,6 +64,16 @@ export function requireApprovedCard(card: Workspace['cards'][number]): void {
     card.contentHash !== contentHash(card.fields)
   )
     throw new Error('Card requires approval of its current revision.');
+}
+
+function audioPlanFor(card: Workspace['cards'][number]): AudioPlan {
+  requireApprovedCard(card);
+  return audioPlanSchema.parse({
+    cardId: card.id,
+    revision: card.revision,
+    contentHash: card.contentHash,
+    items: extractAudioItems(card.fields),
+  });
 }
 
 export class WorkspaceStore {
@@ -86,6 +102,70 @@ export class WorkspaceStore {
     return operation;
   }
 
+  async audioPlan(
+    id: string,
+    expectedRevision: number,
+    expectedContentHash: string,
+  ): Promise<AudioPlan> {
+    return this.withApprovedCard(
+      id,
+      expectedRevision,
+      expectedContentHash,
+      audioPlanFor,
+    );
+  }
+
+  async selectAudio(
+    id: string,
+    input: AudioSelectionRequest,
+  ): Promise<Workspace> {
+    const operation = this.pending.then(async () => {
+      const current = await this.read();
+      const index = current.cards.findIndex((card) => card.id === id);
+      if (index < 0) throw new Error('Card not found.');
+      const card = current.cards[index]!;
+      if (
+        card.revision !== input.expectedRevision ||
+        card.contentHash !== input.expectedContentHash
+      )
+        throw new Error('Stale card revision.');
+      const allowed = new Set(
+        audioPlanFor(card)
+          .items.filter((item) => item.status !== 'invalid')
+          .map((item) => item.placementId),
+      );
+      const requested = new Set(input.placementIds);
+      if (
+        requested.size !== input.placementIds.length ||
+        input.placementIds.some((placementId) => !allowed.has(placementId))
+      )
+        throw new Error('Invalid audio placement selection.');
+      const ordered = [...allowed].filter((placementId) =>
+        requested.has(placementId),
+      );
+      if (
+        card.audioSelection &&
+        JSON.stringify(card.audioSelection.placementIds) ===
+          JSON.stringify(ordered)
+      )
+        return current;
+      const cards = [...current.cards];
+      cards[index] = {
+        ...card,
+        audioSelection: {
+          revision: card.revision,
+          contentHash: card.contentHash,
+          placementIds: ordered,
+        },
+      };
+      const next = workspaceSchema.parse({ version: 4, cards });
+      await this.write(next);
+      return next;
+    });
+    this.pending = operation.catch(() => undefined);
+    return operation;
+  }
+
   async read(): Promise<Workspace> {
     try {
       const raw: unknown = JSON.parse(
@@ -93,6 +173,7 @@ export class WorkspaceStore {
       );
       const old = workspaceV1Schema.safeParse(raw);
       const older = workspaceV2Schema.safeParse(raw);
+      const previous = workspaceV3Schema.safeParse(raw);
       const migrated = old.success
         ? old.data.cards.map((card) => ({
             ...card,
@@ -105,14 +186,23 @@ export class WorkspaceStore {
           : null;
       const workspace = migrated
         ? workspaceSchema.parse({
-            version: 3,
+            version: 4,
             cards: migrated.map((card) => ({
               ...card,
               contentHash: contentHash(card.fields),
               approval: null,
+              audioSelection: null,
             })),
           })
-        : workspaceSchema.parse(raw);
+        : previous.success
+          ? workspaceSchema.parse({
+              version: 4,
+              cards: previous.data.cards.map((card) => ({
+                ...card,
+                audioSelection: null,
+              })),
+            })
+          : workspaceSchema.parse(raw);
       const ids = new Set<string>();
       for (const card of workspace.cards) {
         fieldsSchema.parse(card.fields);
@@ -128,6 +218,25 @@ export class WorkspaceStore {
           throw new Error(
             'Saved card approval does not match current revision.',
           );
+        if (card.audioSelection) {
+          if (
+            !card.approval ||
+            card.audioSelection.revision !== card.revision ||
+            card.audioSelection.contentHash !== card.contentHash
+          )
+            throw new Error('Saved audio selection is stale.');
+          const allowed = new Set(
+            extractAudioItems(card.fields)
+              .filter((item) => item.status !== 'invalid')
+              .map((item) => item.placementId),
+          );
+          const selected = card.audioSelection.placementIds;
+          if (
+            new Set(selected).size !== selected.length ||
+            selected.some((placementId) => !allowed.has(placementId))
+          )
+            throw new Error('Saved audio selection is invalid.');
+        }
         if (ids.has(card.id)) throw new Error('Duplicate saved card identity.');
         ids.add(card.id);
       }
@@ -139,7 +248,7 @@ export class WorkspaceStore {
         'code' in error &&
         error.code === 'ENOENT'
       )
-        return { version: 3, cards: [] };
+        return { version: 4, cards: [] };
       throw error;
     }
   }
@@ -161,7 +270,7 @@ export class WorkspaceStore {
       )
         throw new Error('Only valid preview entries may be saved.');
       const next = workspaceSchema.parse({
-        version: 3,
+        version: 4,
         cards: [
           ...current.cards,
           ...added.map((entry) => ({
@@ -174,6 +283,7 @@ export class WorkspaceStore {
             revision: 1,
             contentHash: contentHash(entry.fields),
             approval: null,
+            audioSelection: null,
             importedAt: now,
           })),
         ],
@@ -206,8 +316,9 @@ export class WorkspaceStore {
         revision: card.revision + 1,
         contentHash: contentHash(fields),
         approval: null,
+        audioSelection: null,
       };
-      const next = workspaceSchema.parse({ version: 3, cards });
+      const next = workspaceSchema.parse({ version: 4, cards });
       await this.write(next);
       return next;
     });
@@ -237,7 +348,7 @@ export class WorkspaceStore {
           approvedAt: new Date().toISOString(),
         },
       };
-      const next = workspaceSchema.parse({ version: 3, cards });
+      const next = workspaceSchema.parse({ version: 4, cards });
       await this.write(next);
       return next;
     });

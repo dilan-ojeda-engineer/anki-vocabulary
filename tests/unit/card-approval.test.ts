@@ -248,6 +248,7 @@ describe('AV-031 server-owned exact-revision approval', () => {
     const oldCard = { ...card };
     delete (oldCard as Partial<typeof card>).contentHash;
     delete (oldCard as Partial<typeof card>).approval;
+    delete (oldCard as Partial<typeof card>).audioSelection;
     const old = { version: 2, cards: [oldCard] };
     await writeFile(file, JSON.stringify(old));
     const migrated = await new WorkspaceStore(directory).read();

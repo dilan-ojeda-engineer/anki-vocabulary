@@ -57,7 +57,7 @@ Accepted audio behavior for the local web direction:
 - Generate only after approval of the exact card revision. Content edits clear approval; regenerate or reuse audio only once the edited revision is approved.
 - Verify replay controls and autoplay in Anki's actual desktop/mobile clients. The back must not accidentally replay the front audio through a repeated front template.
 
-This accepted local web requirement supersedes the earlier front/examples-only selection. The current profile code still needs an implementation change to add `target` to its audio selectors. Four additional examples imply six audio placements per default card; a useful fifth example implies seven. Exact duplicate text/configuration may reuse one artifact while retaining each placement association.
+This accepted local web requirement supersedes the earlier front/examples-only selection. Profile `av005-5` includes `target` in its audio selectors; historical profile snapshots retain their original selectors. Four additional examples imply six audio placements per default card; a useful fifth example implies seven. Exact duplicate text/configuration may reuse one artifact while retaining each placement association.
 
 Alternative card types, cloze deletion, extra quizzes, rankings, and summaries are outside this specification unless the user explicitly requests them.
 

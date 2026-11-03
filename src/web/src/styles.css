@@ -97,6 +97,35 @@ label {
   background: #fff;
   color: #245a45;
 }
+.audio-selection {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #d3ddd4;
+}
+.audio-items {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+.audio-items li {
+  padding: 14px;
+  border: 1px solid #d3ddd4;
+  border-radius: 12px;
+  background: #fbfaf6;
+}
+.audio-items label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.audio-items pre {
+  margin: 10px 0;
+}
+.audio-items p {
+  margin: 0;
+  color: #5b6b64;
+}
 pre {
   overflow: auto;
   white-space: pre-wrap;

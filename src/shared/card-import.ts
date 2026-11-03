@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { audioPlacementIdSchema } from './audio-plan';
 
 export const importFormatSchema = z.enum(['paste', 'json', 'csv', 'tsv']);
 export const importRequestSchema = z.strictObject({
@@ -34,10 +35,17 @@ export const savedCardSchema = z.strictObject({
       approvedAt: z.iso.datetime(),
     })
     .nullable(),
+  audioSelection: z
+    .strictObject({
+      revision: z.number().int().positive(),
+      contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+      placementIds: z.array(audioPlacementIdSchema),
+    })
+    .nullable(),
   importedAt: z.iso.datetime(),
 });
 export const workspaceSchema = z.strictObject({
-  version: z.literal(3),
+  version: z.literal(4),
   cards: z.array(savedCardSchema),
 });
 export const approveCardRequestSchema = z.strictObject({

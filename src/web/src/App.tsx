@@ -410,7 +410,7 @@ export function App() {
 
       <section className="next" aria-labelledby="next-heading">
         <h2 id="next-heading">Next workspace step</h2>
-        <p>Audio selection, generation, and Anki delivery are planned next.</p>
+        <p>Audio generation, playback, and Anki delivery are planned next.</p>
       </section>
     </main>
   );

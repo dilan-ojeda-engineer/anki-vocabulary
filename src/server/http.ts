@@ -7,6 +7,7 @@ import {
   updateCardRequestSchema,
   workspaceSchema,
 } from '../shared/card-import';
+import { audioSelectionRequestSchema } from '../shared/audio-plan';
 import { previewImport } from './card-import';
 import type { WorkspaceStore } from './workspace';
 import { z } from 'zod';
@@ -54,13 +55,15 @@ export function createApiHandler(options: {
       sendJson(response, 403, { error: 'origin-not-allowed' });
       return true;
     }
-    const cardId = /^\/api\/cards\/([0-9a-f-]{36})(?:\/approval)?$/.exec(
-      url.pathname,
-    )?.[1];
+    const cardRoute =
+      /^\/api\/cards\/([0-9a-f-]{36})(?:\/(approval|audio-plan|audio-selection))?$/.exec(
+        url.pathname,
+      );
+    const cardId = cardRoute?.[1];
     if (cardId) {
-      const isApproval = url.pathname.endsWith('/approval');
+      const action = cardRoute?.[2] ?? 'update';
       if (
-        request.method !== (isApproval ? 'POST' : 'PATCH') ||
+        request.method !== (action === 'update' ? 'PATCH' : 'POST') ||
         !options.workspace
       ) {
         sendJson(response, 405, { error: 'method-not-allowed' });
@@ -95,7 +98,11 @@ export function createApiHandler(options: {
         return true;
       }
       const input = (
-        isApproval ? approveCardRequestSchema : updateCardRequestSchema
+        action === 'audio-selection'
+          ? audioSelectionRequestSchema
+          : action === 'update'
+            ? updateCardRequestSchema
+            : approveCardRequestSchema
       ).safeParse(parsed);
       if (!input.success) {
         sendJson(response, 400, { error: 'invalid-request' });
@@ -105,15 +112,27 @@ export function createApiHandler(options: {
         sendJson(
           response,
           200,
-          isApproval
+          action === 'approval'
             ? await options.workspace.approve(
                 cardId,
                 approveCardRequestSchema.parse(input.data),
               )
-            : await options.workspace.update(
-                cardId,
-                updateCardRequestSchema.parse(input.data),
-              ),
+            : action === 'audio-plan'
+              ? await options.workspace.audioPlan(
+                  cardId,
+                  approveCardRequestSchema.parse(input.data).expectedRevision,
+                  approveCardRequestSchema.parse(input.data)
+                    .expectedContentHash,
+                )
+              : action === 'audio-selection'
+                ? await options.workspace.selectAudio(
+                    cardId,
+                    audioSelectionRequestSchema.parse(input.data),
+                  )
+                : await options.workspace.update(
+                    cardId,
+                    updateCardRequestSchema.parse(input.data),
+                  ),
         );
       } catch (error) {
         const message = error instanceof Error ? error.message : '';
