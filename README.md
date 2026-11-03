@@ -2,7 +2,7 @@
 
 A planned local web tool for reviewing English Coach cards, generating target/example audio, and safely creating or updating notes in Anki.
 
-**Status:** The local web foundation reports Anki availability and lists decks. AV-029 adds card paste/file import, structural preview, and a saved pending queue for review; editing, approval, audio, and Anki writes are not implemented. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no production audio provider or written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
+**Status:** The local web app reports Anki availability, lists decks, imports English Coach cards, and saves a pending queue. AV-030 adds individual editing, include/exclude, front/back preview, and card-text copying for review. Exact-revision approval, audio, and Anki writes are not implemented. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no production audio provider or written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
 
 ## Start here
 
@@ -91,7 +91,7 @@ The [delivery playbook](docs/DELIVERY_PLAYBOOK.md) covers the process from disco
 
 You can request changes in plain English; keep accepted scope and decisions in the project documents and, once adopted, track live tasks on the shared issue board.
 
-AV-028 is merged with a recorded real connected-Anki deck check. AV-029 is implemented on its task branch and awaits review and acceptance. AV-030 is the planned individual edit/copy/preview slice; it must be explicitly assigned. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
+AV-028 and AV-029 are merged. AV-030 is implemented on its task branch and awaits review and acceptance. AV-031 is the next planned exact-revision approval slice; it must be explicitly assigned. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
 
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
 

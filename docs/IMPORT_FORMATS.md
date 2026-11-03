@@ -4,7 +4,7 @@ The local workspace accepts UTF-8 text, JSON, CSV, and TSV. Paste content or cho
 
 ## Official card text
 
-Use the exact front and back headings from [CARD_SPEC.md](CARD_SPEC.md). Put the target on line one, a quoted front example on line two, and `What does this expression mean?` on line three. Follow with the back headings in order. `Irregular Forms:` is omitted when inapplicable. Put one `- ` bullet per item under `More examples:`, `Common collocations/chunks:`, and `Natural alternatives:`. Separate multiple cards with a line containing only `---`.
+Use the exact front and back headings from [CARD_SPEC.md](CARD_SPEC.md). Put the target, a quoted front example, and `What does this expression mean?` as the first three nonempty lines. Follow with the back headings in order. `Irregular Forms:` is omitted when inapplicable. Put one `- ` bullet per item under `More examples:`, `Common collocations/chunks:`, and `Natural alternatives:`. Separate multiple cards with a line containing three or more dashes, such as `---` or `-------`. Markdown bold markers around targets, headings, or inline emphasis and blank lines are accepted; the original source retains them while parsed learning fields use plain text.
 
 ```text
 awkward

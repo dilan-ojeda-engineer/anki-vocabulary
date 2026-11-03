@@ -1,7 +1,7 @@
 # Local web plan: Anki Card and Audio Workspace
 
 **Date:** November 2, 2026
-**Status:** Product direction and initial requirements accepted; AV-028 is merged and AV-029 card import/offline queue implementation is prepared for review. Individual editing, audio, approval, and Anki writes have not started.
+**Status:** Product direction and initial requirements accepted; AV-028 and AV-029 are merged, and AV-030 individual review/edit/preview implementation is prepared for review. Audio, exact-revision approval, and Anki writes have not started.
 
 Implementation is tracked as AV-028 through AV-036 in the [current backlog](BACKLOG.md#current-local-web-task-inventory). The IDs continue after the historical Electron backlog to avoid reusing earlier task references. Listing the sequence does not authorize starting the next task automatically.
 

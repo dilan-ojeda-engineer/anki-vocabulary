@@ -11,6 +11,7 @@ import {
   previewCards,
   saveCards,
 } from './api';
+import { CardReview } from './CardReview';
 
 const cardTextPlaceholder = `awkward
 “I felt awkward asking for help.”
@@ -380,11 +381,15 @@ export function App() {
         </ul>
       </section>
 
+      {workspace ? (
+        <CardReview workspace={workspace} onChange={setWorkspace} />
+      ) : null}
+
       <section className="next" aria-labelledby="next-heading">
         <h2 id="next-heading">Next workspace step</h2>
         <p>
-          Individual editing, audio generation, and Anki delivery are planned
-          next.
+          Exact-revision approval, audio generation, and Anki delivery are
+          planned next.
         </p>
       </section>
     </main>

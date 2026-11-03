@@ -1,7 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { localWebStatusSchema } from '../shared/local-web';
 import type { LocalWebStatus } from '../shared/local-web';
-import { importRequestSchema, workspaceSchema } from '../shared/card-import';
+import {
+  importRequestSchema,
+  updateCardRequestSchema,
+  workspaceSchema,
+} from '../shared/card-import';
 import { previewImport } from './card-import';
 import type { WorkspaceStore } from './workspace';
 import { z } from 'zod';
@@ -47,6 +51,70 @@ export function createApiHandler(options: {
     const origin = request.headers.origin;
     if (origin && !options.expectedOrigins.has(origin)) {
       sendJson(response, 403, { error: 'origin-not-allowed' });
+      return true;
+    }
+    const cardId = /^\/api\/cards\/([0-9a-f-]{36})$/.exec(url.pathname)?.[1];
+    if (cardId) {
+      if (request.method !== 'PATCH' || !options.workspace) {
+        sendJson(response, 405, { error: 'method-not-allowed' });
+        return true;
+      }
+      if (
+        !origin ||
+        !options.expectedOrigins.has(origin) ||
+        !options.sessionToken ||
+        request.headers['x-workspace-token'] !== options.sessionToken ||
+        request.headers['content-type']?.split(';')[0] !== 'application/json'
+      ) {
+        sendJson(response, 403, { error: 'request-not-allowed' });
+        return true;
+      }
+      const chunks: Buffer[] = [];
+      let size = 0;
+      for await (const chunk of request) {
+        const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        size += bytes.length;
+        if (size > 100_000) {
+          sendJson(response, 413, { error: 'too-large' });
+          return true;
+        }
+        chunks.push(bytes);
+      }
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+      } catch {
+        sendJson(response, 400, { error: 'invalid-json' });
+        return true;
+      }
+      const input = updateCardRequestSchema.safeParse(parsed);
+      if (!input.success) {
+        sendJson(response, 400, { error: 'invalid-request' });
+        return true;
+      }
+      try {
+        sendJson(
+          response,
+          200,
+          await options.workspace.update(cardId, input.data),
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '';
+        sendJson(
+          response,
+          message === 'Stale card revision.'
+            ? 409
+            : message === 'Card not found.'
+              ? 404
+              : 400,
+          {
+            error:
+              message === 'Stale card revision.'
+                ? 'stale-revision'
+                : 'invalid-card-or-storage',
+          },
+        );
+      }
       return true;
     }
     if (

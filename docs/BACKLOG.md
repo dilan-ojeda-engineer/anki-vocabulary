@@ -14,7 +14,7 @@ The owner accepted the [local web direction and initial requirements](LOCAL_WEB_
 |---|---|---|---|---|---|
 | AV-028 | Read-only loopback web foundation with Anki status and deck discovery | P0 / foundation | In review; automated and live connected-Anki checks recorded, human acceptance pending | Unassigned / Unassigned | Reuses AV-002 tooling and AV-004 Anki contracts |
 | AV-029 | Paste/import English Coach cards and save the pending queue locally for offline use | P0 / import | In review; implementation and local checks recorded, human acceptance pending | Unassigned / Unassigned | AV-028; accepted import fixtures and local store requirements |
-| AV-030 | Review, edit, include/exclude, copy, and preview cards one by one | P0 / review | Backlog | Unassigned / Unassigned | AV-029; English Coach profile/template |
+| AV-030 | Review, edit, include/exclude, copy, and preview cards one by one | P0 / review | In review; implementation and local checks recorded, human acceptance pending | Unassigned / Unassigned | AV-029; English Coach profile/template |
 | AV-031 | Enforce exact-revision content approval outside React and invalidate it on edits | P0 / safety | Backlog | Unassigned / Unassigned | AV-030; relevant AV-003 contracts |
 | AV-032 | Extract and select target/front/additional-example audio items | P0 / audio preparation | Backlog | Unassigned / Unassigned | AV-031; English Coach audio-field rules |
 | AV-033 | Generate, cache, play, compare, and retry audio individually or in batches | P0 / audio | Backlog | Unassigned / Unassigned | AV-032; selected TTS provider/voice and confirmed allowance |
@@ -59,6 +59,8 @@ Only one of these tasks should be treated as the active implementation task unle
 - Copy the reviewed official card text without changing application or Anki state.
 - Provide keyboard-accessible controls and a usable narrow-screen layout. Verify behavior with fixtures rather than a live text provider.
 - Persist committed edits and inclusion state through browser/server restarts while Anki is unavailable; clearly distinguish unsaved form edits.
+
+**AV-030 implementation evidence (November 2, 2026):** The local workspace now reads AV-029 version-1 records into a version-2 review model without rewriting them on read. Individual saves persist edited fields, inclusion, an incremented revision, and the original imported fields/source; stale revisions conflict. Browser checks on an isolated store with AnkiConnect unavailable edited a meaning, recovered it after a server restart, retained include/exclude after reload, and copied the official card text. A second check confirmed that typing a new list item preserves its newline and that a two-tab stale-save conflict leaves the losing draft visible. The user's five-card Markdown attachment exposed an AV-029 paste-parser gap: bold headings, blank front lines, and long dash separators. After the fix, the running API preview returned five structurally valid cards without saving or modifying the attachment. Fixture tests cover migration, invalid/stale edits, heading order, and the Markdown import shape. `npm run check` passed (79 tests, typecheck, lint, formatting, Electron and web builds). No linguistic review, human acceptance, or Anki mutation is claimed.
 
 ### AV-031 — Exact-revision approval
 

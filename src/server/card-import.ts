@@ -67,14 +67,18 @@ function splitDelimited(
 }
 
 function parsePasteCard(raw: string): Record<string, unknown> {
-  const lines = raw.trim().split(/\r?\n/);
-  const target = lines.shift()?.trim() ?? '';
-  const frontExample = (lines.shift()?.trim() ?? '').replace(
-    /^[“"]|[”"]$/g,
-    '',
-  );
-  if (lines.shift()?.trim() !== 'What does this expression mean?')
-    throw new Error('Expected the official front-side question on line 3.');
+  const lines = raw
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const plain = (line: string) => line.replace(/\*\*/g, '').trim();
+  const unquote = (line: string) => line.replace(/^[“"]|[”"]$/g, '');
+  const target = plain(lines.shift() ?? '');
+  const frontExample = unquote(plain(lines.shift() ?? ''));
+  if (plain(lines.shift() ?? '') !== 'What does this expression mean?')
+    throw new Error(
+      'Expected “What does this expression mean?” after the target and front example.',
+    );
   const result: Record<string, unknown> = {
     target,
     frontExample,
@@ -84,7 +88,7 @@ function parsePasteCard(raw: string): Record<string, unknown> {
   let previous = -1;
   const seen = new Set<string>();
   for (const line of lines) {
-    const trimmed = line.trim();
+    const trimmed = plain(line);
     const headingIndex = headings.findIndex(
       ([heading]) => trimmed === heading || trimmed.startsWith(`${heading} `),
     );
@@ -117,7 +121,7 @@ function parsePasteCard(raw: string): Record<string, unknown> {
       typeof value === 'string'
         ? value
             .split('\n')
-            .map((item) => item.replace(/^[-*]\s*/, '').trim())
+            .map((item) => unquote(item.replace(/^[-*]\s*/, '').trim()))
             .filter(Boolean)
         : [];
   }
@@ -130,7 +134,7 @@ function candidates(
 ): { originalText: string; fields: unknown; error?: string }[] {
   if (request.format === 'paste')
     return request.text
-      .split(/^---\s*$/m)
+      .split(/^\s*-{3,}\s*$/m)
       .filter((part) => part.trim())
       .map((part) => ({ originalText: part, fields: part }));
   if (request.format === 'json') {

@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { previewImport } from '../../src/server/card-import';
 import { WorkspaceStore } from '../../src/server/workspace';
 import { englishCoachFieldsFixture } from '../../src/shared/fixtures/workflow';
+import { cardText } from '../../src/shared/card-display';
 
 const fields = {
   ...englishCoachFieldsFixture,
@@ -80,6 +81,36 @@ describe('AV-029 import and offline workspace', () => {
     expect(preview.entries[0]?.fields).toEqual(fields);
     expect(preview.entries[0]?.originalText).toBe(`${card}\n`);
     expect(preview.entries[1]?.issues.length).toBeGreaterThan(0);
+  });
+
+  it('imports Markdown-formatted cards with blank front lines and long separators', () => {
+    const plain = cardText(fields);
+    const markdown = plain
+      .replace(
+        'awkward\n“I felt awkward asking for help.”\nWhat does this expression mean?',
+        '**awkward**\n\n“I felt awkward asking for help.”\n\n**What does this expression mean?**',
+      )
+      .replace(
+        /^(Meaning:|Category:|Pronunciation tip:|Native English:|For Spanish speakers:|More examples:|Common collocations\/chunks:|Common mistake and usage note:|Natural alternatives:|Spanish Translation:)/gm,
+        '**$1**',
+      )
+      .replace(
+        '- There was an awkward pause.',
+        '- “There was an awkward pause.”',
+      )
+      .replace('Feeling uncomfortable', 'Feeling **uncomfortable**');
+    const input = `${markdown}\n\n-------\n\n${markdown}`;
+    const preview = previewImport({ format: 'paste', text: input });
+    expect(preview.entries).toHaveLength(2);
+    expect(preview.entries.every((entry) => entry.issues.length === 0)).toBe(
+      true,
+    );
+    expect(preview.entries[0]?.fields).toMatchObject({
+      target: 'awkward',
+      meaning: fields.meaning,
+      examples: fields.examples,
+    });
+    expect(preview.entries[0]?.originalText).toContain('**awkward**');
   });
 
   it('retains exact quoted CSV source rows and rejects malformed list cells', () => {
