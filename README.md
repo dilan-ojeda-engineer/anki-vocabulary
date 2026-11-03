@@ -25,13 +25,13 @@ A planned local web tool for reviewing English Coach cards, generating target/ex
 - [A realistic session and the tools behind every step](docs/WORKFLOW_WALKTHROUGH.md)
 - [Interactive workflow simulation](docs/workflow-simulation.html) — open in a browser; uses sample data and makes no provider calls.
 
-The current first-release workflow is:
+The planned first-release workflow is:
 
-1. Connect to Anki Desktop through AnkiConnect and select an existing destination deck.
-2. Paste/import English Coach cards or load supported existing notes.
+1. Open the local workspace. Paste/import English Coach cards while Anki is closed, or connect to Anki to load supported existing notes.
+2. Save the pending cards locally and resume them after a browser or server restart.
 3. Review, validate, edit, include/exclude, and preview cards one by one.
 4. Generate and listen to target/front-example/additional-example audio individually or for all missing items.
-5. Create new notes or safely update supported existing notes without resetting scheduling.
+5. Open Anki, select a current destination deck, confirm the send, and create or safely update notes without resetting scheduling.
 6. Open the result in Anki Preview, then sync and study through Anki.
 
 Each group member runs their own installation, stores their own data, and uses their own provider accounts and API keys.
@@ -44,7 +44,7 @@ The application remains in this repository and uses **strict TypeScript, React, 
 |---|---|
 | App development | TypeScript in strict mode, React, Vite, local Node server |
 | Styling | CSS Modules and shared design tokens |
-| Local data | Anki for delivered notes/media; add app persistence only for demonstrated pending-work needs |
+| Local data | Server-owned, versioned workspace for pending cards/audio/receipts; Anki for delivered notes and synced media |
 | Validation | Zod for imports, cards, audio commands, and provider/Anki responses |
 | Audio | Replaceable server-side TypeScript adapter; initial provider/voice pending listening review |
 | Written generation | Deferred provider decision; AV-005 evidence preserved |
@@ -90,7 +90,7 @@ The [delivery playbook](docs/DELIVERY_PLAYBOOK.md) covers the process from disco
 
 You can request changes in plain English; keep accepted scope and decisions in the project documents and, once adopted, track live tasks on the shared issue board.
 
-Next, finish AV-028 by committing the reviewed foundation and recording a real connected-Anki deck check. AV-029 is the following card-import slice, but it must not start until explicitly assigned. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
+AV-028 is merged with a recorded real connected-Anki deck check. AV-029 is the following card-import and offline-save slice, but it must not start until explicitly assigned. Audio provider/voice selection remains a separate prerequisite for AV-033 real voice evidence.
 
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
 

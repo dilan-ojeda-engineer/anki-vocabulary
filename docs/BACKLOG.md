@@ -13,7 +13,7 @@ The owner accepted the [local web direction and initial requirements](LOCAL_WEB_
 | ID | Outcome | Priority / phase | State | Owner / reviewer | Dependencies |
 |---|---|---|---|---|---|
 | AV-028 | Read-only loopback web foundation with Anki status and deck discovery | P0 / foundation | In review; automated and live connected-Anki checks recorded, human acceptance pending | Unassigned / Unassigned | Reuses AV-002 tooling and AV-004 Anki contracts |
-| AV-029 | Paste/import English Coach cards with boundary detection, validation, and source preservation | P0 / import | Backlog | Unassigned / Unassigned | AV-028; accepted import fixtures |
+| AV-029 | Paste/import English Coach cards and save the pending queue locally for offline use | P0 / import | Backlog | Unassigned / Unassigned | AV-028; accepted import fixtures and local store requirements |
 | AV-030 | Review, edit, include/exclude, copy, and preview cards one by one | P0 / review | Backlog | Unassigned / Unassigned | AV-029; English Coach profile/template |
 | AV-031 | Enforce exact-revision content approval outside React and invalidate it on edits | P0 / safety | Backlog | Unassigned / Unassigned | AV-030; relevant AV-003 contracts |
 | AV-032 | Extract and select target/front/additional-example audio items | P0 / audio preparation | Backlog | Unassigned / Unassigned | AV-031; English Coach audio-field rules |
@@ -46,6 +46,8 @@ Only one of these tasks should be treated as the active implementation task unle
 - Preserve the exact original source text for comparison. Import performs no model, audio, media, clipboard, or Anki write operation.
 - Validate the profile structure at runtime, including required headings, conditional sections, and the agreed four-to-five additional examples.
 - Freeze representative valid, invalid, multiline, quoted, and non-ASCII fixtures in the task evidence before declaring the formats supported.
+- Save the original source, parsed cards, validation findings, and stable local source IDs in a server-owned, versioned store outside the repository. Choose and document a store with atomic writes and recovery from an interrupted save.
+- Reopen the browser and restart the local server with Anki closed; the same pending queue must return without another import. A malformed or interrupted save must not silently replace good work.
 
 ### AV-030 — Card review and preview
 
@@ -54,6 +56,7 @@ Only one of these tasks should be treated as the active implementation task unle
 - Render accurate English Coach front/back previews with the official heading order and no unintended Spanish content outside the prompt-defined pronunciation tip/translation fields.
 - Copy the reviewed official card text without changing application or Anki state.
 - Provide keyboard-accessible controls and a usable narrow-screen layout. Verify behavior with fixtures rather than a live text provider.
+- Persist committed edits and inclusion state through browser/server restarts while Anki is unavailable; clearly distinguish unsaved form edits.
 
 ### AV-031 — Exact-revision approval
 
@@ -62,6 +65,7 @@ Only one of these tasks should be treated as the active implementation task unle
 - Editing any card field creates a new revision and clears content approval; reverting content does not silently manufacture approval.
 - Return a clear conflict that lets the browser refresh when its displayed revision is stale.
 - Cover approval, invalidation, replay, and tampered-command cases with controlled tests.
+- Recover the recorded approval and exact revision after a server restart; no browser-only approval state counts.
 
 ### AV-032 — Audio extraction and selection
 
@@ -78,6 +82,7 @@ Only one of these tasks should be treated as the active implementation task unle
 - Cache only exact text/provider/model/voice/settings/format matches. Preserve successes during partial failure and retry only missing or explicitly selected failures.
 - Play every proposed clip before delivery and allow comparison where a replacement is proposed. Changed source text makes the old association stale.
 - Use fake providers for ordinary tests and separately record real listening evidence, actual model/voice/format, allowance authorization, and human voice-quality decision.
+- Store successful audio artifacts and associations locally so they remain playable after browser/server restart without Anki running. The selected provider may still require internet access.
 
 ### AV-034 — Create notes in Anki
 
@@ -86,6 +91,7 @@ Only one of these tasks should be treated as the active implementation task unle
 - Create the app-owned versioned English Coach note type/notes, upload uniquely named media, and use dedicated audio fields without changing source sentence fields.
 - Persist stable source identity and per-item receipts; repeat delivery does not duplicate notes or request unnecessary audio.
 - Reconcile ambiguous creation by source identity before retrying and report partial success accurately. Verify in a disposable Anki profile.
+- Keep pending delivery intent and per-item receipts across disconnects. Reconnection never triggers an automatic send; show the current profile and destination for explicit confirmation, then revalidate before writing.
 
 ### AV-035 — Load and safely update notes/audio
 
@@ -102,6 +108,7 @@ Only one of these tasks should be treated as the active implementation task unle
 - Generate and listen to one clip and all missing clips, including a controlled partial failure and resume.
 - Create selected notes in an existing nested deck, repeat delivery without duplicates, then load one note and replace one clip without changing identity or scheduling.
 - Record automated, fake-provider, real-provider, real-Anki, linguistic, and voice-review evidence separately. Product-owner acceptance is required to close the gate.
+- Demonstrate offline import/edit/audio preparation and recovery after a server restart, then reconnect Anki and confirm that no queued item is sent until the user explicitly initiates delivery.
 
 ## Historical Electron-first backlog
 

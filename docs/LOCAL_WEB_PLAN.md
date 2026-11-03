@@ -7,7 +7,7 @@ Implementation is tracked as AV-028 through AV-036 in the [current backlog](BACK
 
 ## Purpose
 
-Build a small application that runs only on the user's computer, opens in a web browser, and works with the user's running Anki Desktop application through AnkiConnect. Its first useful outcome is to import or load English Coach cards, review them individually, generate and listen to selected audio, and safely create or update notes in an explicitly selected Anki deck.
+Build a small application that runs only on the user's computer and opens in a web browser. The user can prepare English Coach cards and audio while Anki Desktop is closed. AnkiConnect is needed when discovering current decks, loading existing notes, or creating/updating notes in Anki.
 
 The learning outcome remains more important than building a general card platform. The first version supports the app-owned English Coach note type. Any existing Anki deck can be selected as a destination, but arbitrary note types are not modified until their fields and templates can be mapped safely.
 
@@ -27,10 +27,9 @@ Selecting any deck does not make every note type in that deck safe to edit. New 
 
 ```mermaid
 flowchart LR
-    A[Connect to Anki] --> B[Select existing deck]
-    B --> C{Choose source}
-    C -->|Paste or import| D[Validate card list]
-    C -->|Load from Anki| E[Read supported notes]
+    A[Open local workspace] --> C{Choose source}
+    C -->|Paste or import offline| D[Validate and save card list]
+    C -->|Connect to Anki| E[Select deck and load supported notes]
     D --> F[Review and edit one by one]
     E --> F
     F --> G[Preview front and back]
@@ -38,17 +37,28 @@ flowchart LR
     H --> I[Select target and example audio]
     I --> J[Generate one, selected, or all missing]
     J --> K[Listen and approve clips]
-    K --> L[Create or update Anki notes]
+    K --> N[Connect or reconnect to Anki and choose deck]
+    N --> L[Create or update Anki notes]
     L --> M[Open in Anki Preview]
 ```
 
 ### Connect and choose a deck
 
+- The local workspace opens and retains prepared work while Anki is closed. Show Anki as unavailable without blocking paste/import, review, approval, or locally supported audio work.
 - Show Anki/AnkiConnect connection status and the active session or collection pairing.
 - Load and refresh all existing decks, including nested decks.
-- Require the user to choose a destination. Never use a silent default deck.
+- Require the user to choose a live destination before delivery. Never use a silent default deck. A deck name or ID remembered from a previous session is a hint only, never a write authorization.
 - Revalidate the connection, collection pairing, and destination immediately before a write.
 - Treat reconnecting or changing the Anki profile as a new pairing decision; do not trust stale numeric IDs.
+
+### Save and resume offline work
+
+- The Node server owns a local workspace store outside the source tree. Save imported source text, parsed cards, stable source identities, edits/revisions, inclusion state, validation results, explicit approvals, audio selections, generated artifact references, and per-item delivery intent/receipts as those features arrive.
+- Closing the browser, restarting the local server, or having Anki unavailable must not erase saved work. The browser can discard unsaved form edits only after making that state clear to the user.
+- Store media files in an app-owned local directory and refer to them by stable IDs. Validate all reads and writes at the server boundary; keep provider credentials out of the workspace, cards, exports, and logs.
+- Use an atomic, recoverable write strategy and version the stored format. Choose the concrete local store during AV-029 implementation based on these requirements; avoid assuming Anki can hold unfinished drafts.
+- Queue delivery intent while disconnected, but never silently send on reconnection. On reconnect, show the active profile, destination, planned creates/updates, approvals, and audio readiness again. Require an explicit send confirmation and revalidate all identities immediately before each write.
+- A pending item remains visible after a failed or ambiguous send. Reconcile its stable source identity and receipt against Anki before retrying; do not infer failure from a timeout.
 
 ### Paste, import, or load cards
 
@@ -153,7 +163,7 @@ src/
 - The local Node server binds to loopback only, validates command bodies and browser origin/session tokens, owns provider calls and local artifacts, and talks to AnkiConnect.
 - Anki remains the system of record for delivered notes, scheduling, decks, and synced media.
 - Initial local configuration may use process/user environment variables. A later settings design must keep secrets outside browser storage, logs, cards, exports, and Git.
-- Persistence beyond Anki should be added only for demonstrated needs such as resumable imports, pending audio, and delivery reconciliation. SQLite is not assumed for the first vertical slice.
+- Server-owned persistence is required for offline drafts, audio artifacts, approval records, and delivery reconciliation. AV-029 selects the smallest local store that supports atomic, versioned writes and restart recovery; SQLite is an option, not a prerequisite.
 
 The current read-only foundation exposes only `GET /api/status`. It validates the request host and browser origin and returns a sanitized Anki status/deck view; the Anki session remains server-side. Session-token and command-body enforcement becomes mandatory when the first mutation endpoint is introduced.
 
@@ -170,17 +180,18 @@ The current read-only foundation exposes only `GET /api/status`. It validates th
 
 The first vertical slice is acceptable when all of the following are demonstrated with a disposable Anki profile:
 
-1. Connect and select an existing nested deck; disconnecting or changing the session blocks writes.
+1. With Anki closed, import and edit cards, restart the browser and local server, and recover the same pending work.
 2. Paste/import at least five English Coach cards, show invalid input, and retain valid items.
 3. Review and edit every card individually with accurate front/back previews.
 4. Block audio and delivery for an unapproved revision; approve it, then edit a field and prove that the stale approval is invalidated outside the browser.
 5. Extract target, front-example, and additional-example audio items without selecting other learning fields.
-6. Generate one clip and all missing clips; preserve completed items through a controlled partial failure.
+6. Generate one clip and all missing clips; preserve completed items through a controlled partial failure and a restart.
 7. Listen to every generated clip before delivery.
-8. Create the selected notes in the chosen deck with the expected note type and media.
-9. Repeat the same delivery without duplicates or unnecessary regeneration.
-10. Load one delivered note, replace one clip after comparison, and update it without changing note/card identity or scheduling.
-11. Report exact real results separately from fake-provider/error checks and leave human language/voice approval pending until performed.
+8. Connect and select an existing nested deck; disconnecting or changing the session blocks writes and reconnection never sends automatically.
+9. Create the selected notes in the chosen deck with the expected note type and media.
+10. Repeat the same delivery without duplicates or unnecessary regeneration.
+11. Load one delivered note, replace one clip after comparison, and update it without changing note/card identity or scheduling.
+12. Report exact real results separately from fake-provider/error checks and leave human language/voice approval pending until performed.
 
 ## Deferred from the first vertical slice
 
