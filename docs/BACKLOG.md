@@ -20,7 +20,7 @@ The owner accepted the [local web direction and initial requirements](LOCAL_WEB_
 | AV-033 | Generate, cache, play, compare, and retry audio individually or in batches | P0 / audio | In review; controlled and one-item live evidence recorded, human acceptance pending | Unassigned / Unassigned | AV-032; selected TTS provider/voice and confirmed allowance |
 | AV-034 | Create approved English Coach notes with audio in an explicitly selected Anki deck | P0 / delivery | In review; controlled and live disposable-Anki evidence recorded, human acceptance pending | Unassigned / Unassigned | AV-028, AV-031, AV-033; disposable Anki profile |
 | AV-035 | Load supported notes and safely update fields or replace one audio placement in place | P0 / update | Owner workflow verified; commit and merge authorized | Unassigned / Unassigned | AV-034; stable identity and reconciliation evidence from AV-004 |
-| AV-036 | Demonstrate and accept the complete five-card local workflow | P0 / acceptance gate | Backlog | Unassigned / Unassigned | AV-029 through AV-035 |
+| AV-036 | Demonstrate and accept the complete five-card local workflow | P0 / acceptance gate | In review; engineering evidence recorded, owner approved five cards and 30 clips; final milestone disposition pending | Unassigned / Unassigned | AV-029 through AV-035 |
 
 Only one of these tasks should be treated as the active implementation task unless the team explicitly coordinates parallel work. A task becomes Done only after its acceptance evidence is reviewed and accepted; a passing implementation review alone is not product acceptance.
 
@@ -169,6 +169,8 @@ The owner requested these future tasks on November 3, 2026, after the [Anki note
 - Create selected notes in an existing nested deck, repeat delivery without duplicates, then load one note and replace one clip without changing identity or scheduling.
 - Record automated, fake-provider, real-provider, real-Anki, linguistic, and voice-review evidence separately. Product-owner acceptance is required to close the gate.
 - Demonstrate offline import/edit/audio preparation and recovery after a server restart, then reconnect Anki and confirm that no queued item is sent until the user explicitly initiates delivery.
+
+**AV-036 evidence update (November 4, 2026):** A repeatable integrated test covers five valid cards plus an invalid entry, offline review/edit/approval, correct speech extraction, single/missing audio generation, injected quota failure and restart/resume, reconnect without automatic sending, duplicate-free nested-deck delivery, and one immutable clip replacement on a studied fixture. Final checks passed 156 tests and both builds. An isolated real run generated 30 current Sarah clips (14 cache matches, 16 new requests/681 characters), created five notes in the existing disposable nested deck, repeated delivery unchanged, and replaced one target clip for seven additional characters while preserving identity/scheduling/history and old media. The real offline check denied transport while Anki stayed open; physical process closure is not claimed. AI editorial review and code review are recorded separately from the owner's November 4 approval: all five cards look correct and useful, and all 30 current clips are clear and match the text. See [AV-036 acceptance evidence](evidence/AV-036-five-card-workflow.md). Commit and merge are authorized by the owner; final board disposition remains with the owner. No next task is started.
 
 ## Historical Electron-first backlog
 

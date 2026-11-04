@@ -1,0 +1,151 @@
+[
+  {
+    "target": "awkward",
+    "frontExample": "There was an awkward silence after his comment.",
+    "meaning": "Uncomfortable, embarrassing, or difficult in a social situation.",
+    "category": "Adjective",
+    "irregularForms": null,
+    "nativePronunciation": "/ˈɔkwɚd/ — the stress is on the first syllable. The second syllable is weak and reduced.",
+    "spanishPronunciation": "Keep the second syllable weak. Use an American r without tapping or trilling it as in Spanish. Do not add a vowel after the final d.",
+    "examples": [
+      "I always feel awkward when I don’t know anyone at a party.",
+      "The conversation got awkward when they started arguing.",
+      "That was an awkward moment, but everyone eventually laughed about it.",
+      "She’s gotten less awkward in meetings as she’s become more confident."
+    ],
+    "chunks": [
+      "awkward silence",
+      "awkward moment",
+      "feel awkward",
+      "socially awkward",
+      "get awkward",
+      "kind of awkward"
+    ],
+    "usageNote": "Awkward describes a situation or person that feels uncomfortable or socially difficult.\n✅ “I felt awkward.”\n✅ “It was an awkward conversation.”\nDo not confuse awkward with embarrassed.\nAwkward describes the uncomfortable situation or feeling.\nEmbarrassed specifically means feeling ashamed or self-conscious.",
+    "alternatives": [
+      "uncomfortable",
+      "embarrassing",
+      "weird, in informal contexts"
+    ],
+    "spanishTranslation": "incómodo / vergonzoso / torpe socialmente, depending on context"
+  },
+  {
+    "target": "draining",
+    "frontExample": "Long meetings can be mentally draining.",
+    "meaning": "Making you feel very tired, emotionally exhausted, or low on energy.",
+    "category": "Adjective — present participle form of drain used as an adjective",
+    "irregularForms": null,
+    "nativePronunciation": "/ˈdreɪnɪŋ/ — the stress is on the first syllable. The ending -ing is /ɪŋ/, not /in/.",
+    "spanishPronunciation": "The vowel /ɪ/ in -ing differs in quality from Spanish /i/, not just in length. End with the nasal /ŋ/ at the back of the mouth, without a separate hard g sound.",
+    "examples": [
+      "Dealing with constant complaints is emotionally draining.",
+      "Yesterday’s meeting was really draining.",
+      "This project has been draining lately, but we’re almost finished.",
+      "Working long hours without breaks can become physically and mentally draining."
+    ],
+    "chunks": [
+      "emotionally draining",
+      "mentally draining",
+      "physically draining",
+      "really draining",
+      "emotionally and mentally draining",
+      "find something draining"
+    ],
+    "usageNote": "Draining describes the thing that causes tiredness.\n✅ “The meeting was draining.”\nDrained describes how a person feels afterward.\n✅ “I felt drained after the meeting.”\n❌ “I felt draining after the meeting.”",
+    "alternatives": [
+      "exhausting",
+      "tiring",
+      "emotionally exhausting",
+      "wearing"
+    ],
+    "spanishTranslation": "agotador / desgastante / que te deja sin energía"
+  },
+  {
+    "target": "went",
+    "frontExample": "I went straight home after work.",
+    "meaning": "Went is the past simple form of go. It means that someone moved, traveled, or proceeded somewhere in the past.",
+    "category": "Verb — past simple form of go",
+    "irregularForms": "go → went → gone",
+    "nativePronunciation": "/wɛnt/ — one syllable. The vowel is /ɛ/, like the vowel in bed.\nThe irregular forms sound very different:\n- go /ɡoʊ/\n- went /wɛnt/\n- gone /ɡɔn/",
+    "spanishPronunciation": "Start with /w/ without adding a g before it. The vowel /ɛ/ is more open than Spanish /e/. Keep the final /nt/ cluster and do not add a vowel after t.",
+    "examples": [
+      "I usually go to the gym after work.",
+      "We went out for dinner last night.",
+      "She’s already gone home.",
+      "He goes to that coffee shop almost every morning."
+    ],
+    "chunks": [
+      "went home",
+      "went out",
+      "went back",
+      "went to work",
+      "went wrong",
+      "went well"
+    ],
+    "usageNote": "Use went for the past simple: “I went there yesterday.” After have/has/had, use a past participle: “She has gone home.” Do not say “She has went home.” For completed visits, been is often clearer: “I’ve been there several times.” Went, gone, and been are not interchangeable.",
+    "alternatives": [
+      "traveled, in some contexts",
+      "headed",
+      "left, depending on context",
+      "moved, depending on context"
+    ],
+    "spanishTranslation": "fui / fue / fueron / iba, depending on context"
+  },
+  {
+    "target": "put off",
+    "frontExample": "I keep putting off going to the dentist.",
+    "meaning": "To delay doing something until a later time, often because you don’t want to do it yet.",
+    "category": "Phrasal verb",
+    "irregularForms": "put → put → put",
+    "nativePronunciation": "/pʊt ɔf/ — the base, past, and past participle forms of put are pronounced the same. In connected speech, link put and off without inserting an extra vowel.",
+    "spanishPronunciation": "Keep /ʊ/ relaxed; it differs in quality from Spanish /u/. Link put and off without inserting an extra vowel, and finish off with /f/.",
+    "examples": [
+      "I usually put off difficult tasks until the last minute.",
+      "I put off calling him because I didn’t know what to say.",
+      "We’ve put off the meeting until next week.",
+      "Don’t keep putting it off—you’ll have to do it eventually."
+    ],
+    "chunks": [
+      "put something off",
+      "put it off",
+      "put off doing something",
+      "keep putting something off",
+      "put off a meeting",
+      "put off until later"
+    ],
+    "usageNote": "When put off is followed by another action, use an -ing form, not an infinitive.\n✅ “I put off calling him.”\n❌ “I put off to call him.”\nBecause put is irregular but does not change form:\n“I put off the appointment yesterday.”\n“We’ve put off the meeting twice.”",
+    "alternatives": ["postpone", "delay", "push back", "leave until later"],
+    "spanishTranslation": "posponer / dejar para después / aplazar"
+  },
+  {
+    "target": "fuel",
+    "frontExample": "Seeing progress fuels my motivation.",
+    "meaning": "In this context, fuel means to provide energy, motivation, or support that makes something stronger or keeps it growing.",
+    "category": "Verb",
+    "irregularForms": null,
+    "nativePronunciation": "/ˈfjuːəl/ — usually pronounced with two quick syllables. The first syllable contains /fjuː/, similar to few.",
+    "spanishPronunciation": "Move smoothly from /f/ into the /j/ sound, like the y in yes. Keep the weak second vowel /ə/ short and relaxed; do not turn it into a strong open vowel.",
+    "examples": [
+      "Positive feedback often fuels my motivation.",
+      "His criticism fueled her determination to prove him wrong.",
+      "The recent success has fueled even more interest in the project.",
+      "Constant rumors can fuel unnecessary conflict at work."
+    ],
+    "chunks": [
+      "fuel motivation",
+      "fuel growth",
+      "fuel interest",
+      "fuel a debate",
+      "fuel conflict",
+      "fuel speculation"
+    ],
+    "usageNote": "Fuel can be both a noun and a verb, but on this card it is used as a verb.\nAs a noun:\n“We need more fuel for the car.”\nAs a verb:\n“Competition fuels innovation.”\nRegular past form:\n“The announcement fueled speculation.”\nIn American English, fueled is usually spelled with one l.",
+    "alternatives": [
+      "drive",
+      "motivate",
+      "encourage",
+      "feed, in some figurative contexts"
+    ],
+    "spanishTranslation": "impulsar / alimentar / fomentar / dar energía a"
+  }
+]

@@ -1,7 +1,7 @@
 # Local web plan: Anki Card and Audio Workspace
 
 **Date:** November 2, 2026
-**Status:** Product direction and initial requirements accepted; AV-028 through AV-034 are merged. AV-035 existing-note updates are implemented, validated, and owner-verified; the owner authorized committing and merging the work. Complete card-audio listening and human milestone acceptance remain separate.
+**Status:** Product direction and initial requirements accepted; AV-028 through AV-035 are merged. AV-036 engineering acceptance checks and the five-card real Anki/Sarah demonstration are prepared. The owner approved all five cards and all 30 current clips on November 4, 2026. The owner authorized commit and merge; final board disposition remains with the owner.
 
 Implementation is tracked as AV-028 through AV-036 in the [current backlog](BACKLOG.md#current-local-web-task-inventory). The IDs continue after the historical Electron backlog to avoid reusing earlier task references. Listing the sequence does not authorize starting the next task automatically.
 

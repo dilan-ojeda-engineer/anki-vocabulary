@@ -47,7 +47,7 @@ The application remains in this repository and uses **strict TypeScript, React, 
 | Styling | CSS Modules and shared design tokens |
 | Local data | Server-owned, versioned workspace for pending cards/audio/receipts; Anki for delivered notes and synced media |
 | Validation | Zod for imports, cards, audio commands, and provider/Anki responses |
-| Audio | Replaceable server-side TypeScript adapter; initial provider/voice pending listening review |
+| Audio | Replaceable server-side TypeScript adapter; ElevenLabs / Sarah; owner accepted the five-card listening sample |
 | Written generation | Deferred provider decision; AV-005 evidence preserved |
 | Anki integration | Existing TypeScript AnkiConnect adapter for decks, notes, media, identity, and safe updates |
 | Credentials | Local server only; never browser storage, cards, logs, exports, or Git |
@@ -103,12 +103,14 @@ The [delivery playbook](docs/DELIVERY_PLAYBOOK.md) covers the process from disco
 
 You can request changes in plain English; keep accepted scope and decisions in the project documents and, once adopted, track live tasks on the shared issue board.
 
-AV-028 through AV-033 are merged. Initial Sarah selection and one-item playback evidence are recorded; complete card-audio listening and human milestone acceptance remain pending. Fish Audio and individual voice/voice-group selection remain future improvements.
+AV-028 through AV-033 are merged. Initial Sarah selection and one-item playback evidence are recorded; the owner accepted all 30 current clips in the AV-036 five-card sample. Final board disposition remains with the owner. Fish Audio and individual voice/voice-group selection remain future improvements.
 
 AV-034 creation delivery is merged. Select an existing normal destination deck and saved cards, preview per-item decisions, acknowledge card/audio review, then explicitly confirm Send. Selected audio must be complete for the exact approved revision. Delivery intent and receipts persist in `delivery/delivery.json` inside the local application data directory. Reconnection and restart never send automatically.
 
 AV-035 adds **Update existing Anki notes** for notes delivered by this workspace. Its guided flow is **Edit card → Prepare audio → Review changes → Update in Anki**. **Save and continue** saves and approves the text, changed speech gets a targeted generation action, and unchanged clips are kept automatically. **Replace audio** sits beside each clip; one review action shows text and audio differences before explicit confirmation. See the [card update guide](docs/UPDATE_CARD_GUIDE.md). Close any Anki editor for the note before confirmation. Saved update results and explicit reconciliation use `delivery/updates.json`; uncertain outcomes are never blindly retried. Note/card identities and scheduling are checked before and after the update. See [validation and API concurrency limits](docs/evidence/AV-035-note-updates.md). Arbitrary note types and model migrations remain deferred.
 
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
+
+AV-036 adds a repeatable five-card acceptance test with fake speech/Anki, plus separate evidence from real Sarah generation and the disposable Anki collection. Engineering checks passed; the owner approved all five cards and all 30 current clips on November 4, 2026. The owner authorized commit and merge; final board disposition remains with the owner. See the [five-card acceptance record](docs/evidence/AV-036-five-card-workflow.md) and [cards for review](docs/evidence/AV-036-cards-for-review.md).
 
 Use the [reusable task prompt](docs/AI_TASK_WORKFLOW.md#reusable-implementation-assignment) for a selected task. The team should agree readiness and ownership before implementation. Provider keys belong in the documented server-side encrypted storage or temporary environment configuration; never paste them into chat or commit them to source control.

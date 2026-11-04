@@ -1,0 +1,227 @@
+{
+  "task": "AV-036",
+  "date": "2026-11-04",
+  "baseCommit": "8b7892a",
+  "runId": "c589e304-0e5a-408a-b62e-2fbb2e036041",
+  "localRunDirectory": "C:\\projects\\anki-vocabulary\\.tools\\av036-live-c589e304-0e5a-408a-b62e-2fbb2e036041",
+  "fixtures": {
+    "file": "tests/fixtures/av036-cards.json",
+    "sha256": "c17f3ac3996a20df1be40062d67cd820192c14c761d5b04a7e811c96ffe57531",
+    "sourceArchive": "docs/evidence/AV-005-user-comparison-source.txt",
+    "sourceArchiveSha256": "d4ed631662d49fbe2fd89d8b02923dfc7c1056c40f007a0459db5af84ab35800",
+    "profile": "av005-5",
+    "cards": 5,
+    "targets": [
+      "awkward",
+      "draining",
+      "went",
+      "put off",
+      "fuel"
+    ],
+    "currentClips": 30,
+    "origin": "user archive plus documented AI editorial adaptations",
+    "humanLinguisticAcceptance": "accepted by owner"
+  },
+  "controlled": {
+    "test": "tests/unit/five-card-workflow.test.ts",
+    "invalidEntries": 1,
+    "validEntries": 5,
+    "quotaFailure": "fake provider only",
+    "restartResume": true,
+    "cacheRetryNoSynthesis": true,
+    "noAutomaticSendOnReconnect": true,
+    "stableIdentityAndScheduling": true
+  },
+  "realSpeech": {
+    "configuration": {
+      "providerId": "elevenlabs",
+      "modelId": "eleven_multilingual_v2",
+      "modelVersion": null,
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "voiceVersion": null,
+      "settings": {
+        "stability": 0.5,
+        "similarity_boost": 0.75,
+        "style": 0,
+        "speed": 1,
+        "use_speaker_boost": true,
+        "outputFormat": "mp3_44100_128"
+      },
+      "format": "mp3"
+    },
+    "reusedArtifacts": 14,
+    "initialRequests": 16,
+    "initialCharacters": 681,
+    "replacementRequests": 1,
+    "replacementCharacters": 7,
+    "totalRequests": 17,
+    "totalCharacters": 688,
+    "freeAllowanceBefore": {
+      "tier": "free",
+      "used": 1315,
+      "limit": 10000
+    },
+    "noPaidFallback": true,
+    "voiceQualityAcceptance": "accepted by owner"
+  },
+  "offlineRestart": {
+    "transport": "explicitly denied in isolated harness; Anki process remained open",
+    "before": {
+      "OfflineStatus": "unavailable",
+      "SavedCards": 5,
+      "Receipts": 0,
+      "WorkspaceHash": "C1199EFF05A3DFBD8E7C9C644E23BECF441683A386CC6229FEDAEE13F64C880D",
+      "AudioHash": "0334936C473FE60107CBACE872D667A6F0B4CA735FD56A5DB56E711733A053E4"
+    },
+    "after": {
+      "OfflineStatus": "unavailable",
+      "SavedCards": 5,
+      "Receipts": 0,
+      "WorkspaceUnchanged": true,
+      "AudioUnchanged": true
+    },
+    "savedWorkspaceUnchanged": true,
+    "savedAudioUnchanged": true,
+    "noReceiptsBeforeExplicitSend": true
+  },
+  "realAnki": {
+    "version": "26.09.3",
+    "profile": "User 1",
+    "deck": "AV004::4e77c223",
+    "notesAfterReconnectBeforeExplicitSend": 0,
+    "created": 5,
+    "repeated": "unchanged",
+    "identities": [
+      {
+        "noteId": "1793818497278",
+        "cardIds": [
+          "1793818497278"
+        ],
+        "sourceId": "2daeef95-b6aa-41dc-a28c-a6cfc2316755"
+      },
+      {
+        "noteId": "1793818502940",
+        "cardIds": [
+          "1793818502940"
+        ],
+        "sourceId": "1806afd4-d26d-4139-964b-ea969b95b181"
+      },
+      {
+        "noteId": "1793818507845",
+        "cardIds": [
+          "1793818507845"
+        ],
+        "sourceId": "82aedea3-7ccc-4b28-be1f-b4f79f807b06"
+      },
+      {
+        "noteId": "1793818512664",
+        "cardIds": [
+          "1793818512665"
+        ],
+        "sourceId": "da76c98f-b809-4dee-8f29-79fe6a0cfccd"
+      },
+      {
+        "noteId": "1793818517479",
+        "cardIds": [
+          "1793818517479"
+        ],
+        "sourceId": "c7e8c687-e098-4c0c-b555-bd6ea778b27a"
+      }
+    ],
+    "replacement": {
+      "state": "complete",
+      "noteId": "1793818497278",
+      "cardId": "1793818497278",
+      "changedFields": [
+        "AudioTarget"
+      ],
+      "answerRecorded": true,
+      "repetitions": 1,
+      "reviewCount": 1,
+      "identityPreserved": true,
+      "schedulingPreserved": true,
+      "reviewHistoryPreserved": true,
+      "oldMediaRetained": true,
+      "providerCalls": 1,
+      "characters": 7
+    },
+    "editorialUpdate": {
+      "beforeDelivery": {
+        "edited": 3,
+        "providerCalls": 0,
+        "archiveUnchanged": true
+      },
+      "afterDelivery": {
+        "state": "complete",
+        "noteId": "1793818517479",
+        "changedFields": [
+          "AvRevision",
+          "AvContentHash",
+          "AvContent",
+          "SpanishPronunciation"
+        ],
+        "providerCalls": 0,
+        "audioPreserved": true,
+        "schedulingPreserved": true
+      }
+    }
+  },
+  "browser": {
+    "cards": [
+      {
+        "target": "awkward",
+        "currentPlayers": 6,
+        "frontQuestionPresent": true
+      },
+      {
+        "target": "draining",
+        "currentPlayers": 6,
+        "frontQuestionPresent": true
+      },
+      {
+        "target": "went",
+        "currentPlayers": 6,
+        "frontQuestionPresent": true
+      },
+      {
+        "target": "put off",
+        "currentPlayers": 6,
+        "frontQuestionPresent": true
+      },
+      {
+        "target": "fuel",
+        "currentPlayers": 6,
+        "frontQuestionPresent": true
+      }
+    ],
+    "observedVia": "browser accessibility tree",
+    "screenshot": "capture unavailable",
+    "listeningAcceptance": "accepted by owner"
+  },
+  "validation": {
+    "command": "npm run check",
+    "tests": 156,
+    "testFiles": 19,
+    "typecheck": true,
+    "lint": true,
+    "format": true,
+    "electronBuild": true,
+    "webBuild": true,
+    "finalPostEditorialRun": "passed"
+  },
+  "humanMilestoneAcceptance": "pending",
+  "codeReview": "AI-assisted; no blocking findings; not human milestone acceptance",
+  "ownerReview": {
+    "date": "2026-11-04",
+    "content": {
+      "cards": 5,
+      "response": "All five cards look correct and useful"
+    },
+    "listening": {
+      "currentClips": 30,
+      "includesReplacedAwkwardTarget": true,
+      "response": "All 30 clips are clear and match the text"
+    },
+    "scope": "Owner content and listening acceptance; commit and merge authorized by owner; final board disposition remains with the owner"
+  }
+}
