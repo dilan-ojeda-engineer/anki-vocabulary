@@ -92,6 +92,67 @@ async function setup(
   return { directory, workspace, card, provider, allowance, service, input };
 }
 
+it('retries a failed fresh replacement after restart without returning the old cached clip', async () => {
+  let calls = 0;
+  const fixture = await setup(async () => {
+    calls++;
+    if (calls === 3) throw new SpeechFailure('temporary');
+    const bytes = wave();
+    bytes.writeInt16LE(calls, 44);
+    return bytes;
+  });
+  const { service, workspace, card, input, directory, provider, allowance } =
+    fixture;
+  await workspace.approve(card.id, input);
+  const initial = await service.prepare(card.id, input);
+  const first = await service.generate(card.id, {
+    ...input,
+    preflightId: initial.id,
+  });
+  const oldKey = first.items[0]!.artifactKey!;
+  const replacement = {
+    ...input,
+    mode: 'replacement' as const,
+    placementIds: ['target'],
+  };
+  const prepared = await service.prepare(card.id, replacement);
+  const failed = await service.generate(card.id, {
+    ...replacement,
+    preflightId: prepared.id,
+  });
+  expect(failed.items[0]).toMatchObject({
+    audioState: 'failed',
+    retryMode: 'replacement',
+    previousKey: oldKey,
+  });
+  const restarted = new AudioService(
+    join(directory, 'audio'),
+    workspace,
+    provider,
+    allowance,
+  );
+  const retry = { ...input, mode: 'missing' as const };
+  const again = await restarted.prepare(card.id, retry);
+  expect(again.uncachedCharacters).toBe(
+    String(card.fields.target).length +
+      failed.items
+        .filter(
+          (item) =>
+            !['complete', 'invalid'].includes(item.audioState) &&
+            item.placementId !== 'target',
+        )
+        .reduce((sum, item) => sum + item.characterCount, 0),
+  );
+  const result = await restarted.generate(card.id, {
+    ...retry,
+    preflightId: again.id,
+  });
+  expect(calls).toBeGreaterThan(3);
+  expect(result.items[0]!.artifactKey).not.toBe(oldKey);
+  expect(result.items[0]!.audioState).toBe('complete');
+  expect(await restarted.media(oldKey)).not.toBe(null);
+});
+
 it('activates and removes credentials without rebuilding the audio service or losing cached playback', async () => {
   const { directory, workspace, card, provider, allowance, input } =
     await setup();

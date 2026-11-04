@@ -23,12 +23,55 @@ import {
 import type { DeliveryRequest } from '../../shared/delivery';
 import { speechSettingsSchema } from '../../shared/speech-settings';
 import type { SpeechSettingsRequest } from '../../shared/speech-settings';
+import {
+  noteListSchema,
+  noteLoadedSchema,
+  noteUpdatePreviewSchema,
+  noteUpdateResultSchema,
+  noteUpdateStatusSchema,
+} from '../../shared/note-update';
+import type { NoteUpdateRequest } from '../../shared/note-update';
 
 let workspaceToken: string | null = null;
 
 export class WorkspaceConflictError extends Error {}
 export class AudioRequestError extends Error {}
 export class DeliveryRequestError extends Error {}
+export class NoteUpdateRequestError extends Error {}
+export async function listNotes(deckId: string) {
+  return noteListSchema.parse(await post('/api/notes/list', { deckId }));
+}
+export async function loadNote(deckId: string, noteId: string) {
+  return noteLoadedSchema.parse(
+    await post('/api/notes/load', { deckId, noteId }),
+  );
+}
+export async function restoreNoteDraft(
+  loadId: string,
+  expectedRevision: number,
+) {
+  return workspaceSchema.parse(
+    await post('/api/notes/draft', { loadId, expectedRevision }),
+  );
+}
+export async function prepareNoteUpdate(input: NoteUpdateRequest) {
+  return noteUpdatePreviewSchema.parse(await post('/api/notes/prepare', input));
+}
+export async function sendNoteUpdate(previewId: string) {
+  return noteUpdateResultSchema.parse(
+    await post('/api/notes/send', { previewId, reviewed: true }),
+  );
+}
+export async function reconcileNoteUpdate(updateId: string) {
+  return noteUpdateResultSchema.parse(
+    await post('/api/notes/reconcile', { updateId }),
+  );
+}
+export async function getNoteUpdates() {
+  const response = await fetch('/api/notes/status', { cache: 'no-store' });
+  if (!response.ok) throw new Error('Saved note updates unavailable.');
+  return noteUpdateStatusSchema.parse(await response.json());
+}
 
 export async function getSpeechSettings() {
   const response = await fetch('/api/speech/settings', { cache: 'no-store' });
@@ -166,6 +209,15 @@ async function post(
                       : code === 'audio-preview-expired'
                         ? 'Audio preview expired. Prepare this batch again.'
                         : null;
+    if (
+      code === 'update-blocked' &&
+      data &&
+      typeof data === 'object' &&
+      'message' in data &&
+      typeof data.message === 'string' &&
+      data.message.length <= 500
+    )
+      throw new NoteUpdateRequestError(data.message);
     if (
       code === 'delivery-blocked' &&
       data &&

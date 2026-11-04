@@ -6,6 +6,7 @@ import { createServer as createViteServer } from 'vite';
 import { readAnkiStatus } from './anki-status';
 import { AnkiConnectClient } from '../integrations/anki/client';
 import { DeliveryService } from './delivery-service';
+import { NoteUpdateService } from './note-update-service';
 import { createApiHandler } from './http';
 import { WorkspaceStore } from './workspace';
 import { AudioService } from './audio-service';
@@ -46,6 +47,19 @@ const audio = new AudioService(
   () => speechSettings.provider(),
   () => speechSettings.readAllowance(),
 );
+const delivery = new DeliveryService(
+  resolve(dataDirectory, 'delivery'),
+  workspace,
+  audio,
+  anki,
+);
+const notes = new NoteUpdateService(
+  resolve(dataDirectory, 'delivery'),
+  delivery,
+  workspace,
+  audio,
+  anki,
+);
 const api = createApiHandler({
   expectedHosts: new Set([`${host}:${port}`, `localhost:${port}`]),
   expectedOrigins: new Set([baseUrl, `http://localhost:${port}`]),
@@ -53,12 +67,8 @@ const api = createApiHandler({
   workspace,
   audio,
   speechSettings,
-  delivery: new DeliveryService(
-    resolve(dataDirectory, 'delivery'),
-    workspace,
-    audio,
-    anki,
-  ),
+  delivery,
+  notes,
   sessionToken: randomUUID(),
 });
 const vite = await createViteServer({

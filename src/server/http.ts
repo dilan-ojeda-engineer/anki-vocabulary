@@ -18,6 +18,17 @@ import type { SpeechSettingsService } from './speech-settings';
 import { speechSettingsRequestSchema } from '../shared/speech-settings';
 import { DeliveryError } from './delivery-service';
 import type { DeliveryService } from './delivery-service';
+import { NoteUpdateError } from './note-update-service';
+import { AudioDeliveryError } from './audio-service';
+import type { NoteUpdateService } from './note-update-service';
+import {
+  noteListRequestSchema,
+  noteLoadRequestSchema,
+  noteDraftRequestSchema,
+  noteUpdateRequestSchema,
+  noteUpdateSendSchema,
+  noteReconcileSchema,
+} from '../shared/note-update';
 import {
   deliveryRequestSchema,
   deliveryConfirmSchema,
@@ -55,6 +66,7 @@ export function createApiHandler(options: {
   audio?: AudioService;
   delivery?: DeliveryService;
   speechSettings?: SpeechSettingsService;
+  notes?: NoteUpdateService;
 }) {
   return async (
     request: IncomingMessage,
@@ -71,6 +83,138 @@ export function createApiHandler(options: {
     const origin = request.headers.origin;
     if (origin && !options.expectedOrigins.has(origin)) {
       sendJson(response, 403, { error: 'origin-not-allowed' });
+      return true;
+    }
+    if (url.pathname.startsWith('/api/notes/')) {
+      if (!options.notes) {
+        sendJson(response, 503, { error: 'notes-unavailable' });
+        return true;
+      }
+      if (url.pathname === '/api/notes/status' && request.method === 'GET') {
+        try {
+          sendJson(response, 200, await options.notes.status());
+        } catch {
+          sendJson(response, 500, { error: 'updates-unavailable' });
+        }
+        return true;
+      }
+      const mediaMatch = /^\/api\/notes\/media\/([0-9a-f-]{36})$/.exec(
+        url.pathname,
+      );
+      if (mediaMatch && request.method === 'GET') {
+        try {
+          const media = await options.notes.media(mediaMatch[1]!);
+          if (!media) {
+            sendJson(response, 404, { error: 'media-unavailable' });
+            return true;
+          }
+          response.writeHead(200, {
+            'Content-Type':
+              media.record.format === 'mp3' ? 'audio/mpeg' : 'audio/wav',
+            'Content-Length': media.bytes.length,
+            'Cache-Control': 'no-store',
+            'X-Content-Type-Options': 'nosniff',
+            'Cross-Origin-Resource-Policy': 'same-origin',
+          });
+          response.end(media.bytes);
+        } catch {
+          sendJson(response, 404, { error: 'media-unavailable' });
+        }
+        return true;
+      }
+      const schemas = {
+        '/api/notes/list': noteListRequestSchema,
+        '/api/notes/load': noteLoadRequestSchema,
+        '/api/notes/draft': noteDraftRequestSchema,
+        '/api/notes/prepare': noteUpdateRequestSchema,
+        '/api/notes/send': noteUpdateSendSchema,
+        '/api/notes/reconcile': noteReconcileSchema,
+      };
+      const schema = schemas[url.pathname as keyof typeof schemas];
+      if (!schema) {
+        sendJson(response, 404, { error: 'not-found' });
+        return true;
+      }
+      if (request.method !== 'POST') {
+        sendJson(response, 405, { error: 'method-not-allowed' });
+        return true;
+      }
+      if (
+        !origin ||
+        !options.expectedOrigins.has(origin) ||
+        !options.sessionToken ||
+        request.headers['x-workspace-token'] !== options.sessionToken ||
+        request.headers['content-type']?.split(';')[0] !== 'application/json'
+      ) {
+        sendJson(response, 403, { error: 'request-not-allowed' });
+        return true;
+      }
+      const chunks: Buffer[] = [];
+      let size = 0;
+      for await (const chunk of request) {
+        const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        size += bytes.length;
+        if (size > 100000) {
+          sendJson(response, 413, { error: 'too-large' });
+          return true;
+        }
+        chunks.push(bytes);
+      }
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+      } catch {
+        sendJson(response, 400, { error: 'invalid-json' });
+        return true;
+      }
+      if (!schema.safeParse(parsed).success) {
+        sendJson(response, 400, { error: 'invalid-request' });
+        return true;
+      }
+      try {
+        let result: unknown;
+        if (url.pathname === '/api/notes/list')
+          result = await options.notes.list(
+            noteListRequestSchema.parse(parsed).deckId,
+          );
+        else if (url.pathname === '/api/notes/load') {
+          const input = noteLoadRequestSchema.parse(parsed);
+          result = await options.notes.load(input.deckId, input.noteId);
+        } else if (url.pathname === '/api/notes/draft') {
+          const input = noteDraftRequestSchema.parse(parsed);
+          result = await options.notes.draft(
+            input.loadId,
+            input.expectedRevision,
+          );
+        } else if (url.pathname === '/api/notes/prepare')
+          result = await options.notes.prepare(
+            noteUpdateRequestSchema.parse(parsed),
+          );
+        else if (url.pathname === '/api/notes/send')
+          result = await options.notes.send(
+            noteUpdateSendSchema.parse(parsed).previewId,
+          );
+        else
+          result = await options.notes.reconcile(
+            noteReconcileSchema.parse(parsed).updateId,
+          );
+        sendJson(response, 200, result);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '';
+        sendJson(response, message === 'Stale card revision.' ? 409 : 400, {
+          error: 'update-blocked',
+          message:
+            error instanceof NoteUpdateError ||
+            error instanceof DeliveryError ||
+            error instanceof AudioDeliveryError
+              ? error.message
+              : message.includes('approval')
+                ? 'Save, include, and approve this exact card revision before preparing an update.'
+                : message === 'Stale card revision.'
+                  ? 'The saved card revision changed. Refresh and review it again.'
+                  : 'The note update could not proceed. Check Anki, approval, and selected audio; load the note again.',
+        });
+      }
       return true;
     }
     if (url.pathname === '/api/speech/settings') {

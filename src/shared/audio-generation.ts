@@ -3,7 +3,7 @@ import { audioItemSchema, audioSelectionRequestSchema } from './audio-plan';
 import { speechConfigurationSchema } from './contracts/speech';
 
 export const audioBatchRequestSchema = audioSelectionRequestSchema.extend({
-  mode: z.enum(['explicit', 'missing']),
+  mode: z.enum(['explicit', 'missing', 'replacement']),
 });
 export const audioGenerateRequestSchema = audioBatchRequestSchema.extend({
   preflightId: z.uuid(),
@@ -34,6 +34,7 @@ export const audioReviewSchema = z.strictObject({
         .nullable(),
       previousText: z.string().nullable(),
       error: z.string().nullable(),
+      retryMode: z.enum(['explicit', 'replacement']).default('explicit'),
     }),
   ),
 });

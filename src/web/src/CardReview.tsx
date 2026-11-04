@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Workspace } from '../../shared/card-import';
 import {
   cardSides,
@@ -20,10 +20,16 @@ export function CardReview({
   workspace,
   onChange,
   audioRefreshVersion,
+  onAudioChanged,
+  onDirtyChange,
+  updateMode = false,
 }: {
   workspace: Workspace;
   onChange: (next: Workspace) => void;
   audioRefreshVersion: number;
+  onAudioChanged?: (() => void) | undefined;
+  onDirtyChange?: ((dirty: boolean) => void) | undefined;
+  updateMode?: boolean;
 }) {
   const [index, setIndex] = useState(0);
   const card = workspace.cards[Math.min(index, workspace.cards.length - 1)];
@@ -43,6 +49,9 @@ export function CardReview({
       onNavigate={(next) => setIndex(next)}
       onChange={onChange}
       audioRefreshVersion={audioRefreshVersion}
+      onAudioChanged={onAudioChanged}
+      onDirtyChange={onDirtyChange}
+      updateMode={updateMode}
     />
   );
 }
@@ -54,6 +63,9 @@ function CardEditor({
   onNavigate,
   onChange,
   audioRefreshVersion,
+  onAudioChanged,
+  onDirtyChange,
+  updateMode,
 }: {
   card: Card;
   index: number;
@@ -61,6 +73,9 @@ function CardEditor({
   onNavigate: (index: number) => void;
   onChange: (next: Workspace) => void;
   audioRefreshVersion: number;
+  onAudioChanged?: (() => void) | undefined;
+  onDirtyChange?: ((dirty: boolean) => void) | undefined;
+  updateMode: boolean;
 }) {
   const [fields, setFields] = useState<Record<string, unknown>>(() =>
     structuredClone(card.fields),
@@ -89,6 +104,9 @@ function CardEditor({
           (card.fields[field.key] as string[]).join('\n'),
     ) ||
     included !== card.included;
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
   const edited =
     JSON.stringify(card.fields) !== JSON.stringify(card.originalFields);
   const approved =
@@ -130,13 +148,23 @@ function CardEditor({
     setBusy(true);
     setMessage('');
     setConflict(false);
+    let saved: Workspace | null = null;
     try {
       const next = await updateCard(card.id, {
         expectedRevision: card.revision,
         fields: validation.data,
-        included,
+        included: updateMode ? true : included,
       });
-      onChange(next);
+      saved = next;
+      const current = next.cards.find((item) => item.id === card.id)!;
+      onChange(
+        updateMode
+          ? await approveCard(card.id, {
+              expectedRevision: current.revision,
+              expectedContentHash: current.contentHash,
+            })
+          : next,
+      );
       setListDrafts(
         Object.fromEntries(
           coachFields
@@ -149,6 +177,7 @@ function CardEditor({
       );
       setMessage('Saved.');
     } catch (error) {
+      if (saved) onChange(saved);
       if (error instanceof WorkspaceConflictError) {
         setConflict(true);
         setMessage(
@@ -237,44 +266,57 @@ function CardEditor({
     <section aria-labelledby="review-heading" className="review-section">
       <div className="section-heading">
         <div>
-          <p className="step">Card review and approval</p>
-          <h2 id="review-heading">Review cards</h2>
+          {!updateMode ? (
+            <p className="step">Card review and approval</p>
+          ) : null}
+          <h2 id="review-heading">
+            {updateMode ? '1. Edit card' : 'Review cards'}
+          </h2>
         </div>
         <span className="review-status">{status}</span>
       </div>
-      <div className="review-navigation">
-        <button
-          type="button"
-          disabled={index === 0 || dirty}
-          onClick={() => onNavigate(index - 1)}
-        >
-          Previous
-        </button>
-        <span>
-          Card {index + 1} of {count}
-        </span>
-        <button
-          type="button"
-          disabled={index === count - 1 || dirty}
-          onClick={() => onNavigate(index + 1)}
-        >
-          Next
-        </button>
-      </div>
+      {!updateMode ? (
+        <div className="review-navigation">
+          <button
+            type="button"
+            disabled={index === 0 || dirty}
+            onClick={() => onNavigate(index - 1)}
+          >
+            Previous
+          </button>
+          <span>
+            Card {index + 1} of {count}
+          </span>
+          <button
+            type="button"
+            disabled={index === count - 1 || dirty}
+            onClick={() => onNavigate(index + 1)}
+          >
+            Next
+          </button>
+        </div>
+      ) : null}
       {dirty ? (
         <p role="status">
           Unsaved edits. Save or discard before changing cards.
         </p>
       ) : null}
-      <label>
-        <input
-          type="checkbox"
-          disabled={busy}
-          checked={included}
-          onChange={(event) => setIncluded(event.target.checked)}
-        />{' '}
-        Include this card
-      </label>
+      {!updateMode ? (
+        <label>
+          <input
+            type="checkbox"
+            disabled={busy}
+            checked={included}
+            onChange={(event) => setIncluded(event.target.checked)}
+          />{' '}
+          Include this card
+        </label>
+      ) : (
+        <p>
+          Save and continue confirms that this text is ready for audio. Nothing
+          is sent to Anki yet.
+        </p>
+      )}
       <div className="review-grid">
         <div>
           <h3>Fields</h3>
@@ -344,10 +386,12 @@ function CardEditor({
       <div className="review-actions">
         <button
           type="button"
-          disabled={!dirty || !validation.success || busy}
+          disabled={
+            (!dirty && (!updateMode || approved)) || !validation.success || busy
+          }
           onClick={() => void save()}
         >
-          Save changes
+          {updateMode ? 'Save and continue' : 'Save changes'}
         </button>
         <button
           type="button"
@@ -377,15 +421,17 @@ function CardEditor({
         >
           Copy card text
         </button>
-        <button
-          type="button"
-          disabled={
-            dirty || !validation.success || !included || approved || busy
-          }
-          onClick={() => void approve()}
-        >
-          {approved ? 'Approved' : 'Approve this revision'}
-        </button>
+        {!updateMode ? (
+          <button
+            type="button"
+            disabled={
+              dirty || !validation.success || !included || approved || busy
+            }
+            onClick={() => void approve()}
+          >
+            {approved ? 'Approved' : 'Approve this revision'}
+          </button>
+        ) : null}
       </div>
       {message ? <p role="status">{message}</p> : null}
       {conflict ? (
@@ -410,15 +456,16 @@ function CardEditor({
           </button>
         </div>
       ) : null}
-      {approved && !dirty ? (
+      {!updateMode && approved && !dirty ? (
         <AudioSelection
           card={card}
           onChange={onChange}
           refreshVersion={audioRefreshVersion}
+          onGenerated={onAudioChanged}
         />
-      ) : (
+      ) : !updateMode ? (
         <p>Save and approve this revision to select audio items.</p>
-      )}
+      ) : null}
     </section>
   );
 }

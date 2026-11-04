@@ -1,7 +1,7 @@
 # Local web plan: Anki Card and Audio Workspace
 
 **Date:** November 2, 2026
-**Status:** Product direction and initial requirements accepted; AV-028 through AV-033 are merged. AV-034 creation delivery is prepared for review, with controlled and live disposable-Anki evidence. Complete card-audio listening and human milestone acceptance remain pending.
+**Status:** Product direction and initial requirements accepted; AV-028 through AV-034 are merged. AV-035 existing-note updates are implemented, validated, and owner-verified; the owner authorized committing and merging the work. Complete card-audio listening and human milestone acceptance remain separate.
 
 Implementation is tracked as AV-028 through AV-036 in the [current backlog](BACKLOG.md#current-local-web-task-inventory). The IDs continue after the historical Electron backlog to avoid reusing earlier task references. Listing the sequence does not authorize starting the next task automatically.
 

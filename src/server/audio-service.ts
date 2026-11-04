@@ -35,6 +35,7 @@ const recordSchema = z.strictObject({
   text: z.string().min(1),
   configuration: speechConfigurationSchema,
   state: z.enum(['complete', 'failed', 'paused']),
+  purpose: z.enum(['standard', 'replacement']).default('standard'),
   error: z.string().nullable(),
 });
 const manifestSchema = z.strictObject({
@@ -48,6 +49,9 @@ export type AudioAllowance = {
   limit: number;
   canExtend: boolean;
 };
+
+/** Safe actionable delivery failures; never contains provider responses or credentials. */
+export class AudioDeliveryError extends Error {}
 
 export class AudioService {
   private readonly cache: AudioCache;
@@ -96,7 +100,11 @@ export class AudioService {
           (sum, item) => sum + item.characterCount,
           0,
         );
-        const uncachedRequests = await this.uncachedRequests(items);
+        const uncachedRequests = await this.uncachedRequests(
+          items,
+          input.mode === 'replacement',
+          card.id,
+        );
         const uncachedCharacters = uncachedRequests.reduce(
           (sum, item) => sum + item.characterCount,
           0,
@@ -151,7 +159,14 @@ export class AudioService {
         if (preflight.consumed) return this.reviewCard(card);
         const items = await this.chosen(card, input);
         const allowance = await this.readAllowance();
-        this.checkAllowance(allowance, await this.uncachedCharacters(items));
+        this.checkAllowance(
+          allowance,
+          await this.uncachedCharacters(
+            items,
+            input.mode === 'replacement',
+            card.id,
+          ),
+        );
         preflight.consumed = true;
         const manifest = await this.readManifest();
         let paused = false;
@@ -160,6 +175,8 @@ export class AudioService {
             item.text,
             this.provider.configuration,
           );
+          const fresh =
+            input.mode === 'replacement' || item.retryMode === 'replacement';
           const record: z.infer<typeof recordSchema> = {
             cardId: card.id,
             revision: card.revision,
@@ -170,13 +187,33 @@ export class AudioService {
             configuration: this.provider.configuration,
             artifactKey: null,
             state: 'paused',
+            purpose:
+              fresh ||
+              (item.artifactKey !== null && item.artifactKey !== requestKey)
+                ? 'replacement'
+                : 'standard',
             error: 'quota-or-configuration',
           };
           if (!paused) {
             try {
-              record.artifactKey = (
-                await this.cache.generate(item.text, this.provider)
-              ).key;
+              if (
+                !fresh &&
+                item.audioState === 'complete' &&
+                item.artifactKey
+              ) {
+                const current = await this.cache.read(item.artifactKey);
+                if (!current)
+                  throw new AudioIntegrityError(
+                    'Current artifact is unavailable.',
+                  );
+                record.artifactKey = current.record.key;
+              } else {
+                record.artifactKey = (
+                  await (fresh
+                    ? this.cache.generateReplacement(item.text, this.provider)
+                    : this.cache.generate(item.text, this.provider))
+                ).key;
+              }
               record.state = 'complete';
               record.error = null;
             } catch (error) {
@@ -204,22 +241,61 @@ export class AudioService {
     return this.cache.read(key);
   }
 
+  async historyMedia(cardId: string) {
+    const manifest = await this.readManifest();
+    const keys = new Set(
+      manifest.records
+        .filter((record) => record.cardId === cardId && record.artifactKey)
+        .map((record) => record.artifactKey!),
+    );
+    const media = [];
+    for (const key of keys) {
+      try {
+        const artifact = await this.cache.read(key);
+        if (artifact) media.push(artifact);
+      } catch (error) {
+        if (!(error instanceof AudioIntegrityError)) throw error;
+      }
+    }
+    return media;
+  }
+
   /** Used only with a server-loaded card while the workspace approval lock is held. */
-  async deliveryAudio(card: Workspace['cards'][number]) {
+  async deliveryAudio(
+    card: Workspace['cards'][number],
+    onlyPlacements?: readonly string[],
+  ) {
     requireApprovedCard(card);
-    const selected = card.audioSelection?.placementIds ?? [];
+    const saved = card.audioSelection?.placementIds ?? [];
+    const selected = onlyPlacements ?? saved;
+    if (selected.some((id) => !saved.includes(id)))
+      throw new AudioDeliveryError(
+        'Select the audio placement before delivery.',
+      );
     if (!selected.length)
-      throw new Error('Select at least one audio placement before delivery.');
+      throw new AudioDeliveryError(
+        'Select at least one audio placement before delivery.',
+      );
     const review = await this.reviewCard(card);
     const results = [];
     for (const placementId of selected) {
       const item = review.items.find(
         (item) => item.placementId === placementId,
       );
-      if (!item || item.audioState !== 'complete' || !item.artifactKey)
-        throw new Error('Selected audio is incomplete or stale.');
+      if (!item || item.audioState !== 'complete' || !item.artifactKey) {
+        const label =
+          placementId === 'target'
+            ? 'Target'
+            : placementId === 'frontExample'
+              ? 'Front example'
+              : `Additional example ${Number(placementId.split(':')[1]) + 1}`;
+        throw new AudioDeliveryError(
+          `Selected audio is incomplete or stale: ${label}. Generate its audio for the approved revision, or deselect it to keep existing audio when its spoken text is unchanged. Anki was not updated.`,
+        );
+      }
       const media = await this.cache.read(item.artifactKey);
-      if (!media) throw new Error('Selected audio is unavailable.');
+      if (!media)
+        throw new AudioDeliveryError('Selected audio is unavailable.');
       results.push({ placementId, key: item.artifactKey, ...media });
     }
     return results;
@@ -251,19 +327,42 @@ export class AudioService {
       throw new Error('Confirmed free speech allowance is unavailable.');
   }
 
-  private async uncachedCharacters(items: AudioReview['items']) {
-    return (await this.uncachedRequests(items)).reduce(
+  private async uncachedCharacters(
+    items: AudioReview['items'],
+    forceReplacement = false,
+    scope = '',
+  ) {
+    return (await this.uncachedRequests(items, forceReplacement, scope)).reduce(
       (sum, item) => sum + item.characterCount,
       0,
     );
   }
 
-  private async uncachedRequests(items: AudioReview['items']) {
+  private async uncachedRequests(
+    items: AudioReview['items'],
+    forceReplacement = false,
+    scope = '',
+  ) {
     const requests: { key: string; characterCount: number }[] = [];
     const seen = new Set<string>();
     for (const item of items) {
       if (!this.provider) throw new Error('Speech provider is not configured.');
       const key = audioCacheKey(item.text, this.provider.configuration);
+      if (forceReplacement || item.retryMode === 'replacement') {
+        requests.push({
+          key: createHash('sha256')
+            .update(`replacement:${scope}:${item.placementId}:${key}`)
+            .digest('hex'),
+          characterCount: item.characterCount,
+        });
+        continue;
+      }
+      if (
+        item.audioState === 'complete' &&
+        item.artifactKey &&
+        (await this.cache.read(item.artifactKey))
+      )
+        continue;
       if (seen.has(key)) continue;
       seen.add(key);
       try {
@@ -281,6 +380,10 @@ export class AudioService {
     card: Workspace['cards'][number],
     input: AudioBatchRequest,
   ) {
+    if (input.mode === 'replacement' && input.placementIds.length !== 1)
+      throw new Error(
+        'Replacement generation requires exactly one audio placement.',
+      );
     const review = await this.reviewCard(card);
     if (new Set(input.placementIds).size !== input.placementIds.length)
       throw new Error('Duplicate audio placement.');
@@ -368,6 +471,10 @@ export class AudioService {
         previousKey,
         previousText: previousKey ? (older?.text ?? null) : null,
         error,
+        retryMode:
+          latest?.purpose === 'replacement' && audioState !== 'complete'
+            ? 'replacement'
+            : 'explicit',
       });
     }
     return audioReviewSchema.parse({

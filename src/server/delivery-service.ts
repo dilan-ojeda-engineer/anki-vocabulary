@@ -20,6 +20,7 @@ import {
 } from '../integrations/anki/schemas';
 import type { WorkspaceStore } from './workspace';
 import type { AudioService } from './audio-service';
+import { AudioDeliveryError } from './audio-service';
 import type { Workspace } from '../shared/card-import';
 import type {
   DeliveryItem,
@@ -52,12 +53,31 @@ const manifestSchema = z.strictObject({
 });
 type Manifest = z.infer<typeof manifestSchema>;
 type RecordEntry = z.infer<typeof recordSchema>;
+export type DeliveryRecord = RecordEntry;
+export { recordSchema as deliveryRecordSchema };
 const publicItem = (entry: RecordEntry): DeliveryItem =>
   deliveryItemSchema.strip().parse(entry);
 type Collection = z.infer<typeof collectionSchema>;
+export interface OwnedNoteContext {
+  collection: Collection;
+  deckId: string;
+  deckName: string;
+  modelId: string;
+  receipts: readonly DeliveryRecord[];
+  revalidate(): Promise<void>;
+  findSource(sourceId: string): Promise<z.infer<typeof noteSchema> | null>;
+  filename(record: {
+    key: string;
+    checksum: string;
+    format: 'mp3' | 'wav';
+  }): string;
+  upload(filename: string, bytes: Uint8Array, checksum: string): Promise<void>;
+  saveReceipt(record: DeliveryRecord): Promise<void>;
+}
 export class DeliveryError extends Error {}
 const reason = (error: unknown) => {
-  if (error instanceof DeliveryError) return error.message;
+  if (error instanceof DeliveryError || error instanceof AudioDeliveryError)
+    return error.message;
   const message = error instanceof Error ? error.message : '';
   if (message === 'Stale card revision.')
     return 'Card revision changed; review and approve the current content before preparing again.';
@@ -127,11 +147,63 @@ export class DeliveryService {
     this.pending = operation.catch(() => undefined);
     return operation;
   }
+  withDeliveryLock<T>(action: () => Promise<T>): Promise<T> {
+    return this.serialized(action);
+  }
 
   async status() {
     return this.serialized(async () => ({
       items: (await this.manifest()).entries.map((entry) => publicItem(entry)),
     }));
+  }
+
+  /** Server-only update gateway shares the creation lock and ownership checks. */
+  async withOwnedNotes<T>(
+    deckId: string,
+    operation: (context: OwnedNoteContext) => Promise<T>,
+  ): Promise<T> {
+    return this.serialized(async () => {
+      const manifest = await this.manifest();
+      const collection = await this.anki.call(
+        'collection.get',
+        {},
+        collectionSchema,
+      );
+      const deck = await this.destination(collection, deckId);
+      const model = await this.model(manifest, collection, false);
+      if (!model)
+        throw new DeliveryError(
+          'No supported app-owned note type exists in this collection.',
+        );
+      return operation({
+        collection,
+        deckId: deck.id,
+        deckName: deck.name,
+        modelId: model.id,
+        receipts: manifest.entries,
+        revalidate: async () => {
+          await this.destination(collection, deck.id, deck.name);
+          await this.model(manifest, collection, false);
+        },
+        findSource: (id) => this.findSource(id, collection),
+        filename: (record) => this.filename(manifest, record),
+        upload: (filename, bytes, checksum) =>
+          this.storeMedia(filename, bytes, checksum, collection),
+        saveReceipt: async (record) => {
+          const checked = recordSchema.parse(record);
+          if (
+            checked.profile !== collection.profile ||
+            checked.deckId !== deck.id ||
+            checked.modelId !== model.id
+          )
+            throw new DeliveryError(
+              'Update receipt belongs to a different destination.',
+            );
+          this.setEntry(manifest, checked);
+          await this.save(manifest);
+        },
+      });
+    });
   }
 
   async prepare(request: DeliveryRequest): Promise<DeliveryPreview> {
@@ -207,7 +279,11 @@ export class DeliveryService {
             reason:
               reason(error) +
               (error instanceof Error &&
-              error.message === 'Selected audio is incomplete or stale.'
+              (error.message === 'Selected audio is incomplete or stale.' ||
+                (error instanceof AudioDeliveryError &&
+                  error.message.startsWith(
+                    'Selected audio is incomplete or stale:',
+                  )))
                 ? ' Generate or retry the selected audio items, then prepare a new delivery preview.'
                 : ''),
             noteId: null,

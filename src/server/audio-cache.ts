@@ -186,6 +186,36 @@ export class AudioCache {
     return results;
   }
 
+  /** A fresh rendition has a distinct content-derived artifact ID; existing clips stay immutable. */
+  async generateReplacement(
+    text: string,
+    provider: SpeechProvider,
+  ): Promise<CachedAudio> {
+    const requestKey = audioCacheKey(text, provider.configuration);
+    const bytes = await provider.synthesize(text);
+    validateAudio(bytes, provider.configuration.format);
+    const digest = checksum(bytes);
+    const key = checksum(Buffer.from(`${requestKey}:${digest}`));
+    let existing;
+    try {
+      existing = await this.read(key);
+    } catch (error) {
+      if (!(error instanceof AudioIntegrityError)) throw error;
+    }
+    if (existing) return existing.record;
+    const record = recordSchema.parse({
+      version: 1,
+      key,
+      checksum: digest,
+      bytes: bytes.length,
+      format: provider.configuration.format,
+    });
+    await mkdir(this.directory, { recursive: true });
+    await this.atomicWrite(`${key}.${record.format}`, bytes);
+    await this.atomicWrite(`${key}.json`, Buffer.from(JSON.stringify(record)));
+    return record;
+  }
+
   private async atomicWrite(name: string, bytes: Uint8Array): Promise<void> {
     const temporary = join(this.directory, `${randomUUID()}.tmp`);
     try {

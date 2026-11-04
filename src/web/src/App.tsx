@@ -15,6 +15,7 @@ import { CardReview } from './CardReview';
 import { QueueAudio } from './QueueAudio';
 import { DeliveryPanel } from './DeliveryPanel';
 import { SpeechSettings } from './SpeechSettings';
+import { ExistingNotesPanel } from './ExistingNotesPanel';
 
 const cardTextPlaceholder = `awkward
 “I felt awkward asking for help.”
@@ -78,6 +79,8 @@ export function App() {
   const [failed, setFailed] = useState(false);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [audioRefreshVersion, setAudioRefreshVersion] = useState(0);
+  const [editingDeckId, setEditingDeckId] = useState<string | null>(null);
+  const [updateNavigationBlocked, setUpdateNavigationBlocked] = useState(false);
   const [workspaceError, setWorkspaceError] = useState(false);
   const [format, setFormat] = useState<ImportRequest['format']>('paste');
   const [source, setSource] = useState('');
@@ -89,17 +92,19 @@ export function App() {
   const [working, setWorking] = useState(false);
 
   const refresh = useCallback(async () => {
+    if (updateNavigationBlocked) return;
     setLoading(true);
     setFailed(false);
     try {
       setStatus(await getLocalWebStatus());
       setSelectedDeckId('');
+      setEditingDeckId(null);
     } catch {
       setFailed(true);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [updateNavigationBlocked]);
 
   useEffect(() => {
     let cancelled = false;
@@ -217,7 +222,7 @@ export function App() {
           <button
             type="button"
             onClick={() => void refresh()}
-            disabled={loading}
+            disabled={loading || updateNavigationBlocked}
           >
             {loading ? 'Refreshing…' : 'Refresh'}
           </button>
@@ -238,7 +243,11 @@ export function App() {
             Destination deck
             <select
               value={selectedDeckId}
-              onChange={(event) => setSelectedDeckId(event.target.value)}
+              disabled={updateNavigationBlocked}
+              onChange={(event) => {
+                setSelectedDeckId(event.target.value);
+                setEditingDeckId(null);
+              }}
               aria-describedby="deck-help"
             >
               <option value="" disabled>
@@ -430,11 +439,28 @@ export function App() {
             workspace={workspace}
             onUpdated={() => setAudioRefreshVersion((value) => value + 1)}
           />
-          <CardReview
+          <ExistingNotesPanel
+            key={selectedDeckId}
             workspace={workspace}
+            deckId={anki?.status === 'connected' ? selectedDeckId : ''}
             onChange={setWorkspace}
+            onEditing={(editing) =>
+              setEditingDeckId(editing ? selectedDeckId : null)
+            }
             audioRefreshVersion={audioRefreshVersion}
+            onAudioChanged={() => setAudioRefreshVersion((value) => value + 1)}
+            onNavigationBlocked={setUpdateNavigationBlocked}
           />
+          {editingDeckId !== selectedDeckId ? (
+            <CardReview
+              workspace={workspace}
+              onChange={setWorkspace}
+              audioRefreshVersion={audioRefreshVersion}
+              onAudioChanged={() =>
+                setAudioRefreshVersion((value) => value + 1)
+              }
+            />
+          ) : null}
           <DeliveryPanel
             workspace={workspace}
             deckId={anki?.status === 'connected' ? selectedDeckId : ''}
@@ -445,8 +471,8 @@ export function App() {
       <section className="next" aria-labelledby="next-heading">
         <h2 id="next-heading">Next workspace step</h2>
         <p>
-          Loading and safely updating existing notes is planned next. Review
-          delivery results before continuing.
+          Review delivery and update results, then verify the complete five-card
+          workflow in the isolated Anki collection.
         </p>
       </section>
     </main>

@@ -21,10 +21,12 @@ export function AudioSelection({
   card,
   onChange,
   refreshVersion,
+  onGenerated,
 }: {
   card: Card;
   onChange: (workspace: Workspace) => void;
   refreshVersion: number;
+  onGenerated?: (() => void) | undefined;
 }) {
   const [plan, setPlan] = useState<AudioReview | null>(null);
   const [preflight, setPreflight] = useState<AudioPreflight | null>(null);
@@ -90,7 +92,10 @@ export function AudioSelection({
     }
   }
 
-  async function prepare(mode: 'explicit' | 'missing', placementIds: string[]) {
+  async function prepare(
+    mode: AudioBatchRequest['mode'],
+    placementIds: string[],
+  ) {
     if (busy || !plan) return;
     setBusy(true);
     setMessage('');
@@ -128,6 +133,7 @@ export function AudioSelection({
       setMessage(
         'Audio batch finished. Review each result and listen before delivery. Failed or paused items can be retried explicitly.',
       );
+      onGenerated?.();
     } catch (error) {
       if (error instanceof WorkspaceConflictError) setConflict(true);
       setMessage(
@@ -229,6 +235,13 @@ export function AudioSelection({
               aria-label="Audio batch preview"
             >
               <h4>Audio batch preview</h4>
+              {batch?.mode === 'replacement' ? (
+                <p>
+                  This requests a fresh rendition and uses allowance even when a
+                  cached clip exists. The previous clip is retained for
+                  comparison.
+                </p>
+              ) : null}
               <p>
                 {preflight.configuration.providerId} · {preflight.voiceName} ·{' '}
                 {preflight.configuration.modelId} ·{' '}
@@ -338,16 +351,26 @@ export function AudioSelection({
                 <button
                   type="button"
                   disabled={
-                    busy ||
-                    !plan.configuration ||
-                    item.status === 'invalid' ||
-                    item.audioState === 'complete'
+                    busy || !plan.configuration || item.status === 'invalid'
                   }
-                  onClick={() => void prepare('explicit', [item.placementId])}
+                  onClick={() =>
+                    void prepare(
+                      item.audioState === 'complete' ||
+                        item.retryMode === 'replacement'
+                        ? 'replacement'
+                        : 'explicit',
+                      [item.placementId],
+                    )
+                  }
                 >
-                  {item.audioState === 'failed' || item.audioState === 'paused'
-                    ? 'Retry this item'
-                    : 'Generate this item'}
+                  {item.audioState === 'complete'
+                    ? 'Generate replacement'
+                    : item.retryMode === 'replacement'
+                      ? 'Retry replacement'
+                      : item.audioState === 'failed' ||
+                          item.audioState === 'paused'
+                        ? 'Retry this item'
+                        : 'Generate this item'}
                 </button>
               </li>
             ))}

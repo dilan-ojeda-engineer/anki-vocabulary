@@ -139,8 +139,8 @@ export function DeliveryPanel({
       <h2 id="delivery-heading">Send cards to Anki</h2>
       <p>
         Choose saved cards and an existing normal deck above. Previewing does
-        not change Anki. Changes to an existing delivered note require the later
-        update workflow.
+        not change Anki. To change a delivered note, use Update existing Anki
+        notes above.
       </p>
       <button
         type="button"

@@ -1,7 +1,7 @@
 import type { Workspace } from '../shared/card-import';
 import { coachFieldSchema } from '../shared/card-display';
 
-const sourceFields = [
+export const sourceFields = [
   'Target',
   'FrontExample',
   'Meaning',
