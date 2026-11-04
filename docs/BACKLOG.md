@@ -2,9 +2,9 @@
 
 **Version:** 0.3
 
-**Date:** November 2, 2026
+**Date:** November 3, 2026
 
-**Status:** AV-028 through AV-036 are the current local-web implementation sequence. AV-001 through AV-027 remain historical Electron-first records and must not be started automatically. Listing a task does not assign it or authorize work; the user selects each task explicitly.
+**Status:** AV-028 through AV-036 are the current local-web implementation sequence. AV-037 through AV-039 are deferred local-web follow-ups requested by the owner. AV-001 through AV-027 remain historical Electron-first records and must not be started automatically. Listing a task does not assign it or authorize work; the user selects each task explicitly.
 
 The owner accepted the [local web direction and initial requirements](LOCAL_WEB_PLAN.md) on November 2, 2026. The current backlog divides that workflow into small reviewable outcomes. It preserves the old IDs instead of reusing AV-006 through AV-027, so commits and evidence remain unambiguous.
 
@@ -18,11 +18,51 @@ The owner accepted the [local web direction and initial requirements](LOCAL_WEB_
 | AV-031 | Enforce exact-revision content approval outside React and invalidate it on edits | P0 / safety | In review; controlled checks recorded, human acceptance pending | Unassigned / Unassigned | AV-030; relevant AV-003 contracts |
 | AV-032 | Extract and select target/front/additional-example audio items | P0 / audio preparation | In review; implementation and controlled checks recorded, human acceptance pending | Unassigned / Unassigned | AV-031; English Coach audio-field rules |
 | AV-033 | Generate, cache, play, compare, and retry audio individually or in batches | P0 / audio | In review; controlled and one-item live evidence recorded, human acceptance pending | Unassigned / Unassigned | AV-032; selected TTS provider/voice and confirmed allowance |
-| AV-034 | Create approved English Coach notes with audio in an explicitly selected Anki deck | P0 / delivery | Backlog | Unassigned / Unassigned | AV-028, AV-031, AV-033; disposable Anki profile |
+| AV-034 | Create approved English Coach notes with audio in an explicitly selected Anki deck | P0 / delivery | In review; controlled and live disposable-Anki evidence recorded, human acceptance pending | Unassigned / Unassigned | AV-028, AV-031, AV-033; disposable Anki profile |
 | AV-035 | Load supported notes and safely update fields or replace one audio placement in place | P0 / update | Backlog | Unassigned / Unassigned | AV-034; stable identity and reconciliation evidence from AV-004 |
 | AV-036 | Demonstrate and accept the complete five-card local workflow | P0 / acceptance gate | Backlog | Unassigned / Unassigned | AV-029 through AV-035 |
 
 Only one of these tasks should be treated as the active implementation task unless the team explicitly coordinates parallel work. A task becomes Done only after its acceptance evidence is reviewed and accepted; a passing implementation review alone is not product acceptance.
+
+## Deferred local-web follow-ups
+
+The owner requested these future tasks on November 3, 2026, after the [Anki note structure review](ANKI_NOTE_STRUCTURE.md). They do not block the existing AV-034 acceptance or start AV-035 automatically. Their implementation order and human assignments remain to be selected.
+
+| ID | Outcome | Priority / phase | State | Owner / reviewer | Dependencies |
+|---|---|---|---|---|---|
+| AV-037 | Define and implement a smaller versioned English Coach note layout for new notes, with legacy compatibility | P2 / usability | Backlog; deferred, not started | Unassigned / Unassigned | AV-034, AV-035; note structure review |
+| AV-038 | Preview and migrate supported existing notes to the smaller layout while preserving identity and scheduling | P2 / compatibility | Backlog; deferred, not started | Unassigned / Unassigned | AV-037; disposable studied-note fixtures |
+| AV-039 | Select Anki note/card templates and adapt editing, preview, and audio controls through saved field mappings | P2 / flexibility | Backlog; deferred, not started | Unassigned / Unassigned | AV-035; explicit mapping/identity design for supported and arbitrary note types |
+
+### AV-037 — Simplify Anki note metadata
+
+- Finalize and version the recommended layout: retain teaching/audio fields plus `AvSourceId` and `AvProfileVersion`; keep revision/hash tracking in app storage and omit `AvContent` from new notes.
+- Preserve the exact official learning structure and audio placements. Document which internal fields remain visible in Anki's editor.
+- Continue recognizing existing layouts for supported loading, identity searches, receipt comparisons, and reconciliation. Do not silently alter or reject all existing notes merely because new notes use a newer layout.
+- Review field order for editor usability. If `AvSourceId` moves away from the first field, verify native duplicate behavior and maintain source-identity protection before adopting that order.
+- Verify new-note creation, repeat/restarted delivery, ambiguous-response reconciliation, manual Anki edits, and legacy compatibility with fake providers and disposable Anki data. Re-read actual teaching/audio fields rather than trusting old snapshots or stored metadata as proof of approval.
+- Exclude conversion of existing notes; that is AV-038. Specification and schema changes require review before implementation is accepted.
+
+### AV-038 — Migrate existing Anki notes safely
+
+- Show a migration preview with the old/new model versions, affected notes, field mappings, and omitted metadata before explicit confirmation.
+- Validate identity, supported layout, actual teaching/audio fields, delivery receipts, and external-edit conflicts. Block unresolved or unsupported notes instead of guessing a mapping.
+- Convert supported notes in place using the reviewed layout mapping. Preserve source identity, Anki note/card IDs, deck placement, learning content, audio references, and scheduling; never delete/recreate studied notes to simplify fields.
+- Preserve original input and revision/hash evidence in app-owned records. Update receipt/layout information consistently, reconcile interrupted outcomes, and report per-note success/failure without blindly retrying conversion.
+- Verify a studied disposable note before/after migration, including scheduling and content/audio rendering. Repeat and restart recovery must neither duplicate cards nor migrate the same note twice.
+- Keep the legacy layout available until migration and recovery evidence is accepted. Do not automatically convert every note of a shared model as an incidental effect of a single-card action.
+
+### Deferred AV-039 — Selectable note types and dynamic UI
+
+- List available note types from the connected collection, show their fields and card templates, and let the user explicitly select a note type and preview template. A note type and one of its card templates are separate selections; selecting a deck does not select its structure.
+- Build field-editing controls from the selected structure, preserving field order and empty/optional values. Generic fields use plain editing by default; require explicit mappings/settings for list controls, required values, vocabulary targets, examples, and audio destinations rather than guessing semantics from names.
+- Let the user review and save a reusable mapping. Bind it to the collection, note-type identity, and a structure fingerprint; detect changed fields/templates and require remapping rather than silently applying an old mapping.
+- Preview the selected template with the mapped values and audio placements. Define an isolation/sanitization boundary for third-party template HTML/CSS/scripts so it cannot access app credentials, privileged commands, or unrelated workspace data. Do not run imported template scripts in the application's trusted UI.
+- Use profile-specific validation and approval for mapped arbitrary structures. Preserve the official English Coach contract for that built-in profile; do not apply its headings or mandatory fields to every note type.
+- Preserve note/card identity, external-edit detection, exact-revision approval, audio cache matching, per-item receipts, and ambiguous-creation reconciliation. Agree the identity mechanism for arbitrary note types without silently adding internal fields or editing shared models.
+- Show when a note type creates multiple cards. Deliver one note with its intended templates without multiplying notes per card type or deleting existing cards during an update.
+- Test at least English Coach and a different mapped note type, multiple templates, mapping reuse after restart, changed layouts, missing audio mappings, unsupported structures, and malicious template content using fake providers/disposable Anki data.
+- This is future design/implementation work. AV-035 continues to support only the existing app-owned English Coach layout; documenting AV-039 does not start arbitrary-note editing or model migration.
 
 ## Current local-web acceptance criteria
 
@@ -106,6 +146,10 @@ Only one of these tasks should be treated as the active implementation task unle
 - Persist stable source identity and per-item receipts; repeat delivery does not duplicate notes or request unnecessary audio.
 - Reconcile ambiguous creation by source identity before retrying and report partial success accurately. Verify in a disposable Anki profile.
 - Keep pending delivery intent and per-item receipts across disconnects. Reconnection never triggers an automatic send; show the current profile and destination for explicit confirmation, then revalidate before writing.
+
+**AV-034 implementation evidence (November 3, 2026):** The local server now prepares an explicit profile/deck/item preview bound to exact card and audio payloads, then revalidates before sending. Stable source identity and per-item intents/receipts are persisted before creation; ambiguous creation is reconciled or blocked rather than blindly retried. An app-owned versioned model uses separate source and audio fields, no repeated front audio on the back, and verified uniquely named media. Fake tests cover source/layout/session conflicts, omissions, partial success, mid-batch disconnects, lost responses, and repeat/restart behavior. The full check passes 116 tests plus typecheck, lint, formatting, and both builds. A live isolated Anki 26.09.3 check created one note with six diagnostic clips in an existing nested deck; repeating after service restart created no additional note or media and preserved card identity/scheduling. Browser preview, confirmation, receipts, and reload behavior were checked against that fixture. Review findings were fixed and re-reviewed. See [detailed evidence](evidence/AV-034-anki-delivery.md). Human acceptance, speech-quality/client listening, and five-card acceptance remain pending; existing-note updates are blocked for AV-035.
+
+**Owner-authorized credential follow-up (November 3, 2026):** Repeated temporary-key setup blocked audio testing. Persistent [speech settings](SPEECH_SETTINGS.md) now provide Windows-encrypted per-user storage, automatic startup/account verification, and runtime replacement/removal. The owner entered a key successfully; live restart reuse and automatic account verification were confirmed. This work remains part of the current workflow follow-up; AV-035 is not started. Human card/audio listening acceptance remains pending.
 
 ### AV-035 — Load and safely update notes/audio
 

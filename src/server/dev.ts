@@ -3,14 +3,14 @@ import { resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { createServer as createViteServer } from 'vite';
-import { createAnkiReadClient, readAnkiStatus } from './anki-status';
+import { readAnkiStatus } from './anki-status';
+import { AnkiConnectClient } from '../integrations/anki/client';
+import { DeliveryService } from './delivery-service';
 import { createApiHandler } from './http';
 import { WorkspaceStore } from './workspace';
 import { AudioService } from './audio-service';
-import {
-  createInitialSpeechProvider,
-  readElevenLabsAllowance,
-} from './elevenlabs';
+import { CredentialStore, windowsSecretProtection } from './credential-store';
+import { SpeechSettingsService } from './speech-settings';
 
 const host = '127.0.0.1';
 const rawPort = process.env.LOCAL_WEB_PORT ?? '43110';
@@ -20,7 +20,7 @@ if (!Number.isSafeInteger(port) || port < 1 || port > 65535)
 
 const ankiEndpoint =
   process.env.ANKI_CONNECT_URL ?? 'http://127.0.0.1:8765/api/v1';
-const anki = createAnkiReadClient(ankiEndpoint);
+const anki = new AnkiConnectClient(ankiEndpoint);
 const baseUrl = `http://${host}:${port}`;
 const dataDirectory =
   process.env.LOCAL_WEB_DATA_DIR ??
@@ -29,15 +29,22 @@ const dataDirectory =
     'AnkiVocabularyStudio',
   );
 const workspace = new WorkspaceStore(dataDirectory);
-const speechKey = process.env.ELEVENLABS_API_KEY;
+const speechSettings = new SpeechSettingsService(
+  new CredentialStore(
+    process.env.LOCAL_WEB_CREDENTIAL_DIR ??
+      resolve(
+        process.env.LOCALAPPDATA ?? resolve(homedir(), 'AppData', 'Local'),
+        'AnkiVocabularyStudioCredentials',
+      ),
+    await windowsSecretProtection(),
+  ),
+);
+await speechSettings.initialize(process.env.ELEVENLABS_API_KEY);
 const audio = new AudioService(
   resolve(dataDirectory, 'audio'),
   workspace,
-  speechKey ? createInitialSpeechProvider(speechKey) : null,
-  async () => {
-    if (!speechKey) throw new Error('Speech key unavailable.');
-    return readElevenLabsAllowance(speechKey);
-  },
+  () => speechSettings.provider(),
+  () => speechSettings.readAllowance(),
 );
 const api = createApiHandler({
   expectedHosts: new Set([`${host}:${port}`, `localhost:${port}`]),
@@ -45,6 +52,13 @@ const api = createApiHandler({
   readStatus: () => readAnkiStatus(anki),
   workspace,
   audio,
+  speechSettings,
+  delivery: new DeliveryService(
+    resolve(dataDirectory, 'delivery'),
+    workspace,
+    audio,
+    anki,
+  ),
   sessionToken: randomUUID(),
 });
 const vite = await createViteServer({
@@ -74,6 +88,8 @@ await new Promise<void>((resolveListen, reject) => {
   server.listen(port, host, () => resolveListen());
 });
 console.log(`Local web workspace ready at ${baseUrl}`);
+// Read-only account verification; never generates speech or enables paid fallback.
+void speechSettings.action({ action: 'check' });
 
 async function stop(): Promise<void> {
   await vite.close();

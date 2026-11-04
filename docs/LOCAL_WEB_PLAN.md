@@ -1,7 +1,7 @@
 # Local web plan: Anki Card and Audio Workspace
 
 **Date:** November 2, 2026
-**Status:** Product direction and initial requirements accepted; AV-028 through AV-033 are merged. Complete card-audio listening and human milestone acceptance remain pending; Anki writes have not started.
+**Status:** Product direction and initial requirements accepted; AV-028 through AV-033 are merged. AV-034 creation delivery is prepared for review, with controlled and live disposable-Anki evidence. Complete card-audio listening and human milestone acceptance remain pending.
 
 Implementation is tracked as AV-028 through AV-036 in the [current backlog](BACKLOG.md#current-local-web-task-inventory). The IDs continue after the historical Electron backlog to avoid reusing earlier task references. Listing the sequence does not authorize starting the next task automatically.
 
@@ -22,6 +22,8 @@ This direction supersedes Electron as the planned first application shell. The E
 - An **audio item** is one exact text value associated with a specific note field or list entry, voice configuration, and generated media file.
 
 Selecting any deck does not make every note type in that deck safe to edit. New cards use the app-owned, versioned English Coach note type. Existing English Coach notes can be loaded and updated. Other note types require a later explicit field-mapping workflow.
+
+The owner requested selectable note types with a UI that adapts to their fields/templates as a future feature. [AV-039](BACKLOG.md#deferred-av-039--selectable-note-types-and-dynamic-ui) tracks note-type/template selection, dynamic editing controls, reusable semantic/audio mappings, isolated template previews, and safe identity/update behavior. Field names alone do not define teaching or audio semantics. This deferred feature does not expand the current English Coach-only delivery boundary.
 
 ## First-release workflow
 
@@ -135,6 +137,8 @@ The user can play every proposed clip before delivery. A clip is not associated 
 
 ### Replace existing audio
 
+The current note field mapping and internal-field review are documented in [Anki note structure](ANKI_NOTE_STRUCTURE.md). Study templates must preserve the official teaching structure. A proposed reduction to identity/profile metadata is separate from an implemented model migration; existing-note compatibility and scheduling must be preserved before changing a delivered layout.
+
 For a supported existing note:
 
 1. Choose the target or example audio placement.
@@ -162,10 +166,10 @@ src/
 - The React web interface displays data and sends typed commands. It receives no provider keys and cannot call arbitrary filesystem or process operations.
 - The local Node server binds to loopback only, validates command bodies and browser origin/session tokens, owns provider calls and local artifacts, and talks to AnkiConnect.
 - Anki remains the system of record for delivered notes, scheduling, decks, and synced media.
-- Initial local configuration may use process/user environment variables. A later settings design must keep secrets outside browser storage, logs, cards, exports, and Git.
+- Initial local configuration may use process/user environment variables. The owner authorized [persistent local speech settings](SPEECH_SETTINGS.md) on November 3, 2026: Windows-encrypted, separate per-user storage; account verification at save/start; replacement/removal without a restart. Secrets stay outside browser storage, logs, cards, exports, and Git.
 - Server-owned persistence is required for offline drafts, audio artifacts, approval records, and delivery reconciliation. AV-029 selects the smallest local store that supports atomic, versioned writes and restart recovery; SQLite is an option, not a prerequisite.
 
-The current read-only foundation exposes only `GET /api/status`. It validates the request host and browser origin and returns a sanitized Anki status/deck view; the Anki session remains server-side. Session-token and command-body enforcement becomes mandatory when the first mutation endpoint is introduced.
+The server exposes sanitized status/workspace/receipt reads and typed import, review, audio, and delivery commands. It validates hosts, origins, session tokens, and command bodies; raw Anki collection sessions remain server-side. Delivery requires a bound preview and separate explicit confirmation.
 
 ## Reuse from completed work
 

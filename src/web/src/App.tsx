@@ -13,6 +13,8 @@ import {
 } from './api';
 import { CardReview } from './CardReview';
 import { QueueAudio } from './QueueAudio';
+import { DeliveryPanel } from './DeliveryPanel';
+import { SpeechSettings } from './SpeechSettings';
 
 const cardTextPlaceholder = `awkward
 “I felt awkward asking for help.”
@@ -71,6 +73,7 @@ const importPlaceholders: Record<ImportRequest['format'], string> = {
 
 export function App() {
   const [status, setStatus] = useState<LocalWebStatus | null>(null);
+  const [selectedDeckId, setSelectedDeckId] = useState('');
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
@@ -90,6 +93,7 @@ export function App() {
     setFailed(false);
     try {
       setStatus(await getLocalWebStatus());
+      setSelectedDeckId('');
     } catch {
       setFailed(true);
     } finally {
@@ -232,23 +236,37 @@ export function App() {
         {anki?.status === 'connected' ? (
           <label>
             Destination deck
-            <select defaultValue="" aria-describedby="deck-help">
+            <select
+              value={selectedDeckId}
+              onChange={(event) => setSelectedDeckId(event.target.value)}
+              aria-describedby="deck-help"
+            >
               <option value="" disabled>
                 Select a deck
               </option>
               {anki.decks.map((deck) => (
-                <option key={deck.id} value={deck.id}>
+                <option
+                  key={deck.id}
+                  value={deck.id}
+                  disabled={deck.kind === 'filtered'}
+                >
                   {deck.name}
                   {deck.kind === 'filtered' ? ' (filtered)' : ''}
                 </option>
               ))}
             </select>
             <span id="deck-help">
-              Selection is local only. This foundation performs no Anki writes.
+              Choose a normal deck for delivery. Filtered decks cannot receive
+              newly created notes. Sending requires a separate preview and
+              confirmation.
             </span>
           </label>
         ) : null}
       </section>
+
+      <SpeechSettings
+        onChanged={() => setAudioRefreshVersion((value) => value + 1)}
+      />
 
       <section aria-labelledby="import-heading">
         <p className="step">AV-029</p>
@@ -417,14 +435,18 @@ export function App() {
             onChange={setWorkspace}
             audioRefreshVersion={audioRefreshVersion}
           />
+          <DeliveryPanel
+            workspace={workspace}
+            deckId={anki?.status === 'connected' ? selectedDeckId : ''}
+          />
         </>
       ) : null}
 
       <section className="next" aria-labelledby="next-heading">
         <h2 id="next-heading">Next workspace step</h2>
         <p>
-          Anki delivery is planned next. Review and listen to your prepared
-          audio first.
+          Loading and safely updating existing notes is planned next. Review
+          delivery results before continuing.
         </p>
       </section>
     </main>

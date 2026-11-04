@@ -16,11 +16,51 @@ import type {
   AudioBatchRequest,
   AudioGenerateRequest,
 } from '../../shared/audio-generation';
+import {
+  deliveryPreviewSchema,
+  deliveryStatusSchema,
+} from '../../shared/delivery';
+import type { DeliveryRequest } from '../../shared/delivery';
+import { speechSettingsSchema } from '../../shared/speech-settings';
+import type { SpeechSettingsRequest } from '../../shared/speech-settings';
 
 let workspaceToken: string | null = null;
 
 export class WorkspaceConflictError extends Error {}
 export class AudioRequestError extends Error {}
+export class DeliveryRequestError extends Error {}
+
+export async function getSpeechSettings() {
+  const response = await fetch('/api/speech/settings', { cache: 'no-store' });
+  if (!response.ok)
+    throw new Error(
+      'Speech settings are unavailable. Restart the local server to load the settings feature.',
+    );
+  workspaceToken = response.headers.get('x-workspace-token') ?? workspaceToken;
+  return speechSettingsSchema.parse(await response.json());
+}
+export async function updateSpeechSettings(input: SpeechSettingsRequest) {
+  return speechSettingsSchema.parse(await post('/api/speech/settings', input));
+}
+
+export async function getDeliveryStatus() {
+  const response = await fetch('/api/delivery/status', { cache: 'no-store' });
+  if (!response.ok)
+    throw new DeliveryRequestError(
+      'Saved delivery receipts could not be loaded.',
+    );
+  return deliveryStatusSchema.parse(await response.json());
+}
+export async function prepareDelivery(input: DeliveryRequest) {
+  return deliveryPreviewSchema.parse(
+    await post('/api/delivery/prepare', input),
+  );
+}
+export async function sendDelivery(previewId: string) {
+  return deliveryStatusSchema.parse(
+    await post('/api/delivery/send', { previewId, reviewed: true }),
+  );
+}
 
 export async function getLocalWebStatus(): Promise<LocalWebStatus> {
   const response = await fetch('/api/status', {
@@ -107,15 +147,34 @@ async function post(
     const code =
       data && typeof data === 'object' && 'error' in data ? data.error : null;
     const message =
-      code === 'speech-not-configured'
-        ? 'Start the local server with ELEVENLABS_API_KEY configured.'
-        : code === 'allowance-check-failed'
-          ? 'Could not verify allowance. Check the speech key, account read permissions, and connection.'
-          : code === 'free-allowance-unavailable'
-            ? 'Available free allowance could not cover this request. No paid fallback was used.'
-            : code === 'audio-preview-expired'
-              ? 'Audio preview expired. Prepare this batch again.'
-              : null;
+      code === 'credential-validation-failed'
+        ? 'The key could not be validated. Check the key, account permissions, and connection. Your previous saved key was kept.'
+        : code === 'credential-storage-failed'
+          ? 'Secure key storage failed. No plaintext fallback was used.'
+          : code === 'invalid-credential' || code === 'invalid-settings-request'
+            ? 'Enter a valid API key. No key was saved.'
+            : code === 'speech-not-configured'
+              ? 'Open Speech settings and validate/save your ElevenLabs key. No server restart is needed.'
+              : code === 'speech-account-access-denied'
+                ? 'ElevenLabs denied the account check (401/403). Check that the key is valid and has account/subscription read permission, then check or replace it in Speech settings. No audio was generated.'
+                : code === 'speech-account-rate-limited'
+                  ? 'ElevenLabs rate-limited the account check. Wait and try again. No audio was generated.'
+                  : code === 'allowance-check-failed'
+                    ? 'Could not verify ElevenLabs allowance. Check the connection and account access, then try again. No audio was generated.'
+                    : code === 'free-allowance-unavailable'
+                      ? 'Available free allowance could not cover this request. No paid fallback was used.'
+                      : code === 'audio-preview-expired'
+                        ? 'Audio preview expired. Prepare this batch again.'
+                        : null;
+    if (
+      code === 'delivery-blocked' &&
+      data &&
+      typeof data === 'object' &&
+      'message' in data &&
+      typeof data.message === 'string' &&
+      data.message.length <= 300
+    )
+      throw new DeliveryRequestError(data.message);
     if (message) throw new AudioRequestError(message);
     throw new Error('Workspace request failed.');
   }

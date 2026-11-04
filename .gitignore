@@ -15,6 +15,7 @@ playwright-report/
 !.env.example
 !.env.*.example
 credentials*.json
+*.dpapi
 secrets/
 *.pem
 *.key

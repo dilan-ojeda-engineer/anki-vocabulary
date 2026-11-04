@@ -163,6 +163,11 @@ export function AudioSelection({
         Choose audio items, review the batch details, then generate. Listen to
         each clip before delivery.
       </p>
+      {message ? (
+        <p className="status" role="alert">
+          {message}
+        </p>
+      ) : null}
       {plan ? (
         <>
           <div className="review-actions">
@@ -202,10 +207,20 @@ export function AudioSelection({
             </button>
           </div>
           {!plan.configuration ? (
-            <p>
-              Speech is not configured. Start the local server with
-              ELEVENLABS_API_KEY in its environment.
-            </p>
+            <div role="status" className="status error">
+              <p>
+                Speech generation is unavailable because this server session has
+                no key. Saved clips can still play.
+              </p>
+              <details>
+                <summary>Restore speech generation</summary>
+                <p>
+                  Open <a href="#speech-settings-heading">Speech settings</a>,
+                  paste your key, and choose Validate and save key. Generation
+                  becomes available without restarting the server.
+                </p>
+              </details>
+            </div>
           ) : null}
           {preflight ? (
             <div
@@ -345,7 +360,6 @@ export function AudioSelection({
       ) : !message ? (
         <p>Loading audio items…</p>
       ) : null}
-      {message ? <p role="alert">{message}</p> : null}
       {conflict ? (
         <button
           type="button"

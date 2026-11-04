@@ -119,6 +119,11 @@ label {
   align-items: center;
   gap: 8px;
 }
+.delivery-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .audio-items pre {
   margin: 10px 0;
 }
@@ -221,7 +226,8 @@ label {
   font-weight: 700;
 }
 
-select {
+select,
+.speech-key-input {
   width: 100%;
   min-height: 48px;
   padding: 0 13px;

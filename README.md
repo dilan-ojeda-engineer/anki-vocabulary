@@ -2,7 +2,7 @@
 
 A planned local web tool for reviewing English Coach cards, generating target/example audio, and safely creating or updating notes in Anki.
 
-**Status:** The local web app reports Anki availability, lists decks, imports and reviews English Coach cards, approves exact content revisions, and generates and plays cached audio using ElevenLabs/Sarah. Anki writes are not implemented. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
+**Status:** The local web app reports Anki availability, lists decks, imports and reviews English Coach cards, approves exact content revisions, and generates and plays cached audio using ElevenLabs/Sarah. AV-034 adds confirmed creation delivery to Anki with persisted receipts on its task branch for review. AV-002 through AV-005 remain preserved as foundation and feasibility evidence. Electron is no longer the planned first application shell; no written-card provider is adopted. The project name is a working name, and document versions remain separate from application version `0.1.0-dev.0`.
 
 ## Start here
 
@@ -56,6 +56,8 @@ The application remains in this repository and uses **strict TypeScript, React, 
 
 See the [local web plan](docs/LOCAL_WEB_PLAN.md) for current boundaries and acceptance scenarios. [PROJECT.md](docs/PROJECT.md) retains the earlier Electron proposal as historical design context until its reusable requirements are migrated.
 
+See the [Anki note structure review](docs/ANKI_NOTE_STRUCTURE.md) for the mapping between official teaching sections, audio fields, and internal tracking fields visible in Anki's editor. Its smaller-layout recommendation is documented; existing note types have not been migrated.
+
 ## Run the local web foundation
 
 Prerequisites are Node.js 26.13.x, npm 11.20.0, and—when testing the live connection—a running Anki Desktop installation with the supported AnkiConnect API. Install dependencies and start the loopback server:
@@ -67,9 +69,15 @@ npm run dev:web
 
 Open `http://127.0.0.1:43110` in a browser. You can preview and save imports locally while Anki is closed. Refreshing connection status and choosing a displayed deck do not change Anki. Stop the server with `Ctrl+C`.
 
+For the existing isolated Windows test collection, close Anki normally and run `npm run anki:test`, then refresh the app's Anki connection. This opens `.tools/anki-av004` with its supported add-on and disposable **User 1** profile. Opening Anki from its ordinary shortcut uses your regular collection instead; it does not select this test setup. The command refuses to start while any Anki instance is running, and it never closes Anki, copies add-ons into your regular collection, or creates a missing test collection. Fresh machines must first prepare the disposable setup described in [Anki feasibility evidence](docs/ANKI_FEASIBILITY.md); optionally set `ANKI_EXECUTABLE` if Anki is installed outside `%LOCALAPPDATA%\Programs\Anki\Anki.exe`.
+
 After changing server or shared TypeScript code during development, stop and rerun `npm run dev:web`, then reload the browser page. The browser updates its UI automatically, but this command does not restart the Node server.
 
-For speech, set `ELEVENLABS_API_KEY` in the terminal environment before starting the server. The initial voice is Sarah with `eleven_multilingual_v2`, normal speed, and MP3 output. Without a key, saved audio remains available for playback; generation is disabled. Approve a card, choose one item or a batch, review the provider/voice/format/count and reported allowance, then confirm generation. Queue audio can prepare all missing or selected placements across saved approved cards; it shows combined totals and deduplicates matching speech. The server rechecks approval and free allowance, preserves successes on partial failure, and requires an explicit retry for remaining work. Closing the browser may leave the current server request finishing; prepare again to resume missing queue items. Changing content clears approval; after reapproval, old clips appear for comparison and exact cached speech can be reused. Fish Audio and selectable voices/voice groups remain future work.
+For speech, use **Speech settings** in the app: paste your ElevenLabs key once and choose **Validate and save key**. The server checks account access, stores the key with Windows encryption outside the card/audio workspace, and activates it immediately. Later starts reuse it and automatically check allowance. You can check the account, replace the key, or remove it in the same panel. Saved audio remains playable when no key is configured. See [storage boundaries and recovery](docs/SPEECH_SETTINGS.md).
+
+The optional `npm run dev:web:with-key` hidden terminal prompt remains available for a temporary key; it does not persist the key. If delivery reports incomplete or stale selected audio, generate or retry those items first, then prepare a new delivery preview.
+
+The initial voice is Sarah with `eleven_multilingual_v2`, normal speed, and MP3 output. Approve a card, choose one item or a batch, review the provider/voice/format/count and reported allowance, then confirm generation. Queue audio can prepare all missing or selected placements across saved approved cards; it shows combined totals and deduplicates matching speech. The server rechecks approval and free allowance, preserves successes on partial failure, and requires an explicit retry for remaining work. Closing the browser may leave the current server request finishing; prepare again to resume missing queue items. Changing content clears approval; after reapproval, old clips appear for comparison and exact cached speech can be reused. Fish Audio and selectable voices/voice groups remain future work.
 
 Run the complete local validation with:
 
@@ -97,6 +105,8 @@ You can request changes in plain English; keep accepted scope and decisions in t
 
 AV-028 through AV-033 are merged. Initial Sarah selection and one-item playback evidence are recorded; complete card-audio listening and human milestone acceptance remain pending. Fish Audio and individual voice/voice-group selection remain future improvements.
 
+AV-034 creation delivery is prepared for review. Select an existing normal destination deck and saved cards, preview per-item decisions, acknowledge card/audio review, then explicitly confirm Send. Selected audio must be complete for the exact approved revision. Delivery intent and receipts persist in `delivery/delivery.json` inside the local application data directory. Reconnection and restart never send automatically. A source already delivered with different content or audio is blocked until the AV-035 update workflow is implemented.
+
 The product owner judges whether the cards and voices are useful for learning and accepts milestone demonstrations. Each developer owns their assigned changes and evidence; another developer reviews them. Codex helps implement, explain, test, and document work within an assigned task.
 
-Use the [reusable task prompt](docs/AI_TASK_WORKFLOW.md#reusable-implementation-assignment) for a selected task. The team should agree readiness and ownership before implementation. Provider keys currently belong only in the documented local environment configuration; never paste them into chat or commit them to source control.
+Use the [reusable task prompt](docs/AI_TASK_WORKFLOW.md#reusable-implementation-assignment) for a selected task. The team should agree readiness and ownership before implementation. Provider keys belong in the documented server-side encrypted storage or temporary environment configuration; never paste them into chat or commit them to source control.

@@ -61,6 +61,10 @@ This accepted local web requirement supersedes the earlier front/examples-only s
 
 Alternative card types, cloze deletion, extra quizzes, rankings, and summaries are outside this specification unless the user explicitly requests them.
 
+## Anki storage fields
+
+The official structure above governs the rendered teaching card. The local delivery implementation uses distinct Anki fields for that content and its audio, plus internal identity/tracking fields that are visible in Anki's editor but excluded from the study templates. Those internal fields are implementation metadata, not prompt-defined teaching sections. The [Anki note structure review](ANKI_NOTE_STRUCTURE.md) documents the current mapping, actual metadata uses, a recommended smaller layout, and the compatibility work needed before changing existing notes. The recommendation has not changed the current note schema or this teaching structure.
+
 ## Original user prompt
 
 The following preserves the supplied prompt's wording and order. The contract above makes the application's proposed interpretation explicit; it does not replace the original learning requirements.

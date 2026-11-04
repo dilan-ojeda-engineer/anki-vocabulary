@@ -12,6 +12,16 @@ import { previewImport } from './card-import';
 import type { WorkspaceStore } from './workspace';
 import { z } from 'zod';
 import type { AudioService } from './audio-service';
+import { SpeechAllowanceError } from './elevenlabs';
+import { SpeechSettingsError } from './speech-settings';
+import type { SpeechSettingsService } from './speech-settings';
+import { speechSettingsRequestSchema } from '../shared/speech-settings';
+import { DeliveryError } from './delivery-service';
+import type { DeliveryService } from './delivery-service';
+import {
+  deliveryRequestSchema,
+  deliveryConfirmSchema,
+} from '../shared/delivery';
 import {
   audioBatchRequestSchema,
   audioGenerateRequestSchema,
@@ -43,6 +53,8 @@ export function createApiHandler(options: {
   workspace?: WorkspaceStore;
   sessionToken?: string;
   audio?: AudioService;
+  delivery?: DeliveryService;
+  speechSettings?: SpeechSettingsService;
 }) {
   return async (
     request: IncomingMessage,
@@ -59,6 +71,152 @@ export function createApiHandler(options: {
     const origin = request.headers.origin;
     if (origin && !options.expectedOrigins.has(origin)) {
       sendJson(response, 403, { error: 'origin-not-allowed' });
+      return true;
+    }
+    if (url.pathname === '/api/speech/settings') {
+      if (!options.speechSettings) {
+        sendJson(response, 503, { error: 'settings-unavailable' });
+        return true;
+      }
+      if (request.method === 'GET') {
+        sendJson(
+          response,
+          200,
+          options.speechSettings.status(),
+          options.sessionToken
+            ? { 'X-Workspace-Token': options.sessionToken }
+            : {},
+        );
+        return true;
+      }
+      if (request.method !== 'POST') {
+        sendJson(response, 405, { error: 'method-not-allowed' });
+        return true;
+      }
+      if (
+        !origin ||
+        !options.expectedOrigins.has(origin) ||
+        !options.sessionToken ||
+        request.headers['x-workspace-token'] !== options.sessionToken ||
+        request.headers['content-type']?.split(';')[0] !== 'application/json'
+      ) {
+        sendJson(response, 403, { error: 'request-not-allowed' });
+        return true;
+      }
+      const chunks: Buffer[] = [];
+      let size = 0;
+      for await (const chunk of request) {
+        const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        size += bytes.length;
+        if (size > 2048) {
+          sendJson(response, 413, { error: 'too-large' });
+          return true;
+        }
+        chunks.push(bytes);
+      }
+      try {
+        const input = speechSettingsRequestSchema.safeParse(
+          JSON.parse(Buffer.concat(chunks).toString('utf8')),
+        );
+        if (!input.success) {
+          sendJson(response, 400, { error: 'invalid-settings-request' });
+          return true;
+        }
+        sendJson(
+          response,
+          200,
+          await options.speechSettings.action(input.data),
+        );
+      } catch (error) {
+        sendJson(response, 400, {
+          error:
+            error instanceof SpeechSettingsError
+              ? error.code
+              : 'settings-request-failed',
+        });
+      }
+      return true;
+    }
+    if (url.pathname.startsWith('/api/delivery/')) {
+      if (!options.delivery) {
+        sendJson(response, 503, { error: 'delivery-unavailable' });
+        return true;
+      }
+      if (url.pathname === '/api/delivery/status' && request.method === 'GET') {
+        try {
+          sendJson(response, 200, await options.delivery.status());
+        } catch {
+          sendJson(response, 500, { error: 'delivery-storage-unavailable' });
+        }
+        return true;
+      }
+      if (
+        !['/api/delivery/prepare', '/api/delivery/send'].includes(url.pathname)
+      ) {
+        sendJson(response, 404, { error: 'not-found' });
+        return true;
+      }
+      if (request.method !== 'POST') {
+        sendJson(response, 405, { error: 'method-not-allowed' });
+        return true;
+      }
+      if (
+        !origin ||
+        !options.expectedOrigins.has(origin) ||
+        !options.sessionToken ||
+        request.headers['x-workspace-token'] !== options.sessionToken ||
+        request.headers['content-type']?.split(';')[0] !== 'application/json'
+      ) {
+        sendJson(response, 403, { error: 'request-not-allowed' });
+        return true;
+      }
+      const chunks: Buffer[] = [];
+      let size = 0;
+      for await (const chunk of request) {
+        const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        size += bytes.length;
+        if (size > 100_000) {
+          sendJson(response, 413, { error: 'too-large' });
+          return true;
+        }
+        chunks.push(bytes);
+      }
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+      } catch {
+        sendJson(response, 400, { error: 'invalid-json' });
+        return true;
+      }
+      try {
+        if (url.pathname === '/api/delivery/prepare') {
+          const input = deliveryRequestSchema.safeParse(parsed);
+          if (!input.success) {
+            sendJson(response, 400, { error: 'invalid-request' });
+            return true;
+          }
+          sendJson(response, 200, await options.delivery.prepare(input.data));
+        } else {
+          const input = deliveryConfirmSchema.safeParse(parsed);
+          if (!input.success) {
+            sendJson(response, 400, { error: 'invalid-request' });
+            return true;
+          }
+          sendJson(
+            response,
+            200,
+            await options.delivery.send(input.data.previewId),
+          );
+        }
+      } catch (error) {
+        sendJson(response, 400, {
+          error: 'delivery-blocked',
+          message:
+            error instanceof DeliveryError
+              ? error.message
+              : 'Delivery unavailable. Check Anki, the selected collection/deck, approvals, and saved receipts.',
+        });
+      }
       return true;
     }
     const mediaKey = /^\/api\/audio\/([a-f0-9]{64})$/.exec(url.pathname)?.[1];
@@ -152,6 +310,7 @@ export function createApiHandler(options: {
             sendJson(response, 503, { error: 'audio-unavailable' });
             return true;
           }
+          const audio = options.audio;
           const ref = approveCardRequestSchema.parse({
             expectedRevision: input.data.expectedRevision,
             expectedContentHash:
@@ -159,22 +318,25 @@ export function createApiHandler(options: {
                 ? input.data.expectedContentHash
                 : undefined,
           });
-          const result =
+          const execute = async () =>
             action === 'audio-review'
-              ? await options.audio.review(
+              ? await audio.review(
                   cardId,
                   ref.expectedRevision,
                   ref.expectedContentHash,
                 )
               : action === 'audio-prepare'
-                ? await options.audio.prepare(
+                ? await audio.prepare(
                     cardId,
                     audioBatchRequestSchema.parse(input.data),
                   )
-                : await options.audio.generate(
+                : await audio.generate(
                     cardId,
                     audioGenerateRequestSchema.parse(input.data),
                   );
+          const result = options.speechSettings
+            ? await options.speechSettings.withCredentials(execute)
+            : await execute();
           sendJson(response, 200, result);
           return true;
         }
@@ -206,15 +368,18 @@ export function createApiHandler(options: {
       } catch (error) {
         const message = error instanceof Error ? error.message : '';
         const audioError =
-          message === 'Speech provider is not configured.'
-            ? 'speech-not-configured'
-            : message === 'Speech allowance could not be verified.'
-              ? 'allowance-check-failed'
-              : message === 'Confirmed free speech allowance is unavailable.'
-                ? 'free-allowance-unavailable'
-                : message === 'Audio preview expired. Prepare the batch again.'
-                  ? 'audio-preview-expired'
-                  : null;
+          error instanceof SpeechAllowanceError
+            ? error.code
+            : message === 'Speech provider is not configured.'
+              ? 'speech-not-configured'
+              : message === 'Speech allowance could not be verified.'
+                ? 'allowance-check-failed'
+                : message === 'Confirmed free speech allowance is unavailable.'
+                  ? 'free-allowance-unavailable'
+                  : message ===
+                      'Audio preview expired. Prepare the batch again.'
+                    ? 'audio-preview-expired'
+                    : null;
         sendJson(
           response,
           message === 'Stale card revision.'

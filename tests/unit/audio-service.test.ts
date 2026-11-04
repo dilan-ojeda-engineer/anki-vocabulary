@@ -92,6 +92,45 @@ async function setup(
   return { directory, workspace, card, provider, allowance, service, input };
 }
 
+it('activates and removes credentials without rebuilding the audio service or losing cached playback', async () => {
+  const { directory, workspace, card, provider, allowance, input } =
+    await setup();
+  let active: SpeechProvider | null = null;
+  const service = new AudioService(
+    join(directory, 'audio'),
+    workspace,
+    () => active,
+    allowance,
+  );
+  await workspace.approve(card.id, input);
+  expect(
+    (await service.review(card.id, card.revision, card.contentHash))
+      .configuration,
+  ).toBe(null);
+  await expect(service.prepare(card.id, input)).rejects.toThrow(
+    'not configured',
+  );
+  active = provider;
+  const preview = await service.prepare(card.id, input);
+  const result = await service.generate(card.id, {
+    ...input,
+    preflightId: preview.id,
+  });
+  expect(
+    result.items.filter((item) => item.audioState === 'complete'),
+  ).toHaveLength(2);
+  active = null;
+  await expect(service.prepare(card.id, input)).rejects.toThrow(
+    'not configured',
+  );
+  const offline = await service.review(
+    card.id,
+    card.revision,
+    card.contentHash,
+  );
+  expect(offline.items.filter((item) => !!item.artifactKey)).toHaveLength(2);
+});
+
 it('rejects unapproved, stale, tampered and unpreviewed generation commands', async () => {
   let calls = 0;
   const { service, workspace, card, input } = await setup(async () => {

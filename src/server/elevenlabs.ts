@@ -3,11 +3,23 @@ import { SpeechFailure } from './audio-cache';
 import type { SpeechProvider } from './audio-cache';
 import type { AudioAllowance } from './audio-service';
 
+export class SpeechAllowanceError extends Error {
+  constructor(
+    readonly code:
+      | 'speech-account-access-denied'
+      | 'speech-account-rate-limited'
+      | 'allowance-check-failed',
+  ) {
+    super('Speech allowance could not be verified.');
+  }
+}
+
 export async function readElevenLabsAllowance(
   apiKey: string,
+  fetcher: typeof fetch = fetch,
 ): Promise<AudioAllowance> {
   try {
-    const response = await fetch(
+    const response = await fetcher(
       'https://api.elevenlabs.io/v1/user/subscription',
       {
         headers: { 'xi-api-key': apiKey },
@@ -15,10 +27,19 @@ export async function readElevenLabsAllowance(
         signal: AbortSignal.timeout(20_000),
       },
     );
-    if (!response.ok) throw new Error('unavailable');
+    if (!response.ok) {
+      await response.body?.cancel();
+      throw new SpeechAllowanceError(
+        response.status === 401 || response.status === 403
+          ? 'speech-account-access-denied'
+          : response.status === 429
+            ? 'speech-account-rate-limited'
+            : 'allowance-check-failed',
+      );
+    }
     const data = z
       .object({
-        tier: z.string(),
+        tier: z.string().max(80),
         character_count: z.number().nonnegative(),
         character_limit: z.number().nonnegative(),
         can_extend_character_limit: z.boolean(),
@@ -30,8 +51,9 @@ export async function readElevenLabsAllowance(
       limit: data.character_limit,
       canExtend: data.can_extend_character_limit,
     };
-  } catch {
-    throw new Error('Speech allowance could not be verified.');
+  } catch (error) {
+    if (error instanceof SpeechAllowanceError) throw error;
+    throw new SpeechAllowanceError('allowance-check-failed');
   }
 }
 

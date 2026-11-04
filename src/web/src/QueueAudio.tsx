@@ -4,7 +4,7 @@ import type {
   AudioBatchRequest,
   AudioPreflight,
 } from '../../shared/audio-generation';
-import { prepareAudio, generateAudio } from './api';
+import { prepareAudio, generateAudio, AudioRequestError } from './api';
 import { hasBlockingAudioFailure } from '../../shared/audio-generation';
 
 type PreparedCard = {
@@ -99,9 +99,11 @@ export function QueueAudio({
       setPrepared(cards);
       if (!cards.length)
         setMessage('No eligible audio items in the saved approved cards.');
-    } catch {
+    } catch (error) {
       setMessage(
-        'Could not prepare the queue. Check free allowance, speech configuration, and approvals; try a smaller selection if needed.',
+        error instanceof AudioRequestError
+          ? error.message
+          : 'Could not prepare the queue. Check free allowance, speech configuration, and approvals; try a smaller selection if needed.',
       );
     } finally {
       setBusy(false);

@@ -10,6 +10,7 @@ import {
 } from './audio-cache';
 import type { SpeechProvider } from './audio-cache';
 import type { WorkspaceStore } from './workspace';
+import { requireApprovedCard } from './workspace';
 import { extractAudioItems } from '../shared/audio-plan';
 import type {
   AudioBatchRequest,
@@ -57,11 +58,18 @@ export class AudioService {
   constructor(
     private readonly directory: string,
     private readonly workspace: WorkspaceStore,
-    private readonly provider: SpeechProvider | null,
+    private readonly providerSource:
+      SpeechProvider | null | (() => SpeechProvider | null),
     private readonly readAllowance: () => Promise<AudioAllowance>,
     private readonly voiceName = 'Sarah',
   ) {
     this.cache = new AudioCache(join(directory, 'artifacts'));
+  }
+
+  private get provider(): SpeechProvider | null {
+    return typeof this.providerSource === 'function'
+      ? this.providerSource()
+      : this.providerSource;
   }
 
   async review(
@@ -194,6 +202,27 @@ export class AudioService {
     if (!manifest.records.some((record) => record.artifactKey === key))
       return null;
     return this.cache.read(key);
+  }
+
+  /** Used only with a server-loaded card while the workspace approval lock is held. */
+  async deliveryAudio(card: Workspace['cards'][number]) {
+    requireApprovedCard(card);
+    const selected = card.audioSelection?.placementIds ?? [];
+    if (!selected.length)
+      throw new Error('Select at least one audio placement before delivery.');
+    const review = await this.reviewCard(card);
+    const results = [];
+    for (const placementId of selected) {
+      const item = review.items.find(
+        (item) => item.placementId === placementId,
+      );
+      if (!item || item.audioState !== 'complete' || !item.artifactKey)
+        throw new Error('Selected audio is incomplete or stale.');
+      const media = await this.cache.read(item.artifactKey);
+      if (!media) throw new Error('Selected audio is unavailable.');
+      results.push({ placementId, key: item.artifactKey, ...media });
+    }
+    return results;
   }
 
   private signature(id: string, input: AudioBatchRequest) {

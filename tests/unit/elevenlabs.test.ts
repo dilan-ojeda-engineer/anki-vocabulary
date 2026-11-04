@@ -1,11 +1,70 @@
 import { expect, it } from 'vitest';
-import { ElevenLabsProvider } from '../../src/server/elevenlabs';
+import {
+  ElevenLabsProvider,
+  readElevenLabsAllowance,
+} from '../../src/server/elevenlabs';
 
 const input = {
   apiKey: 'fake-private-key',
   voiceId: 'fixture-voice',
   modelId: 'fixture-model',
 };
+
+it('classifies account check failures without exposing provider bodies or transport details', async () => {
+  for (const [status, code] of [
+    [401, 'speech-account-access-denied'],
+    [403, 'speech-account-access-denied'],
+    [429, 'speech-account-rate-limited'],
+    [503, 'allowance-check-failed'],
+  ] as const) {
+    await expect(
+      readElevenLabsAllowance(
+        input.apiKey,
+        async () => new Response('private-provider-detail', { status }),
+      ),
+    ).rejects.toMatchObject({
+      code,
+      message: 'Speech allowance could not be verified.',
+    });
+  }
+  await expect(
+    readElevenLabsAllowance(input.apiKey, async () => {
+      throw new Error('private transport detail');
+    }),
+  ).rejects.toMatchObject({
+    code: 'allowance-check-failed',
+    message: 'Speech allowance could not be verified.',
+  });
+  await expect(
+    readElevenLabsAllowance(input.apiKey, async () =>
+      Response.json({ private: 'detail' }),
+    ),
+  ).rejects.toMatchObject({ code: 'allowance-check-failed' });
+});
+
+it('reads validated allowance through the account endpoint', async () => {
+  const result = await readElevenLabsAllowance(
+    input.apiKey,
+    async (url, options) => {
+      expect(String(url)).toBe(
+        'https://api.elevenlabs.io/v1/user/subscription',
+      );
+      expect(options?.redirect).toBe('error');
+      return Response.json({
+        tier: 'free',
+        character_count: 12,
+        character_limit: 10000,
+        can_extend_character_limit: false,
+      });
+    },
+  );
+  expect(result).toEqual({
+    tier: 'free',
+    used: 12,
+    limit: 10000,
+    canExtend: false,
+  });
+});
 
 it('sends exact text and explicit voice settings to the fixed speech endpoint', async () => {
   const fetcher: typeof fetch = async (url, options) => {
